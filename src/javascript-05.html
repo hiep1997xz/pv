@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>JavaScript 05 — this · call/apply/bind · arrow</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">JavaScript</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">05 / 10</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">this · call/apply/bind · arrow</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Xác định this trong một hàm dựa vào cái gì?</span></div>
+      <div class="q"><i>?</i><span>Vì sao truyền method làm callback thì mất this?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><code>this</code> xác định lúc <b>gọi</b>, không phải lúc khai báo. 4 quy tắc ưu tiên giảm dần: <code>new</code> → <code>call</code>/<code>apply</code>/<code>bind</code> → gọi qua object <code>o.f()</code> → gọi trơn.</li>
+      <li>Gọi trơn: strict mode cho <code>this = undefined</code>, sloppy mode cho <code>globalThis</code>. Class body và ES module <b>luôn strict</b>, nên lỗi thường hiện ra dưới dạng <code>TypeError</code>.</li>
+      <li><b>Arrow không có this riêng</b> — nó lấy <code>this</code> của scope bao ngoài lúc định nghĩa. Vì thế <code>call</code>/<code>bind</code> không đổi được <code>this</code> của arrow.</li>
+      <li>Tách <code>o.f</code> ra biến, hay truyền vào <code>setTimeout</code>/<code>addEventListener</code>, là mất luôn object gọi. Sửa bằng <code>f.bind(o)</code> hoặc bọc arrow <code>() =&gt; o.f()</code>.</li>
+      <li><code>call(o, a, b)</code> gọi ngay với danh sách tham số, <code>apply(o, [a, b])</code> gọi ngay với mảng, <code>bind(o)</code> <b>không gọi</b> mà trả về hàm mới đã khoá <code>this</code>.</li>
+    </ul>
+    <pre class="code"><span class="k">class</span> Counter {
+  n = 0;
+  incBad() { this.n++; }          <span class="c">// method nằm trên prototype</span>
+  incOk = () =&gt; { this.n++; };    <span class="c">// class field arrow: this khoá vào c</span>
+}
+<span class="k">const</span> c = <span class="k">new</span> Counter();
+<span class="k">const</span> bad = c.incBad, ok = c.incOk;
+
+<span class="c bad">// ❌ tách khỏi object → this = undefined (class luôn strict)</span>
+try { bad(); } catch (e) { console.log(e.name); }   <span class="c">// TypeError</span>
+
+ok();                       <span class="c good">// ✅ arrow giữ nguyên this</span>
+c.incBad.call(c);           <span class="c good">// ✅ ép this bằng call</span>
+setTimeout(c.incBad.bind(c), 0);   <span class="c good">// ✅ bind trả về hàm mới</span>
+console.log(c.n);           <span class="c">// 2 — sau timeout thành 3</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Rất khó tìm: cùng một lỗi mất <code>this</code> mà hai nơi biểu hiện khác nhau. Trong class (strict) nó ném <code>TypeError</code> ngay; trong hàm thường sloppy mode <code>this</code> thành <code>globalThis</code> nên code <b>âm thầm</b> ghi biến toàn cục.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Arrow không chỉ thiếu <code>this</code>: nó cũng không có <code>arguments</code>, không có <code>prototype</code>, không gọi được bằng <code>new</code>, và không làm generator được. Kể đủ danh sách này là điểm cộng rõ.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

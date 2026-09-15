@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>JavaScript 10 — ES Module · CommonJS · tree-shaking</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">JavaScript</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">10 / 10</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">ES Module · CommonJS · tree-shaking</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Vì sao ESM tree-shake được còn CommonJS thì không?</span></div>
+      <div class="q"><i>?</i><span>import và require khác nhau ở những điểm nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><code>import</code>/<code>export</code> là <b>tĩnh</b>: phải ở top-level, tên xác định lúc compile. <code>require</code> là <b>lời gọi hàm</b> chạy lúc runtime, đường dẫn còn ghép chuỗi được.</li>
+      <li>Vì tĩnh nên bundler dựng được đồ thị phụ thuộc và <b>cắt bỏ export không ai dùng</b> (tree-shaking). Với CJS, <code>exports</code> là object thường, sửa được lúc chạy nên bundler không dám cắt.</li>
+      <li>ESM dùng <b>live binding</b>: biến import trỏ tới ô nhớ trong module gốc, giá trị đổi thì bên import thấy ngay. <code>require</code> thì <b>copy giá trị</b> tại thời điểm gọi.</li>
+      <li>ESM luôn strict, được phân giải trước khi chạy, load bất đồng bộ, có top-level <code>await</code>. CJS load đồng bộ, có <code>__dirname</code> và <code>module.exports</code>.</li>
+      <li><code>import()</code> động trả về promise → code-splitting, nạp theo route. Circular dependency: ESM chịu được vì binding phân giải trước (có thể dính TDZ), CJS trả về <code>exports</code> dang dở.</li>
+    </ul>
+    <pre class="code"><span class="c">// m.mjs</span>
+<span class="k">export</span> <span class="k">let</span> count = 0;
+<span class="k">export</span> <span class="k">function</span> inc() { count++; }
+
+<span class="c">// main.mjs — live binding: biến import trỏ vào ô nhớ của module gốc</span>
+<span class="k">import</span> { count, inc } <span class="k">from</span> <span class="s">'./m.mjs'</span>;
+console.log(count);     <span class="c">// 0</span>
+inc();
+console.log(count);     <span class="c good">// ✅ 1 — thấy ngay giá trị mới</span>
+
+<span class="c">// CommonJS: destructuring copy giá trị ngay lúc require</span>
+<span class="k">const</span> { count: c, inc: i } = require(<span class="s">'./m.cjs'</span>);
+i();
+console.log(c);         <span class="c bad">// ❌ 0 — c là bản copy, không bao giờ đổi</span>
+<span class="k">const</span> heavy = <span class="k">await</span> <span class="k">import</span>(<span class="s">'./heavy.mjs'</span>);   <span class="c">// dynamic, tách bundle</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Tình huống thực chiến: <code>import</code> được <b>hoisted</b> — mọi module phụ thuộc chạy xong trước dòng code đầu tiên của file. Nên đặt một lệnh cấu hình kiểu <code>dotenv.config()</code> phía trên các <code>import</code> sẽ <b>không ăn</b>; với <code>require</code> thì lại ăn.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Tree-shaking chỉ thực sự hiệu quả khi package khai báo <code>"sideEffects": false</code> và ship kèm bản ESM. Import cả namespace bằng <code>import * as _</code>, hoặc dùng package chỉ có bản CJS, là bundle phình ngay.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

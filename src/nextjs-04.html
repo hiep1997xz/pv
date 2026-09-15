@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Next.js 04 — SSR · SSG · ISR · Streaming</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Next.js</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">04 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">SSR · SSG · ISR · Streaming</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Next quyết định static hay dynamic dựa vào cái gì?</span></div>
+      <div class="q"><i>?</i><span>generateStaticParams dùng để làm gì?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Không còn <code>getServerSideProps</code>. Next <b>tự suy ra</b>: route chỉ dùng dữ liệu cache được thì render <b>static</b> lúc build; chạm vào dynamic API thì render <b>dynamic</b> mỗi request.</li>
+      <li>Dynamic API gồm <code>cookies()</code>, <code>headers()</code>, <code>searchParams</code>, <code>draftMode()</code>. Next 15 chúng là async, phải <code>await</code>. Ép tay bằng <code>export const dynamic</code>.</li>
+      <li><b>ISR</b> = static + <code>revalidate</code>: trả bản cũ ngay, nền dựng lại bản mới (stale-while-revalidate). Không phải build lại cả site.</li>
+      <li><code>generateStaticParams</code> liệt kê trước các <code>[slug]</code> cần prerender. Param ngoài danh sách vẫn render on-demand, trừ khi đặt <code>dynamicParams = false</code> → trả 404.</li>
+      <li><b>Streaming</b>: <code>loading.tsx</code> hoặc <code>&lt;Suspense&gt;</code> cho phép gửi shell HTML ra trước, phần chậm đẩy xuống sau — TTFB không còn phụ thuộc query chậm nhất.</li>
+    </ul>
+    <pre class="code"><span class="c">// app/blog/[slug]/page.tsx</span>
+<span class="k">export</span> <span class="k">async</span> <span class="k">function</span> generateStaticParams() {
+  <span class="k">const</span> posts = <span class="k">await</span> getTopPosts();
+  <span class="k">return</span> posts.map(p =&gt; ({ slug: p.slug }));  <span class="c good">// ✅ prerender lúc build</span>
+}
+<span class="k">export</span> <span class="k">const</span> revalidate = 3600;    <span class="c">// ISR: làm mới mỗi giờ</span>
+<span class="k">export</span> <span class="k">const</span> dynamicParams = true; <span class="c">// slug lạ vẫn render on-demand</span>
+
+<span class="c">// Streaming: shell ra ngay, phần chậm chờ sau</span>
+<span class="k">export</span> default <span class="k">function</span> Page() {
+  <span class="k">return</span> &lt;main&gt;
+    &lt;Header /&gt;
+    &lt;Suspense fallback={&lt;Skeleton /&gt;}&gt;&lt;SlowFeed /&gt;&lt;/Suspense&gt;
+  &lt;/main&gt;;
+}</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Lỗi rất hay gặp: bọc <code>&lt;Suspense&gt;</code> nhưng lại <code>await</code> ngay ở component cha rồi mới truyền kết quả xuống → cha bị chặn, streaming thành vô nghĩa. Phần <code>await</code> phải nằm <b>bên trong</b> component đặt dưới Suspense.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> <b>Partial Prerendering</b> ghép cả hai: shell static phục vụ từ CDN, lỗ dynamic stream vào cùng một response. Đây vẫn là tính năng experimental — nói rõ "chưa stable" để khỏi hớ khi bị hỏi sâu.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

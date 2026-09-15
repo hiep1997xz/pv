@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Thực Chiến 03 — Auth · Access token &amp; Refresh token</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Thực Chiến</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">03 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Auth · Access token & Refresh token</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Lưu access token ở localStorage có an toàn không?</span></div>
+      <div class="q"><i>?</i><span>Nhiều request cùng dính 401 thì refresh ra sao?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Cookie <b>httpOnly + Secure + SameSite</b>: JS không đọc được nên XSS không lấy được token ra ngoài. <code>localStorage</code> thì mọi script trên trang, kể cả thư viện bên thứ ba, đều đọc được.</li>
+      <li>Access token sống ngắn (5–15 phút), refresh token sống dài và nên <b>rotate</b> mỗi lần dùng. Server phát hiện refresh token cũ bị dùng lại thì thu hồi cả phiên.</li>
+      <li><b>Refresh ngầm</b>: interceptor bắt 401 → gọi <code>/auth/refresh</code> → phát lại request cũ. Bắt buộc có cờ <code>_retry</code> để không lặp vô hạn khi refresh cũng 401.</li>
+      <li>Gộp refresh bằng <b>single-flight</b>: giữ một promise dùng chung, mọi request 401 cùng chờ promise đó rồi mới chạy lại.</li>
+      <li>Đăng xuất nhiều tab: phát tín hiệu qua <code>BroadcastChannel</code> hoặc sự kiện <code>storage</code>. Dùng cookie thì phải chống CSRF: SameSite=Lax/Strict, thêm CSRF token cho request cross-site.</li>
+    </ul>
+    <pre class="code"><span class="k">let</span> refreshing: Promise&lt;unknown&gt; | null = null;
+
+api.interceptors.response.use(undefined, <span class="k">async</span> (err) =&gt; {
+  <span class="k">const</span> req = err.config;
+  <span class="k">if</span> (err.response?.status !== 401 || req._retry) throw err;
+  req._retry = true;                      <span class="c good">// ✅ chỉ thử lại đúng 1 lần</span>
+  <span class="c good">// ✅ gộp N request 401 vào 1 lần refresh (single-flight)</span>
+  refreshing ??= api
+    .post(<span class="s">'/auth/refresh'</span>)
+    .finally(() =&gt; { refreshing = null; });
+
+  <span class="k">await</span> refreshing;
+  <span class="k">return</span> api(req);                        <span class="c">// phát lại request cũ</span>
+});</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Không gộp refresh là bug khó chịu nhất: 8 request song song cùng 401 → bắn 8 lần refresh. Với refresh token rotation, lần đầu đổi token xong thì 7 lần sau cầm token đã cũ → server coi là tái sử dụng và <b>đá user ra</b> ngẫu nhiên.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Đừng nói httpOnly cookie là miễn nhiễm XSS. Kẻ tấn công tuy không đọc được token nhưng vẫn <b>gọi API thay mặt user</b> ngay trên tab đó. httpOnly chỉ chặn việc mang token đi nơi khác.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>System Design 05 — Message queue · Xử lý bất đồng bộ</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">System Design</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">05 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Message queue · Xử lý bất đồng bộ</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Khi nào nên đẩy việc sang message queue?</span></div>
+      <div class="q"><i>?</i><span>At-least-once và exactly-once khác nhau chỗ nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Dùng queue cho việc <b>nặng</b>, <b>chậm</b> hoặc <b>được phép trễ</b>: gửi mail, resize ảnh, xuất báo cáo, gọi bên thứ ba. Request trả <code>202 Accepted</code> ngay, worker làm phần còn lại.</li>
+      <li>Queue còn để <b>giảm chấn</b>: traffic tăng đột biến thì queue phình ra thay vì DB gục. Nhưng queue dài nghĩa là người dùng chờ lâu — phải giám sát <b>consumer lag</b> và cảnh báo sớm.</li>
+      <li><b>At-least-once</b> là mặc định thực tế: ack sau khi xử lý xong, worker chết giữa chừng thì message được giao lại → <b>có thể trùng</b>. Vì vậy consumer bắt buộc phải <b>idempotent</b>.</li>
+      <li><b>Exactly-once</b> đầu-cuối gần như không tồn tại. Thứ người ta gọi là exactly-once thường là at-least-once cộng khử trùng theo message id. Nói thẳng điều này rất ghi điểm.</li>
+      <li><b>DLQ</b> hứng message fail quá số lần retry để không chặn queue chính — phải có alert và công cụ replay. <b>Backpressure</b>: giới hạn prefetch, không kéo message vô hạn về worker.</li>
+    </ul>
+    <pre class="code diagram"><span class="c bad">// ❌ đồng bộ: user ngồi chờ hết mọi việc mới thấy phản hồi</span>
+POST /order ─▸ ghi DB ─▸ gọi payment ─▸ gửi mail ─▸ 200  (ví dụ 3.5s)
+
+<span class="c good">// ✅ bất đồng bộ: trả về ngay, việc nặng đẩy sang worker</span>
+POST /order ─▸ ghi DB ─▸ push <span class="s">'order.mail'</span> ─▸ 202      (ví dụ 80ms)
+                              │
+                              ▼
+                     ┌────────────────┐
+                     │  worker: mail  │──▸ DLQ   <span class="c">// fail quá 3 lần</span>
+                     └────────────────┘
+
+<span class="c">// consumer idempotent: message giao lại lần hai cũng vô hại</span>
+<span class="k">if</span> (<span class="k">await</span> daXuLy(msg.id)) <span class="k">return</span> ack(msg);
+<span class="k">await</span> xuLy(msg); <span class="k">await</span> ghiNhan(msg.id); <span class="k">return</span> ack(msg);</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Trả lời “dùng Kafka là có exactly-once” là sập bẫy. Hỏi vặn ngay: worker xử lý xong nhưng chết <b>trước khi ack</b> thì sao? → message được giao lại, khách bị trừ tiền hai lần nếu consumer không idempotent.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Phân biệt queue và log: RabbitMQ hay SQS lấy message ra là mất, hợp với task. Kafka giữ log theo <b>offset</b>, nhiều consumer group đọc lại được — hợp với event streaming và nhu cầu replay.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

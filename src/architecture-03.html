@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Kiến Trúc FE 03 — Bảo mật phía frontend</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Kiến Trúc FE</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">03 / 06</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Bảo mật phía frontend</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>XSS có mấy dạng và bạn chặn bằng cách nào?</span></div>
+      <div class="q"><i>?</i><span>Ẩn nút “Xoá” với user thường đã đủ an toàn chưa?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>XSS</b> có 3 dạng: <b>stored</b> (payload nằm trong DB, bung ra với mọi người xem), <b>reflected</b> (payload đi theo URL), <b>DOM-based</b> (JS phía client tự nhét dữ liệu bẩn vào DOM).</li>
+      <li>React <b>tự escape</b> nội dung trong JSX. Lỗ hổng mở ra khi dùng <code>dangerouslySetInnerHTML</code>, <code>innerHTML</code>, hoặc <code>href</code> nhận chuỗi <code>javascript:</code>. Cần render HTML thì <b>sanitize bằng DOMPurify</b>.</li>
+      <li><b>CSRF</b>: trình duyệt tự gửi cookie kèm request. Chặn bằng cookie <code>SameSite=Lax/Strict</code> + <code>HttpOnly</code> + <code>Secure</code>, và anti-CSRF token cho form đổi dữ liệu.</li>
+      <li><b>CSP</b> là lưới an toàn cuối: khai báo nguồn script hợp lệ, chặn inline script. Bật <code>report-only</code> trước để gom vi phạm rồi mới siết.</li>
+      <li>Mọi thứ trong bundle là <b>công khai</b> — <code>VITE_*</code>, <code>NEXT_PUBLIC_*</code> lộ hết. Không để API secret ở đó. <b>Kiểm tra quyền phải ở server</b>: ẩn nút chỉ là UX, kẻ tấn công gọi thẳng API.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ stored XSS: bình luận chứa &lt;img onerror=...&gt; chạy ngay</span>
+&lt;div dangerouslySetInnerHTML={{ __html: comment.body }} /&gt;
+
+<span class="c good">// ✅ sanitize bằng DOMPurify rồi mới render</span>
+<span class="k">import</span> DOMPurify <span class="k">from</span> <span class="s">'dompurify'</span>;
+<span class="k">const</span> clean = DOMPurify.sanitize(comment.body);
+&lt;div dangerouslySetInnerHTML={{ __html: clean }} /&gt;
+
+<span class="c bad">// ❌ chỉ ẩn nút = bảo mật giả, kẻ tấn công gọi thẳng API</span>
+{user.isAdmin &amp;&amp; &lt;DeleteButton /&gt;}
+
+<span class="c good">// ✅ header do server trả về</span>
+Content-Security-Policy: default-src <span class="s">'self'</span>; script-src <span class="s">'self'</span>
+Set-Cookie: sid=abc; HttpOnly; Secure; SameSite=Lax</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Câu trả lời trượt hay gặp: “để token trong <code>localStorage</code> cho tiện”. Dính XSS là script đọc sạch token. Cookie <code>HttpOnly</code> thì JS không đọc được — đổi lại phải xử lý CSRF. Biết <b>trade-off</b> này mới là câu trả lời đủ.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Nêu <b>defense in depth</b>: sanitize + CSP + <code>HttpOnly</code> cookie + kiểm tra quyền ở server, mỗi lớp bắt phần lớp trước sót. Thêm <code>npm audit</code> / Dependabot trong CI vì supply chain là đường vào hay bị bỏ quên nhất.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

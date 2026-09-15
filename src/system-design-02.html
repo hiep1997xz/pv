@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>System Design 02 — Scale · Load balancer · Stateless</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">System Design</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">02 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Scale · Load balancer · Stateless</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Scale ngang khác scale dọc ở điểm nào?</span></div>
+      <div class="q"><i>?</i><span>Vì sao app server bắt buộc phải stateless?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>Vertical</b> = nâng cấu hình một máy: nhanh, không đụng code, nhưng có trần phần cứng và vẫn là <b>một điểm chết duy nhất</b>. <b>Horizontal</b> = thêm máy: không trần, đổi lại phải lo state.</li>
+      <li><b>Stateless</b> nghĩa là app không giữ dữ liệu phiên trong RAM tiến trình. Request rơi vào máy nào cũng xử lý được → thêm máy, rút máy, deploy hay máy chết đều không mất phiên.</li>
+      <li>Session đặt ở <b>store dùng chung</b> (Redis) hoặc gói vào <b>JWT</b> phía client. JWT khỏi tra cứu nhưng khó thu hồi trước hạn — phải có TTL ngắn kèm refresh token, hoặc danh sách chặn.</li>
+      <li><b>Sticky session</b> ghim user vào một máy: dễ làm nhưng tải lệch, máy chết là mất phiên, auto-scale không rút được máy cũ. Coi nó là giải pháp tạm, không phải kiến trúc.</li>
+      <li><b>Health check</b>: LB gọi <code>/health</code> định kỳ, fail vài lần liên tiếp thì rút máy khỏi pool. Thuật toán hay dùng: round robin, least connections, consistent hashing.</li>
+    </ul>
+    <pre class="code diagram">              ┌────────────┐
+ client ─────▸│     LB     │  <span class="c">// health check, fail 3 lần → rút</span>
+              └─────┬──────┘
+        ┌───────────┼───────────┐
+        ▼           ▼           ▼
+    ┌───────┐   ┌───────┐   ┌───────┐  <span class="c">// app stateless: không giữ</span>
+    │ app 1 │   │ app 2 │   │ app 3 │  <span class="c">// session trong RAM tiến trình</span>
+    └───┬───┘   └───┬───┘   └───┬───┘
+        └───────────┼───────────┘
+                    ▼
+          ┌──────────────────┐
+          │  Redis  session  │  <span class="c good">// ✅ state dùng chung, máy nào</span>
+          └──────────────────┘  <span class="c">//    cũng đọc được phiên của user</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Đừng trả lời “cứ thêm server là scale được”. Câu vặn ngay sau đó: <b>session đang nằm ở đâu?</b> Nếu session nằm trong RAM từng app thì thêm máy = user bị đăng xuất ngẫu nhiên khi LB đổi đích.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Tách rõ phần <b>stateless</b> (app) và phần <b>stateful</b> (DB, Redis, file). Scale phần stateless là chuyện dễ; cái khó luôn nằm ở phần stateful — chủ động nói ra chỗ đó là ghi điểm.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

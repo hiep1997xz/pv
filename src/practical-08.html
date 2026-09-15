@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Thực Chiến 08 — Error tracking · Log · Feature flag</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Thực Chiến</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">08 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Error tracking · Log · Feature flag</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Lỗi chỉ xảy ra ở production thì điều tra thế nào?</span></div>
+      <div class="q"><i>?</i><span>Deploy tính năng mới mà chưa dám bật cho tất cả?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>Error boundary theo tầng</b>: một boundary ở route để giữ layout, thêm boundary quanh từng widget để một khối hỏng không làm trắng cả trang.</li>
+      <li>Gom lỗi về <b>Sentry</b> kèm release version, user id, breadcrumb. Upload <b>source map</b> lúc build để đọc được stack trace của bundle đã minify.</li>
+      <li><b>Correlation id</b>: frontend sinh id cho mỗi request (<code>X-Request-Id</code>), backend log kèm id đó → nối được một luồng từ cú click đến query DB. Gắn luôn id vào tag của Sentry.</li>
+      <li>Phân biệt <b>lỗi người dùng</b> (400/422, nhập sai) với <b>lỗi hệ thống</b> (5xx, TypeError). Ném hết vào Sentry thì alert nhiễu, lỗi thật bị chìm và không ai còn nhìn dashboard.</li>
+      <li><b>Feature flag</b>: rollout theo % user, tắt tức thì không cần deploy (kill switch), tách release khỏi deploy. Flag phải có hạn dọn, để lâu code thành mê cung <code>if</code>.</li>
+    </ul>
+    <pre class="code">Sentry.init({
+  dsn, release: import.meta.env.VITE_RELEASE,  <span class="c">// khớp với source map</span>
+  tracesSampleRate: 0.1,
+  beforeSend(ev) {
+    <span class="c good">// ✅ lỗi nghiệp vụ (422) là bình thường, đừng làm nhiễu alert</span>
+    <span class="k">return</span> ev.tags?.kind === <span class="s">'user'</span> ? null : ev;
+  },
+});
+
+api.interceptors.request.use((c) =&gt; {
+  c.headers[<span class="s">'X-Request-Id'</span>] = crypto.randomUUID();  <span class="c">// nối log FE ↔ BE</span>
+  <span class="k">return</span> c;
+});
+<span class="c good">// ✅ kill switch: tắt ngay, không cần deploy lại</span>
+{flags.newCheckout ? &lt;NewCheckout /&gt; : &lt;OldCheckout /&gt;}</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Error boundary bắt được ít hơn bạn tưởng: lỗi ném trong <code>onClick</code>, trong <code>setTimeout</code> hay trong promise không await đều <b>lọt ra ngoài</b>. Không đăng ký <code>onerror</code> và <code>unhandledrejection</code> thì Sentry trắng trơn trong khi app đang hỏng.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Đừng deploy file <code>.map</code> cạnh bundle trên CDN — lộ nguyên source; upload riêng cho Sentry rồi xoá. Flag đọc một lần lúc mount thì đổi giữa chừng user sẽ thấy UI nửa cũ nửa mới, nên tính sẵn cách làm mới hoặc remount.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

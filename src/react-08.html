@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>ReactJS 08 — React 18/19 · Concurrent · RSC</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">ReactJS</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">08 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">React 18/19 · Concurrent · RSC</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>useTransition dùng để làm gì?</span></div>
+      <div class="q"><i>?</i><span>Server Component khác Client Component chỗ nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>Concurrent rendering</b>: React có thể <b>tạm dừng hoặc bỏ</b> một lần render đang dở để ưu tiên việc gấp hơn (gõ phím) → UI không bị đơ.</li>
+      <li><code>useTransition</code> đánh dấu update là <b>không gấp</b>: ô input cập nhật ngay, danh sách nặng render sau. <code>isPending</code> để hiện trạng thái chờ.</li>
+      <li><code>useDeferredValue</code> hoãn một <b>GIÁ TRỊ</b> thay vì một update — dùng khi bạn không sở hữu hàm set (ví dụ value đến từ props).</li>
+      <li><b>Suspense</b>: khai báo trạng thái chờ ngay trên cây UI, ghép với <code>lazy()</code> để chia nhỏ bundle.</li>
+      <li><b>Server Component</b> chạy trên server, <b>không vào bundle</b>, truy cập DB trực tiếp, nhưng <b>không có</b> state / effect / event handler. Client Component có <code>"use client"</code>.</li>
+    </ul>
+    <pre class="code"><span class="k">const</span> [isPending, startTransition] = useTransition();
+
+<span class="k">function</span> onChange(e) {
+  setText(e.target.value);                 <span class="c">// gấp: ô input phản hồi ngay</span>
+  startTransition(() =&gt; {
+    setResults(search(e.target.value));    <span class="c">// không gấp: có thể bị ngắt</span>
+  });
+}</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Đừng nói “Server Component để render nhanh hơn”. Ý chính là <b>giảm lượng JS gửi xuống client</b> và <b>lấy dữ liệu sát nguồn</b>, bỏ được một vòng round-trip API.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Kể thêm React 19: <code>use()</code>, <b>form Actions</b>, <code>useOptimistic</code>, <b>React Compiler</b>. Nhắc đúng tên là ghi điểm senior ngay.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

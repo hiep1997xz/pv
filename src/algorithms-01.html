@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Thuật Toán 01 — Big-O · cách phân tích độ phức tạp</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Thuật Toán</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">01 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Big-O · cách phân tích độ phức tạp</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>O(n log n) nghĩa là gì, bạn gặp nó ở đâu?</span></div>
+      <div class="q"><i>?</i><span>includes đặt trong vòng for thì độ phức tạp bao nhiêu?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>Big-O</b> mô tả chi phí tăng thế nào khi <code>n</code> lớn. Bỏ hằng số và số hạng nhỏ: <code>3n + 100</code> vẫn là <b>O(n)</b>.</li>
+      <li>Thang quen thuộc: <b>O(1)</b> tra Map · <b>O(log n)</b> binary search · <b>O(n)</b> quét một lượt · <b>O(n log n)</b> sort · <b>O(n²)</b> hai vòng lồng nhau.</li>
+      <li>Vòng lặp <b>lồng nhau</b> thì <b>nhân</b> (n×n = O(n²)); vòng lặp <b>nối tiếp</b> thì <b>cộng</b>, mà cộng xong vẫn lấy số hạng lớn nhất: O(n)+O(n) = O(n).</li>
+      <li><b>Space complexity</b> chỉ đếm bộ nhớ <b>cấp phát thêm</b>, không tính mảng đầu vào. Đệ quy tốn O(chiều sâu) cho call stack dù không tạo mảng nào.</li>
+      <li>Method mảng JS: <code>includes</code> · <code>indexOf</code> · <code>find</code> là <b>O(n)</b> · <code>sort</code> là <b>O(n log n)</b> · <code>push</code>/<code>pop</code> là O(1) · <code>shift</code>/<code>unshift</code> là <b>O(n)</b>.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ O(n²): 2 vòng lồng nhau, n = 10.000 → ~50 triệu phép so sánh</span>
+<span class="k">function</span> hasDup(a) {
+  for (<span class="k">let</span> i = 0; i &lt; a.length; i++)
+    for (<span class="k">let</span> j = i + 1; j &lt; a.length; j++)
+      <span class="k">if</span> (a[i] === a[j]) <span class="k">return</span> true;
+  <span class="k">return</span> false;
+}
+<span class="c good">// ✅ O(n) thời gian, đổi lại O(n) bộ nhớ — Set tra cứu O(1) trung bình</span>
+<span class="k">const</span> hasDupFast = a =&gt; <span class="k">new</span> Set(a).size !== a.length;
+console.log(hasDup([1, 2, 3, 1]), hasDupFast([1, 2, 3, 1])); <span class="c">// true true</span>
+
+<span class="c bad">// ❌ includes là O(n); đặt trong vòng lặp → tổng O(n²)</span>
+<span class="k">const</span> uniq = a =&gt; a.reduce((r, x) =&gt; r.includes(x) ? r : [...r, x], []);
+<span class="c good">// ✅ Set một lượt, O(n)</span>
+console.log(uniq([1, 2, 2]), [...new Set([1, 2, 2])]);</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Bẫy đếm sai hay gặp nhất: “em quét mảng một lần nên O(n)”. Nhưng bên trong có <code>includes</code> hoặc <code>indexOf</code> — mỗi lần gọi đã quét lại cả mảng. Tổng thật là <b>O(n²)</b>. <code>[...r, x]</code> trong reduce cũng vậy.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Phân biệt <b>trung bình</b> và <b>xấu nhất</b>: quicksort trung bình O(n log n) nhưng xấu nhất O(n²); tra Map trung bình O(1), xấu nhất O(n) khi hash đụng độ. Nói rõ mình đang nói trường hợp nào.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

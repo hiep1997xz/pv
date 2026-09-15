@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Thực Chiến 01 — Infinite scroll · Virtualization</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Thực Chiến</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">01 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Infinite scroll · Virtualization</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Dùng IntersectionObserver hay sự kiện scroll?</span></div>
+      <div class="q"><i>?</i><span>Vì sao phân trang bằng offset lại bị trùng item?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>IntersectionObserver</b> theo dõi một sentinel ở cuối danh sách. Callback chạy ngoài luồng scroll nên không cần throttle và không gây layout thrashing như <code>onScroll</code>.</li>
+      <li><b>Cursor pagination</b>: gửi con trỏ của item cuối (vd <code>created_at + id</code>) thay vì vị trí tuyệt đối. Dữ liệu mới chèn vào không làm lệch các trang sau.</li>
+      <li><b>Virtualization</b> là chuyện khác: infinite scroll lo <b>tải thêm</b>, virtualization lo <b>chỉ render phần nhìn thấy</b>. Cần khi DOM node phình lên hàng nghìn hoặc mỗi dòng nặng.</li>
+      <li>Giữ vị trí cuộn: chỉ <b>nối vào cuối</b> mảng, key ổn định theo id. Chèn vào đầu hoặc thay cả mảng là trình duyệt nhảy cuộn.</li>
+      <li>Luôn có trạng thái <b>đang tải</b>, <b>hết dữ liệu</b> và <b>lỗi + nút thử lại</b>. Thiếu cờ hết dữ liệu là observer bắn request vô hạn.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ offset: có bài mới chèn lên đầu → trang 2 lặp lại item trang 1</span>
+api.feed({ offset: page * 20, limit: 20 });
+
+<span class="c good">// ✅ cursor: neo vào item cuối, dữ liệu mới không phá trang sau</span>
+<span class="k">const</span> { data, fetchNextPage, hasNextPage } = useInfiniteQuery({
+  queryKey: [<span class="s">'feed'</span>],
+  queryFn: ({ pageParam }) =&gt; api.feed({ cursor: pageParam, limit: 20 }),
+  initialPageParam: null as string | null,
+  getNextPageParam: (last) =&gt; last.nextCursor ?? undefined,
+});
+
+<span class="k">const</span> io = <span class="k">new</span> IntersectionObserver(([e]) =&gt; {
+  <span class="k">if</span> (e.isIntersecting &amp;&amp; hasNextPage) fetchNextPage();
+}, { rootMargin: <span class="s">'400px'</span> });   <span class="c">// tải trước khi chạm đáy 400px</span>
+io.observe(sentinelRef.current!);</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Offset hỏng khi dữ liệu đổi giữa hai lần gọi: thêm 1 bài lên đầu thì item thứ 20 bị đẩy xuống 21 → trang 2 trả <b>lại đúng item đó</b>. Xoá 1 bài thì ngược lại, có item <b>bị nhảy mất</b>, không ai nhìn thấy.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Cursor phải sắp xếp trên cột <b>duy nhất và không đổi</b>. Sắp theo <code>created_at</code> đơn thuần mà hai bản ghi trùng giây là lặp hoặc sót — ghép thêm <code>id</code> làm tie-breaker.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

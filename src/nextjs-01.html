@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Next.js 01 — App Router · Cấu trúc thư mục</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Next.js</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">01 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">App Router · Cấu trúc thư mục</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>App Router khác Pages Router ở những điểm nào?</span></div>
+      <div class="q"><i>?</i><span>Route group và dynamic segment dùng khi nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Mỗi folder trong <code>app/</code> là một URL segment. Chỉ file tên đặc biệt mới thành route: <code>page.tsx</code> (UI) và <code>route.ts</code> (API). File khác chỉ là colocation, không lộ ra URL.</li>
+      <li><code>layout.tsx</code> bọc mọi route con và <b>giữ nguyên state khi điều hướng</b>, không remount. Root layout bắt buộc có <code>&lt;html&gt;</code> và <code>&lt;body&gt;</code>.</li>
+      <li><code>loading.tsx</code> là Suspense boundary tự động cho segment; <code>error.tsx</code> là Error Boundary (<b>bắt buộc</b> Client Component); <code>not-found.tsx</code> hiện khi gọi <code>notFound()</code>.</li>
+      <li><code>(marketing)</code> là <b>route group</b>: gom file và chia layout nhưng <b>không thêm vào URL</b>. Folder bắt đầu bằng <code>_</code> là private, hoàn toàn không routable.</li>
+      <li>Dynamic segment: <code>[id]</code> một đoạn, <code>[...slug]</code> catch-all, <code>[[...slug]]</code> optional. Next 15: <code>params</code> là Promise, phải <code>await</code> trước khi đọc.</li>
+    </ul>
+    <pre class="code">app/
+  layout.tsx            <span class="c">// root layout: bắt buộc có &lt;html&gt; và &lt;body&gt;</span>
+  (marketing)/          <span class="c">// route group — KHÔNG xuất hiện trong URL</span>
+    page.tsx            <span class="c good">// ✅ /</span>
+  blog/
+    layout.tsx          <span class="c">// bọc mọi route con của /blog</span>
+    loading.tsx         <span class="c">// Suspense boundary tự động</span>
+    [slug]/
+      page.tsx          <span class="c good">// ✅ /blog/hello</span>
+      _components/      <span class="c">// private folder: không routable</span>
+
+<span class="c">// Next 15: params là Promise</span>
+<span class="k">export</span> default <span class="k">async</span> <span class="k">function</span> Page({ params }) {
+  <span class="k">const</span> { slug } = <span class="k">await</span> params;
+}</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> <code>error.tsx</code> KHÔNG bắt được lỗi ném từ <code>layout.tsx</code> cùng cấp, vì boundary nằm bên trong layout đó. Lỗi ở root layout phải dùng <code>global-error.tsx</code> — và file này phải tự render thẻ html, body.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Layout không nhận được <code>pathname</code>. Cần biết route hiện tại thì tách một Client Component nhỏ dùng <code>usePathname()</code>, đừng gắn <code>use client</code> cho cả layout.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

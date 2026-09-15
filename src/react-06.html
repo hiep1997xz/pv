@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>ReactJS 06 — Quản lý state · Context · Server state</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">ReactJS</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">06 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Quản lý state · Context · Server state</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Khi nào cần Redux / Zustand?</span></div>
+      <div class="q"><i>?</i><span>Context có thay được state manager không?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Chia rõ 2 loại: <b>server state</b> (dữ liệu từ API — cần cache, refetch, đồng bộ) và <b>client state</b> (UI: modal, tab, form).</li>
+      <li><b>Server state → React Query / SWR</b>. Tự lo cache, dedupe request, stale-while-revalidate, retry. Nhét vào Redux là tự viết lại một cái cache tệ hơn.</li>
+      <li><b>Client state</b>: đơn giản thì <code>useState</code> + lifting up; phức tạp/chia sẻ rộng thì Zustand, Jotai, Redux Toolkit.</li>
+      <li><b>Context KHÔNG phải state manager</b> — nó chỉ là đường truyền dữ liệu chống prop drilling. Mọi consumer re-render khi <code>value</code> đổi, và không có selector.</li>
+      <li>Context hợp với giá trị <b>ít thay đổi</b>: theme, ngôn ngữ, user đã đăng nhập.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ gom state đổi liên tục vào 1 Context → cả cây re-render</span>
+&lt;AppContext.Provider value={{ user, cart, theme, mousePos }}&gt;
+
+<span class="c good">// ✅ tách Context theo tần suất thay đổi</span>
+&lt;ThemeContext.Provider value={theme}&gt;
+  &lt;UserContext.Provider value={user}&gt;</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Trả lời “dự án lớn thì dùng Redux” là <b>mất điểm ngay</b>. Người phỏng vấn muốn nghe bạn phân biệt được <b>server state</b> và <b>client state</b>.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Tách Context thành <b>state context</b> và <b>dispatch context</b> riêng — component chỉ cần dispatch sẽ không re-render khi state đổi.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

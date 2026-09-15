@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Thuật Toán 07 — Đệ quy · DFS · BFS · duyệt cây</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Thuật Toán</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">07 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Đệ quy · DFS · BFS · duyệt cây</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>DFS và BFS khác nhau chỗ nào, khi nào chọn cái nào?</span></div>
+      <div class="q"><i>?</i><span>Vì sao đệ quy sâu lại gây stack overflow?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Đệ quy cần đủ hai thứ: <b>base case</b> để thoát, và mỗi lần gọi phải <b>thu nhỏ bài toán</b>. Thiếu base case là <code>RangeError</code> — Maximum call stack size exceeded.</li>
+      <li>Mỗi lần gọi đẩy một frame lên <b>call stack</b>. Node vỡ stack ở độ sâu cỡ chục nghìn. Cây lệch (skewed) sâu bằng số node → nên chuyển sang vòng lặp + stack thủ công.</li>
+      <li><b>DFS</b> dùng <b>stack</b> (<code>push</code>/<code>pop</code>), đi hết một nhánh mới quay lại. Bộ nhớ O(chiều cao cây). Hợp với: kiểm tra tồn tại đường đi, duyệt toàn bộ, backtracking.</li>
+      <li><b>BFS</b> dùng <b>queue</b>, quét xong tầng này mới sang tầng sau. Bộ nhớ O(bề rộng lớn nhất). Hợp với: <b>đường đi ngắn nhất</b> theo số bước, xử lý theo level.</li>
+      <li>Duyệt cây nhị phân: <b>preorder</b> gốc-trái-phải · <b>inorder</b> trái-gốc-phải (với BST cho ra dãy <b>tăng dần</b>) · <b>postorder</b> trái-phải-gốc · <b>level order</b> chính là BFS.</li>
+    </ul>
+    <pre class="code"><span class="k">const</span> T = { v: 1, k: [{ v: 2, k: [{ v: 4, k: [] }] }, { v: 3, k: [] }] };
+<span class="c">// DFS = STACK, đi sâu trước — O(n) thời gian, O(chiều cao) bộ nhớ</span>
+<span class="k">function</span> dfs(r, out = [], st = [r]) {
+  while (st.length) {
+    <span class="k">const</span> n = st.pop(); out.push(n.v);
+    for (<span class="k">let</span> i = n.k.length - 1; i &gt;= 0; i--) st.push(n.k[i]);
+  }
+  <span class="k">return</span> out;
+}
+<span class="c">// BFS = QUEUE, quét từng tầng — O(n) thời gian, O(bề rộng) bộ nhớ</span>
+<span class="k">function</span> bfs(r, out = [], q = [r]) {
+  for (<span class="k">let</span> i = 0; i &lt; q.length; i++) out.push(q[i].v), q.push(...q[i].k);
+  <span class="k">return</span> out;
+}
+console.log(dfs(T).join(), bfs(T).join());   <span class="c">// 1,2,4,3  1,2,3,4</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Bẫy hiệu năng ít người nói: viết BFS bằng <code>q.shift()</code>. <code>shift</code> phải dồn lại toàn bộ mảng nên là <b>O(n)</b>, biến BFS O(n) thành <b>O(n²)</b>. Thay bằng một con trỏ index chạy trên mảng, hoặc dùng deque.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> <b>Tail call optimization</b> có trong chuẩn ES6 nhưng <b>V8 không cài</b> — nên trên Node và Chrome, viết đệ quy đuôi vẫn ăn call stack như thường. Biết chi tiết này cho thấy bạn đọc kỹ chứ không học thuộc.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

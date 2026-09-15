@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Debug &amp; Fix 04 — Stale closure · đọc phải giá trị cũ</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Debug & Fix</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">04 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Stale closure · đọc phải giá trị cũ</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>setInterval đếm 0 rồi 1 xong đứng im, vì sao?</span></div>
+      <div class="q"><i>?</i><span>Vì sao handler đọc ra state cũ dù UI đã cập nhật?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Dấu hiệu: hàm đọc ra <b>giá trị của lần render trước</b> — timer đếm mãi không nhích, event listener lọc theo filter cũ, callback gửi đi tham số đã lỗi thời.</li>
+      <li>Nguyên nhân: mỗi lần render là <b>một bộ biến mới</b>. Hàm đăng ký ở lần render nào thì <b>closure</b> giữ mãi biến của lần render đó. Closure không tự nhìn thấy state mới.</li>
+      <li>Deps <code>[]</code> khiến effect chỉ chạy một lần, nên listener/timer bên trong vĩnh viễn nhìn ảnh chụp (snapshot) đầu tiên.</li>
+      <li>Sửa 1 — giá trị mới suy từ giá trị cũ: dùng <b>updater function</b> <code>setX(prev =&gt; ...)</code>. React truyền vào state mới nhất, không phụ thuộc closure.</li>
+      <li>Sửa 2 — cần đọc nhiều state/props: <code>useRef</code> giữ bản mới nhất, cập nhật <code>ref.current</code> trong effect không deps; hoặc khai đủ deps và chấp nhận đăng ký lại.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ interval tạo 1 lần, closure giữ count = 0 mãi mãi</span>
+useEffect(() =&gt; {
+  <span class="k">const</span> id = setInterval(() =&gt; setCount(count + 1), 1000);
+  <span class="k">return</span> () =&gt; clearInterval(id);
+}, []);
+
+<span class="c good">// ✅ updater function luôn nhận giá trị mới nhất</span>
+useEffect(() =&gt; {
+  <span class="k">const</span> id = setInterval(() =&gt; setCount(c =&gt; c + 1), 1000);
+  <span class="k">return</span> () =&gt; clearInterval(id);
+}, []);
+
+<span class="c good">// ✅ cần đọc nhiều giá trị trong callback → giữ qua ref</span>
+<span class="k">const</span> latest = useRef(filters);
+useEffect(() =&gt; { latest.current = filters; });</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Câu vặn hay gặp: "thêm vào deps là xong chứ gì?". Với <code>setInterval</code> thì thêm deps làm timer bị <b>huỷ và tạo lại</b> mỗi lần state đổi, nhịp đếm lệch hẳn. Muốn giữ đúng một timer thì phải dùng updater function hoặc ref.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> <code>useRef</code> không gây re-render nên rất hợp để giữ "giá trị mới nhất". Nhưng đừng đọc <code>ref.current</code> lúc render để dựng UI: React không render lại khi ref đổi, màn hình sẽ đứng yên với dữ liệu cũ.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

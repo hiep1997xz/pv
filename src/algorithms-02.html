@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Thuật Toán 02 — Mảng · kỹ thuật two pointer</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Thuật Toán</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">02 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Mảng · kỹ thuật two pointer</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Two pointer dùng được khi nào?</span></div>
+      <div class="q"><i>?</i><span>Two-sum trên mảng đã sắp xếp, làm sao tránh O(n²)?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Two pointer là hai chỉ số cùng chạy trên một mảng, thay cho hai vòng lặp lồng nhau. Hạ <b>O(n²)</b> xuống <b>O(n)</b> mà vẫn giữ <b>O(1)</b> bộ nhớ.</li>
+      <li>Hai dạng: <b>hai đầu dồn vào giữa</b> (đảo mảng, palindrome, two-sum trên mảng đã sắp xếp) và <b>hai con trỏ cùng chiều</b> (loại trùng, tách chẵn lẻ tại chỗ).</li>
+      <li>Điều kiện của kiểu dồn vào giữa: mảng phải <b>đã sắp xếp</b>. Tổng nhỏ hơn target → kéo <code>l</code> lên cho tổng tăng; lớn hơn → lùi <code>r</code>. Mỗi bước loại hẳn một biên.</li>
+      <li>Loại trùng tại chỗ: con trỏ <b>chậm</b> giữ vị trí ghi, con trỏ <b>nhanh</b> quét; gặp giá trị mới thì ghi vào vị trí chậm rồi tăng. O(n) thời gian, O(1) bộ nhớ.</li>
+      <li>Mảng chưa sắp xếp thì phải sort trước, mất <b>O(n log n)</b> — lúc đó hash map O(n) thường là lựa chọn tốt hơn.</li>
+    </ul>
+    <pre class="code"><span class="c">// Đảo mảng TẠI CHỖ — O(n) thời gian, O(1) bộ nhớ</span>
+<span class="k">const</span> rev = a =&gt; { <span class="k">let</span> l = 0, r = a.length - 1;
+  while (l &lt; r) { [a[l], a[r]] = [a[r], a[l]]; l++; r--; } <span class="k">return</span> a; };
+console.log(rev([1, 2, 3, 4]));                <span class="c">// [ 4, 3, 2, 1 ]</span>
+
+<span class="c">// Two-sum mảng ĐÃ SẮP XẾP — O(n), O(1) (brute force là O(n²))</span>
+<span class="k">function</span> twoSumSorted(a, target) {
+  <span class="k">let</span> l = 0, r = a.length - 1;
+  while (l &lt; r) {
+    <span class="k">const</span> s = a[l] + a[r];
+    <span class="k">if</span> (s === target) <span class="k">return</span> [l, r];
+    s &lt; target ? l++ : r--;   <span class="c">// thiếu thì kéo trái, thừa thì lùi phải</span>
+  }
+}
+console.log(twoSumSorted([1, 3, 4, 6, 9], 7)); <span class="c">// [ 0, 3 ]</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Bẫy kinh điển: đề two-sum yêu cầu trả về <b>index của mảng gốc</b>. Bạn sort để dùng two pointer thì index đã xáo trộn, trả ra sai hoàn toàn. Muốn sort thì phải mang index đi kèm, hoặc đổi sang hash map.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Nói ra <b>invariant</b> của vòng lặp: “mọi cặp có tổng bằng target đều nằm trong đoạn <code>[l, r]</code>”, nên bỏ một biên là bỏ đúng những cặp chắc chắn sai. Chứng minh được điều này ăn điểm hơn hẳn đọc code.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

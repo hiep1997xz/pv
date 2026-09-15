@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>TypeScript 07 — keyof · typeof · indexed access · mapped</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">TypeScript</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">07 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">keyof · typeof · indexed access · mapped</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>keyof và typeof kết hợp với nhau thế nào?</span></div>
+      <div class="q"><i>?</i><span>Mapped type dùng để làm gì trong thực tế?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><code>keyof T</code> cho ra <b>union các key</b> của T. <code>typeof obj</code> ở vị trí type thì rút type từ một <b>giá trị</b> đang có — khác hẳn <code>typeof</code> lúc runtime.</li>
+      <li>Ghép hai thứ lại: <code>keyof typeof config</code> lấy đúng danh sách key của object thật, khỏi phải khai lại union chuỗi bằng tay rồi quên đồng bộ.</li>
+      <li><b>Indexed access</b> <code>T[K]</code> lấy type của field. <code>T[keyof T]</code> ra union mọi giá trị, <code>Arr[number]</code> ra type phần tử của mảng hoặc tuple.</li>
+      <li><b>Mapped type</b> <code>[K in keyof T]</code> duyệt từng key để dựng type mới. Có modifier <code>readonly</code> và <code>?</code>, gỡ bằng <code>-readonly</code> và <code>-?</code>.</li>
+      <li><b>Template literal type</b> ghép chuỗi ngay ở tầng type: từ <code>click</code> dựng ra <code>onClick</code>. Ghép với mapped type và <code>as</code> để <b>đổi tên key</b> lúc map.</li>
+    </ul>
+    <pre class="code"><span class="k">const</span> config = { host: <span class="s">'localhost'</span>, port: 5432, ssl: false };
+
+<span class="k">type</span> Key = keyof typeof config;    <span class="c">// 'host' | 'port' | 'ssl'</span>
+<span class="k">type</span> Val = (typeof config)[Key];   <span class="c">// string | number | boolean</span>
+
+<span class="c">// mapped type: gỡ readonly và gỡ optional của mọi field</span>
+<span class="k">type</span> Mutable&lt;T&gt; = { -readonly [K in keyof T]-?: T[K] };
+
+<span class="c">// đổi tên key ngay lúc map bằng as + template literal</span>
+<span class="k">type</span> Handlers&lt;T&gt; = {
+  [K in keyof T as <span class="s">`on${Capitalize&lt;K &amp; string&gt;}`</span>]: (v: T[K]) =&gt; void;
+};
+
+<span class="c">// Handlers&lt;{ id: string }&gt;  →  { onId: (v: string) =&gt; void }</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Đừng lẫn hai <code>typeof</code>: ở vị trí giá trị nó trả chuỗi lúc runtime, ở vị trí type nó rút type lúc compile. Và <code>keyof</code> trên object có index signature <code>string</code> sẽ ra <code>string | number</code>, không phải union key cụ thể.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Thói quen đáng kể trong phỏng vấn: khai object config trước rồi lấy union key bằng <code>keyof typeof</code>, thay vì gõ lại union chuỗi. Thêm <code>as const</code> để giá trị giữ nguyên literal type.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

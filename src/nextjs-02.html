@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Next.js 02 — Server Component vs Client Component</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Next.js</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">02 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Server Component vs Client Component</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Khi nào bắt buộc phải thêm "use client"?</span></div>
+      <div class="q"><i>?</i><span>Client Component có chạy trên server không?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Trong App Router mọi component <b>mặc định là Server Component</b>: chạy trên server, không vào JS bundle, viết <code>async</code> được, đọc DB và secret trực tiếp.</li>
+      <li>Server Component <b>không có</b> state, effect, event handler và API trình duyệt. Cần một trong số đó mới thêm <code>use client</code>.</li>
+      <li><code>use client</code> không có nghĩa "render ở client" mà là <b>đánh dấu ranh giới</b>: từ file đó trở xuống, mọi import đều thành Client Component và bị đóng gói vào bundle.</li>
+      <li>Client Component vẫn được <b>prerender ra HTML trên server</b> rồi hydrate ở browser. Nó chạy cả hai nơi, không phải chỉ client.</li>
+      <li>Props qua ranh giới phải <b>serialize được</b>: không truyền function (trừ Server Action), class instance hay Symbol. Muốn con vẫn là Server Component thì truyền qua <code>children</code>.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ import Server Component vào file client → nó bị kéo vào bundle</span>
+<span class="s">'use client'</span>;
+<span class="k">import</span> Heavy <span class="k">from</span> <span class="s">'./heavy-chart'</span>;
+<span class="k">export</span> default <span class="k">function</span> Tabs() { <span class="k">return</span> &lt;div&gt;&lt;Heavy /&gt;&lt;/div&gt;; }
+
+<span class="c good">// ✅ nhận Server Component qua children → Heavy vẫn chạy trên server</span>
+<span class="s">'use client'</span>;
+<span class="k">export</span> <span class="k">function</span> Tabs({ children }) {
+  <span class="k">const</span> [open, setOpen] = useState(false);
+  <span class="k">return</span> &lt;div onClick={() =&gt; setOpen(!open)}&gt;{children}&lt;/div&gt;;
+}
+
+<span class="c">// page.tsx là Server Component — nó quyết định children là gì</span>
+&lt;Tabs&gt;&lt;Heavy /&gt;&lt;/Tabs&gt;</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Câu vặn kinh điển: "Server Component có render lại khi state đổi không?" → <b>Không</b>. Nó không có state và chỉ chạy trên server. Muốn dữ liệu mới phải <code>router.refresh()</code> hoặc revalidate rồi điều hướng.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Đặt <code>use client</code> càng sâu trong cây càng tốt. Gắn ở root layout là kéo cả app vào bundle — chỉ lá nào thật sự cần tương tác mới đánh dấu.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

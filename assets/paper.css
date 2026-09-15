@@ -1,0 +1,128 @@
+/* ============================================================
+   paper.css — Nen "giay vo ke o" dung chung cho moi the anh
+   Kho trang: 1080 x 1350 (ti le 4:5, hop doc tren dien thoai)
+   ============================================================ */
+@import url('fonts.css');
+
+:root{
+  --paper:#FFFCF3;          /* mau giay kem */
+  --rule:#D9E4F5;           /* dong ke ngang mau xanh nhat */
+  --margin-red:#F0A9A9;     /* duong le do doc */
+  --ink:#16325C;            /* muc xanh dam - chu than */
+  --blue:#1A56DB;           /* xanh nhan manh */
+  --red:#D93025;
+  --yellow:#FFE55C;         /* but da quang */
+  --green:#0B8A55;
+  --purple:#7C3AED;
+  --orange:#E8890C;
+  --gray:#5B6B84;
+  --page-w:1080px;
+  --page-h:1350px;          /* bia */
+  --min-h:900px;            /* chieu cao toi thieu cua the noi dung */
+  --gutter:158px;           /* le trai chua lo dong ho + duong do */
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#E9E6DE}
+
+body{
+  font-family:'Be Vietnam Pro',system-ui,sans-serif;
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+/* ---------- Khung trang ---------- */
+.page{
+  position:relative;
+  width:var(--page-w);
+  min-height:var(--min-h);
+  overflow:hidden;
+  background:var(--paper);
+}
+.page.fixed{ height:var(--page-h); }   /* anh bia - kho co dinh 4:5 */
+
+/* Dong ke ngang - ve bang gradient lap lai, cach nhau 45px */
+.page::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(
+    to bottom,
+    transparent 0 43px,
+    var(--rule) 43px 45px
+  );
+  pointer-events:none;
+}
+
+/* Duong le do doc */
+.page::after{
+  content:'';
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:var(--gutter);
+  width:3px;
+  background:var(--margin-red);
+  opacity:.85;
+}
+
+/* ---------- Lo dong so gay ---------- */
+.holes{
+  position:absolute;
+  top:0;
+  left:46px;
+  width:56px;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  align-items:center;
+  gap:64px;
+  padding:42px 0;
+  z-index:3;
+}
+.holes i{
+  display:block;
+  flex:none;                /* khong cho flex bop meo thanh hinh bau duc */
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:5px solid #B9BCC2;
+  background:#F2F0EA;
+  box-shadow:inset 0 3px 5px rgba(0,0,0,.14);
+}
+
+/* ---------- Vung noi dung ---------- */
+.body{
+  position:relative;
+  z-index:2;
+  padding:44px 56px 46px calc(var(--gutter) + 34px);
+}
+.page.fixed .body{ position:absolute; inset:0; }
+/* Lop trong duoc script auto-fit do chieu cao va thu nho neu tran trang */
+.fit{ display:flex; flex-direction:column; }
+.page.fixed .fit{ min-height:100%; }
+
+/* ---------- Tien ich dung chung ---------- */
+.hl{                        /* to but da quang vang */
+  background:linear-gradient(transparent 12%, var(--yellow) 12% 88%, transparent 88%);
+  padding:0 6px;
+  border-radius:2px;
+}
+.under-red{
+  border-bottom:4px solid var(--red);
+  padding-bottom:2px;
+}
+.tape{                      /* bang dinh washi o goc */
+  position:absolute;
+  width:150px;
+  height:40px;
+  background:rgba(255,214,102,.62);
+  border-left:2px dashed rgba(0,0,0,.10);
+  border-right:2px dashed rgba(0,0,0,.10);
+  box-shadow:0 2px 5px rgba(0,0,0,.10);
+  z-index:5;
+}
+.mono{font-family:'Noto Sans Mono','DejaVu Sans Mono',monospace}
+.cursive{font-family:'Caveat',cursive} /* CHI dung cho chu khong dau */

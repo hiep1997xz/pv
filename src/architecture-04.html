@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Kiến Trúc FE 04 — Monorepo · pnpm workspace · Turborepo</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Kiến Trúc FE</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">04 / 06</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Monorepo · pnpm workspace · Turborepo</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Khi nào nên dùng monorepo, khi nào không?</span></div>
+      <div class="q"><i>?</i><span>Turborepo giải quyết vấn đề gì mà workspace không làm được?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Monorepo đáng dùng khi nhiều app <b>dùng chung code</b> và <b>thay đổi cùng nhau</b>: đổi một component design system là sửa luôn mọi nơi dùng nó, trong <b>một PR duy nhất</b> (atomic change).</li>
+      <li><b>pnpm workspace</b> lo phần liên kết package nội bộ và chia sẻ node_modules. Chia thường thấy: <code>apps/*</code> cho ứng dụng, <code>packages/ui</code>, <code>packages/config</code> (eslint, tsconfig), <code>packages/utils</code>.</li>
+      <li><b>Turborepo</b> (hoặc Nx) lo chạy task: khai báo <b>pipeline</b> phụ thuộc, chạy song song, <b>cache</b> theo hash input — không đổi thì không build lại. Remote cache dùng chung cho team và CI.</li>
+      <li>Mặt trái: CI dễ phình vì mỗi PR đụng nhiều package — phải lọc theo <b>affected</b>. Ranh giới sở hữu mờ đi, cần <b>CODEOWNERS</b>. Repo nặng dần, git thao tác chậm.</li>
+      <li><b>Đa repo</b> tốt hơn khi các team có <b>nhịp release độc lập</b>, stack khác nhau, hoặc yêu cầu phân quyền truy cập nghiêm ngặt.</li>
+    </ul>
+    <pre class="code">packages:                            # pnpm-workspace.yaml
+  - <span class="s">"apps/*"</span>
+  - <span class="s">"packages/*"</span>
+
+<span class="c">// turbo.json — "^build" = build xong dependency rồi mới tới mình</span>
+{
+  <span class="s">"tasks"</span>: {
+    <span class="s">"build"</span>: { <span class="s">"dependsOn"</span>: [<span class="s">"^build"</span>], <span class="s">"outputs"</span>: [<span class="s">"dist/**"</span>] },
+    <span class="s">"test"</span>:  { <span class="s">"dependsOn"</span>: [<span class="s">"build"</span>] },
+    <span class="s">"lint"</span>:  {}
+  }
+}
+
+<span class="c good">// ✅ chỉ chạy cho package đổi so với main → CI không phình</span>
+turbo run test --filter=...[origin/main]</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Câu trả lời trừ điểm: “công ty lớn nên dùng monorepo”. Monorepo là công cụ giải quyết <b>chia sẻ code và thay đổi xuyên package</b>, không phải chuẩn mực quy mô. Ba app không liên quan nhau nhét chung repo chỉ tạo CI chậm và conflict vô nghĩa.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Nêu <b>changesets</b> cho versioning: mỗi PR kèm một file changeset mô tả loại bump, CI gom lại tự bump version + sinh CHANGELOG + publish. Phân biệt thêm: <b>Nx</b> nhiều tính năng hơn Turborepo — generators, project graph, module boundaries.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Docker 04 — Multi-stage build · Giảm kích thước image</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Docker</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">04 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Multi-stage build · Giảm kích thước image</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Multi-stage build giải quyết vấn đề gì?</span></div>
+      <div class="q"><i>?</i><span>Làm sao giảm image 1.2GB xuống vài chục MB?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Một stage để build (có compiler, devDependencies), một stage để chạy chỉ copy <b>kết quả</b> sang. Công cụ build không lọt vào image cuối.</li>
+      <li><code>COPY --from=builder</code> chỉ lấy đúng thứ cần: thư mục <code>dist</code>, binary đã compile, hoặc <code>node_modules</code> bản production.</li>
+      <li>Base image nhẹ dần: <code>node:22</code> khoảng 1.1GB → <code>node:22-alpine</code> khoảng 150MB → <b>distroless</b> hoặc <code>scratch</code> cho binary Go/Rust, chỉ vài chục MB.</li>
+      <li>Image nhỏ không chỉ đỡ tốn đĩa: kéo về nhanh hơn, deploy nhanh hơn, và <b>ít lỗ hổng hơn</b> vì không còn shell, package manager hay compiler để mà khai thác.</li>
+      <li>Cần debug stage giữa thì dừng lại ở đó bằng <code>docker build --target builder</code>.</li>
+    </ul>
+    <pre class="code">FROM node:22-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci                  # có devDependencies để build
+COPY . .
+RUN npm run build
+
+FROM node:22-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+COPY package*.json ./
+RUN npm ci --omit=dev       # ✅ chỉ dependency chạy thật
+COPY --from=builder /app/dist ./dist
+USER node                   # ✅ không chạy bằng root
+CMD [<span class="s">"node"</span>, <span class="s">"dist/index.js"</span>]</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Chỉ đổi sang <code>alpine</code> chưa chắc đủ. Nếu stage chạy vẫn <code>npm ci</code> đầy đủ cả devDependencies thì image vẫn phình. Phải <b>tách stage</b> thì công cụ build mới thật sự không lọt vào image cuối.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Alpine dùng <b>musl</b> thay cho glibc, nên vài thư viện native như sharp, bcrypt, canvas có thể lỗi hoặc chậm bất thường. Gặp vấn đề thì đổi sang <code>node:22-slim</code> chứ đừng cố vá.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

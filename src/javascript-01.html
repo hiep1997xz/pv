@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>JavaScript 01 — Kiểu dữ liệu · value vs reference</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">JavaScript</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">01 / 10</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Kiểu dữ liệu · value vs reference</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Primitive và object khác nhau thế nào khi gán biến?</span></div>
+      <div class="q"><i>?</i><span>Copy một object lồng nhau sao cho an toàn?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>7 <b>primitive</b>: string, number, boolean, null, undefined, symbol, bigint — lưu theo <b>value</b>. Object / array / function lưu theo <b>reference</b>: biến chỉ giữ địa chỉ.</li>
+      <li>Gán primitive là copy giá trị, hai biến độc lập. Gán object là copy <b>địa chỉ</b> — hai biến trỏ cùng một vùng nhớ, sửa bên này thì bên kia đổi theo.</li>
+      <li><code>===</code> với object so sánh địa chỉ chứ không so nội dung, nên <code>{a:1} === {a:1}</code> là <b>false</b>. Muốn so nội dung phải tự duyệt hoặc dùng thư viện.</li>
+      <li>Spread <code>{...obj}</code> và <code>Object.assign</code> chỉ copy <b>nông (shallow)</b> — đúng một tầng. Object lồng bên trong vẫn dùng chung reference với bản gốc.</li>
+      <li>Deep clone: <code>structuredClone(obj)</code> (Node 17+, mọi browser hiện đại). Nó không copy được function; còn <code>JSON.stringify</code> thì mất <code>undefined</code> và biến Date thành string.</li>
+    </ul>
+    <pre class="code"><span class="k">const</span> a = { x: 1, deep: { y: 2 } };
+
+<span class="c bad">// ❌ spread chỉ copy 1 tầng: deep vẫn chung reference</span>
+<span class="k">const</span> b = { ...a };
+b.deep.y = 99;
+console.log(a.deep.y);        <span class="c">// 99 — a bị sửa theo</span>
+
+<span class="c good">// ✅ structuredClone cắt đứt mọi tầng</span>
+<span class="k">const</span> c = structuredClone(a);
+c.deep.y = 7;
+console.log(a.deep.y);        <span class="c">// 99 — a không đổi</span>
+
+console.log({ x: 1 } === { x: 1 });   <span class="c">// false: khác địa chỉ</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Câu vặn hay gặp: <code>const</code> có làm object bất biến không? → <b>Không</b>. <code>const</code> chỉ khoá việc <b>gán lại biến</b>; <code>obj.x = 2</code> và <code>arr.push(1)</code> vẫn chạy bình thường.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> <code>Object.freeze</code> cũng chỉ đóng băng một tầng. Và khi truyền object vào hàm: sửa <b>thuộc tính</b> thì ảnh hưởng ra ngoài, nhưng <b>gán lại</b> cả tham số thì không — vì JS luôn truyền theo value.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

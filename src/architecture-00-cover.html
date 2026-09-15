@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Kiến Trúc FE — Toàn tập</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page fixed">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="tape" style="top:-14px;left:330px;transform:rotate(-2.4deg)"></div>
+  
+  <svg width="286" height="286" viewBox="-150 -150 300 300"
+       style="position:absolute;left:246px;top:918px;color:#4338CA;opacity:.30;z-index:1">
+    
+    <g stroke="currentColor" stroke-width="9" fill="none" stroke-linejoin="round">
+      <path d="M0 -122 L124 -62 L0 -2 L-124 -62 Z"/>
+      <path d="M-124 -4 L0 56 L124 -4"/>
+      <path d="M-124 54 L0 114 L124 54"/>
+    </g>
+  </svg>
+  <div class="body"><div class="fit">
+    <div class="cover-kicker cursive" style="font-size:34px">( Cẩm nang )</div>
+    <div class="cover-title"><b>Kiến Trúc FE</b></div>
+    <div class="cover-sub">Toàn Tập <span class="hl">Đầy Đủ</span></div>
+    <div class="cover-sub2"><span class="under-red">Cách tổ chức một dự án lớn</span></div>
+    <ul class="toc">
+      <li><span class="ic">🗂️</span>Cấu trúc thư mục & feature-based <small>· Mid</small></li>
+      <li><span class="ic">🔗</span>Quy tắc phụ thuộc một chiều <small>· Mid</small></li>
+      <li><span class="ic">🧪</span>Chiến lược test & testing trophy <small>· Mid</small></li>
+      <li><span class="ic">🎯</span>Test hành vi, không test cài đặt <small>· Mid</small></li>
+      <li><span class="ic">🛡️</span>Bảo mật FE: XSS · CSRF · CSP <small>· Mid</small></li>
+      <li><span class="ic">🔐</span>Bí mật & phân quyền phía server <small>· Mid</small></li>
+      <li><span class="ic">📦</span>Monorepo: pnpm workspace · Turborepo <small>· Senior</small></li>
+      <li><span class="ic">🔖</span>Versioning với changesets <small>· Senior</small></li>
+      <li><span class="ic">🚀</span>CI/CD pipeline & fail fast <small>· Senior</small></li>
+      <li><span class="ic">📉</span>Performance budget · size-limit <small>· Senior</small></li>
+      <li><span class="ic">👀</span>Code review & convention <small>· Senior</small></li>
+      <li><span class="ic">📝</span>ADR: ghi lại quyết định kiến trúc <small>· Senior</small></li>
+    </ul>
+  </div></div>
+  <div class="cover-note">~ Kiến trúc tốt là kiến trúc <em>dễ xoá</em> —<br>đổi một tính năng không phải đụng cả repo. ♥</div>
+  <div class="sticky" style="right:44px;bottom:398px;width:318px"><div><span class="ok">✓</span> Giải thích dễ hiểu</div><div><span class="ok">✓</span> Có code thật</div><div><span class="ok">✓</span> Bẫy phỏng vấn</div><div><span class="ok">✓</span> Câu trả lời mẫu</div></div>
+  <div class="chips" style="bottom:88px">
+    <span class="chip" style="background:#DCE9FF;transform:rotate(-1.8deg)">Khái niệm</span>
+    <span class="chip" style="background:#D6F5E3;transform:rotate(1.6deg)">Code mẫu</span>
+    <span class="chip" style="background:#FFDCD4;transform:rotate(-1.8deg)">Bẫy thường gặp</span>
+    <span class="chip" style="background:#FFE9C7;transform:rotate(1.6deg)">Câu hỏi thật</span>
+    <span class="chip" style="background:#F3DDFF;transform:rotate(-1.8deg)">Mẹo ghi điểm</span>
+  </div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

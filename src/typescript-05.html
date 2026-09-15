@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>TypeScript 05 — Narrowing · type guard · discriminated union</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">TypeScript</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">05 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Narrowing · type guard · discriminated union</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Type guard tự viết khác gì typeof thường?</span></div>
+      <div class="q"><i>?</i><span>Làm sao để switch báo lỗi khi thêm case mới?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>TS narrow tự động qua <code>typeof</code> (primitive), <code>instanceof</code> (class), <code>in</code> (có field), so sánh literal, và <code>Array.isArray</code>.</li>
+      <li>Type guard tự viết trả về <code>x is Foo</code>. TS <b>tin</b> lời khai đó chứ không kiểm chứng — logic bên trong sai thì narrow sai mà compiler vẫn im.</li>
+      <li><b>Discriminated union</b>: mỗi nhánh có chung một field literal (<code>kind</code>, <code>type</code>, <code>status</code>), nhờ đó <code>switch</code> trên field ấy narrow được từng nhánh.</li>
+      <li><b>Exhaustive check</b>: ở nhánh <code>default</code> gán giá trị vào một biến kiểu <code>never</code>. Thêm nhánh mới mà quên xử lý là <b>lỗi compile</b>, không phải bug lặng lẽ.</li>
+      <li><b>Assertion function</b> <code>asserts x is T</code>: ném lỗi nếu sai, sau lời gọi thì narrow cho cả phần còn lại. Nếu gán vào biến thì phải khai type tường minh.</li>
+    </ul>
+    <pre class="code"><span class="k">type</span> Shape =
+  | { kind: <span class="s">'circle'</span>; r: number }
+  | { kind: <span class="s">'rect'</span>; w: number; h: number };
+
+<span class="k">function</span> area(s: Shape): number {
+  switch (s.kind) {
+    case <span class="s">'circle'</span>: <span class="k">return</span> Math.PI * s.r ** 2;
+    case <span class="s">'rect'</span>:   <span class="k">return</span> s.w * s.h;
+    default: {
+      <span class="c good">// ✅ thêm kind mới mà quên case → dòng dưới lỗi compile</span>
+      <span class="k">const</span> _never: never = s;
+      <span class="k">return</span> _never;
+    }
+  }
+}</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Type guard chỉ là <b>lời hứa</b>: khai <code>x is User</code> nhưng bên trong mới kiểm <code>!!x</code> thì TS vẫn tin tuyệt đối. Narrow sai kiểu này không có một cảnh báo nào, bug lòi ra tận runtime.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Truthiness narrowing có bẫy với số và chuỗi: <code>if (count)</code> loại luôn <code>0</code>, <code>if (s)</code> loại luôn chuỗi rỗng. Với <code>number|undefined</code> thì phải so sánh <code>!== undefined</code> mới đúng.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

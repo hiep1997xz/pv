@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>System Design 04 — Chọn DB · Index · Sharding</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">System Design</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">04 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Chọn DB · Index · Sharding</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Chọn SQL hay NoSQL dựa trên tiêu chí nào?</span></div>
+      <div class="q"><i>?</i><span>Sharding theo key nào, đánh đổi những gì?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Chọn theo <b>hình dạng truy vấn</b> và mức nhất quán, không theo mốt. Cần transaction, join, ràng buộc → SQL. Ghi cực lớn, schema linh hoạt, luôn truy vấn theo một key → NoSQL.</li>
+      <li><b>Index</b> đổi ghi lấy đọc: duyệt B-tree thay vì full scan nên đọc nhanh, nhưng mỗi index phải cập nhật theo từng lần ghi và tốn dung lượng. Index thừa hại chẳng kém thiếu index.</li>
+      <li><b>Read replica</b> gánh tải đọc, nhưng có <b>replication lag</b>: vừa ghi xong đọc ngay ở replica có thể ra dữ liệu cũ. Trường hợp user đọc lại chính thứ mình vừa ghi thì ép đọc ở primary.</li>
+      <li><b>Sharding</b> chia dữ liệu theo key: hash để phân bố đều, range để truy vấn theo khoảng. Key phải có <b>cardinality cao</b> và được truy cập đều, nếu không sẽ sinh <b>hot shard</b>.</li>
+      <li>Cái giá của sharding: join cross-shard coi như không làm được, transaction nhiều shard rất khó, thêm/bớt shard phải resharding. Chỉ shard khi một máy không gánh nổi.</li>
+    </ul>
+    <pre class="code diagram">┌─────────────────────┬─────────────────────┬───────────────────────────┐
+│ Nhu cầu chính       │ Chọn                │ Vì sao                    │
+├─────────────────────┼─────────────────────┼───────────────────────────┤
+│ transaction, join   │ PostgreSQL, MySQL   │ ACID, ràng buộc, khoá FK  │
+│ ghi lớn theo 1 key  │ Cassandra, DynamoDB │ ghi phân tán, schema mềm  │
+│ tìm kiếm full-text  │ Elasticsearch       │ inverted index            │
+│ phân tích, thống kê │ ClickHouse          │ lưu theo cột, quét nhanh  │
+│ quan hệ nhiều tầng  │ Neo4j               │ duyệt cạnh, khỏi join lồng│
+└─────────────────────┴─────────────────────┴───────────────────────────┘
+<span class="c good">// ✅ shard theo user_id băm ra: đều tay, dữ liệu 1 user nằm 1 chỗ</span>
+<span class="c bad">// ❌ shard theo created_at: shard của tháng hiện tại thành hot shard</span>
+<span class="c">// thứ tự nên làm: index ▸ cache ▸ read replica ▸ cuối cùng mới shard</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Hai câu mất điểm ngay: “dữ liệu lớn nên dùng NoSQL” và “shard từ đầu cho chắc”. Một Postgres cấu hình tử tế gánh được rất nhiều. Nêu đúng thứ tự leo thang: index → cache → read replica → mới tới sharding.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Nói được <b>composite index</b> khớp tiền tố từ trái sang: index <code>(a, b)</code> phục vụ truy vấn lọc theo <code>a</code>, hoặc theo <code>a</code> và <code>b</code>, nhưng không dùng được nếu chỉ lọc theo <code>b</code>.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

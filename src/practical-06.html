@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Thực Chiến 06 — i18n · Ngày giờ · Tiền tệ</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Thực Chiến</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">06 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">i18n · Ngày giờ · Tiền tệ</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Vì sao phải lưu UTC thay vì giờ người dùng?</span></div>
+      <div class="q"><i>?</i><span>Số nhiều của tiếng Anh và tiếng Ả Rập xử lý sao?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Tách chuỗi khỏi code theo key + namespace. <b>Không nối chuỗi thủ công</b> vì trật tự từ mỗi ngôn ngữ mỗi khác — dùng interpolation có tên: <code>t(&#39;hi&#39;, { name })</code>.</li>
+      <li>Số nhiều theo <code>Intl.PluralRules</code> hoặc cú pháp ICU: tiếng Việt 1 dạng, tiếng Anh 2, tiếng Ả Rập 6. Tự viết <code>n &gt; 1 ? ... : ...</code> là sai ngay khi thêm ngôn ngữ.</li>
+      <li><code>Intl.DateTimeFormat</code> và <code>Intl.NumberFormat</code> lo giúp thứ tự ngày/tháng, dấu phân cách, ký hiệu tiền theo locale. Tự ghép chuỗi là tự chuốc bug.</li>
+      <li>Lưu <b>UTC</b> (<code>timestamptz</code> / ISO 8601) ở DB, chỉ đổi sang timezone người dùng ở tầng hiển thị. Sự kiện lặp trong tương lai phải lưu kèm tên IANA vì offset đổi theo DST.</li>
+      <li>Chia nhỏ gói ngôn ngữ: lazy-load theo locale và namespace, đừng bundle cả 20 ngôn ngữ. Tiền tệ lưu <b>số nguyên đơn vị nhỏ nhất</b> để tránh sai số float.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ tự ghép: sai thứ tự ngày/tháng và dấu phân cách theo locale</span>
+<span class="c">//    `${d.getDate()}/${d.getMonth() + 1} — ${(n / 100).toFixed(2)}đ`</span>
+
+<span class="c good">// ✅ để Intl lo, chỉ truyền locale + timezone của người dùng</span>
+<span class="k">new</span> Intl.DateTimeFormat(locale, {
+  dateStyle: <span class="s">'medium'</span>, timeStyle: <span class="s">'short'</span>, timeZone: user.tz,
+}).format(<span class="k">new</span> Date(iso));        <span class="c">// iso luôn là UTC lấy từ server</span>
+
+<span class="k">new</span> Intl.NumberFormat(locale, {
+  style: <span class="s">'currency'</span>, currency: <span class="s">'VND'</span>,
+}).format(amountInMinorUnit / 100);
+
+<span class="c bad">// ❌ n &gt; 1 ? 'items' : 'item'  →  vỡ với tiếng Ả Rập (6 dạng)</span>
+<span class="c good">// ✅ t('cart.items', { count: n })  →  ICU plural lo phần còn lại</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> <code>new Date(&#39;2024-03-10&#39;)</code> là <b>UTC</b> nửa đêm; thêm phần giờ <code>&#39;2024-03-10T00:00:00&#39;</code> thì lại thành giờ <b>local</b>. Người ở GMT+7 nhìn cùng một chuỗi ra hai ngày khác nhau — lỗi lệch một ngày kinh điển.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Tạo formatter <b>một lần</b> rồi tái dùng, gọi <code>Intl.DateTimeFormat</code> trong vòng lặp 1000 dòng là chậm thấy rõ. Có <code>Intl.RelativeTimeFormat</code> cho “3 ngày trước”. Nhớ test layout với tiếng Đức (chuỗi dài hơn) và ngôn ngữ RTL.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

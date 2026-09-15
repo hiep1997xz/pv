@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>TypeScript 01 — Vì sao TS · any vs unknown vs never</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">TypeScript</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">01 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Vì sao TS · any vs unknown vs never</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>TypeScript giúp gì mà JavaScript không tự làm được?</span></div>
+      <div class="q"><i>?</i><span>any và unknown khác nhau chỗ nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>TS là lớp kiểm tra <b>lúc compile</b>. Build xong type bị <b>xoá sạch</b>, runtime chỉ còn JS thuần — nên type <b>không</b> kiểm chứng được dữ liệu API lúc chạy.</li>
+      <li>Giá trị thật: bắt lỗi sớm, autocomplete, refactor an toàn, type là tài liệu sống. Bật <code>strict</code> mới có <code>strictNullChecks</code> — thứ chặn nhiều bug nhất.</li>
+      <li><code>any</code> tắt mọi kiểm tra và <b>lây lan</b>: gán any sang biến khác là mất type ở đó luôn. <code>unknown</code> nhận mọi giá trị nhưng bắt <b>narrow</b> trước khi dùng.</li>
+      <li><code>never</code> là <b>tập rỗng</b>, không giá trị nào thuộc kiểu này. Gặp ở hàm luôn throw, vòng lặp vô tận, và ở nhánh <b>exhaustive check</b>.</li>
+      <li>Muốn chắc dữ liệu runtime đúng type thì phải validate thật bằng Zod / io-ts rồi lấy type ra bằng <code>z.infer</code> — đừng tin mỗi <code>as</code>.</li>
+    </ul>
+    <pre class="code"><span class="k">function</span> handle(res: unknown) {
+  <span class="c bad">// ❌ any: tắt hết kiểm tra, compile im lặng, runtime mới nổ</span>
+  <span class="k">const</span> a = res as any;
+  a.data.items.map((x: any) =&gt; x.id);
+
+  <span class="c good">// ✅ unknown: buộc narrow trước khi đụng vào</span>
+  <span class="k">if</span> (typeof res === <span class="s">'object'</span> &amp;&amp; res !== null &amp;&amp; <span class="s">'data'</span> in res) {
+    console.log(res.data);
+  }
+}
+
+<span class="c">// never: hàm không bao giờ trả về giá trị</span>
+<span class="k">function</span> fail(msg: string): never { throw <span class="k">new</span> Error(msg); }</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Câu vặn hay gặp: “type có chặn được API trả sai dữ liệu không?” → <b>Không</b>. Type bay hết sau khi compile. Và <code>as</code> chỉ là lời hứa với compiler, nó không kiểm tra gì cả — sai là nổ lúc runtime.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Kể lộ trình siết dần: bật <code>strict</code> trước, rồi thêm <b>noUncheckedIndexedAccess</b> để truy cập mảng ra kèm <code>undefined</code>. Dùng <code>unknown</code> ở biên hệ thống, <code>any</code> chỉ khi gỡ code cũ và phải kèm comment.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

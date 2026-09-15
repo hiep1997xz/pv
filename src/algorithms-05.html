@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Thuật Toán 05 — Sliding window · cửa sổ trượt</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Thuật Toán</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">05 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Sliding window · cửa sổ trượt</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Làm sao nhận ra một bài là sliding window?</span></div>
+      <div class="q"><i>?</i><span>Hai vòng lặp lồng nhau mà vẫn O(n), vì sao?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Dấu hiệu nhận bài: đề nói về <b>đoạn con liên tiếp</b> (contiguous subarray/substring) kèm một điều kiện tối ưu — dài nhất, ngắn nhất, tổng lớn nhất.</li>
+      <li><b>Cửa sổ cố định</b> (biết trước k): trượt một bước = cộng phần tử mới bên phải, trừ phần tử vừa rời bên trái. <b>O(n)</b> thay vì O(n·k) như cách tính lại từ đầu.</li>
+      <li><b>Cửa sổ co giãn</b>: <code>right</code> luôn tiến để mở rộng; khi cửa sổ vi phạm điều kiện thì đẩy <code>left</code> lên cho tới khi hợp lệ trở lại.</li>
+      <li>Vẫn là <b>O(n)</b> dù nhìn như hai vòng lồng nhau: mỗi con trỏ chỉ tiến, không lùi, tổng số bước tối đa 2n. Đây là <b>amortized analysis</b>.</li>
+      <li>Bộ nhớ thường <b>O(1)</b> khi chỉ giữ một tổng, hoặc <b>O(k)</b> khi phải giữ bảng tần suất của các phần tử trong cửa sổ.</li>
+    </ul>
+    <pre class="code"><span class="c">// Cửa sổ CỐ ĐỊNH: tổng lớn nhất của k phần tử liên tiếp — O(n), O(1)</span>
+<span class="k">function</span> maxSumK(a, k) {
+  <span class="k">let</span> sum = 0;
+  for (<span class="k">let</span> i = 0; i &lt; k; i++) sum += a[i];
+  <span class="k">let</span> best = sum;
+  for (<span class="k">let</span> i = k; i &lt; a.length; i++) {
+    sum += a[i] - a[i - k];            <span class="c">// thêm bên phải, bớt bên trái</span>
+    best = Math.max(best, sum);
+  }
+  <span class="k">return</span> best;
+}
+console.log(maxSumK([2, 1, 5, 1, 3, 2], 3));   <span class="c">// 9</span>
+
+<span class="c bad">// ❌ tính lại tổng cho từng cửa sổ → O(n·k), làm thừa việc</span>
+<span class="c">// a.slice(i, i + k).reduce((x, y) =&gt; x + y, 0)</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Câu vặn hay gặp: “có <code>while</code> lồng trong <code>for</code>, sao vẫn O(n)?” → vì <code>left</code> chỉ tiến, không bao giờ lùi. Tổng số lần dịch của cả hai con trỏ bị chặn bởi 2n, nên trung bình mỗi phần tử tốn chi phí hằng số.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Phân biệt rõ với two pointer: sliding window luôn giữ một <b>đoạn liên tiếp</b> và quan tâm nội dung bên trong đoạn; two pointer kiểu hai đầu chỉ quan tâm cặp ở biên. Sliding window <b>không</b> đòi mảng đã sắp xếp.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

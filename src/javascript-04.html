@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>JavaScript 04 — Closure &amp; private state</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">JavaScript</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">04 / 10</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Closure & private state</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Closure là gì, cho ví dụ bạn từng dùng thật?</span></div>
+      <div class="q"><i>?</i><span>Vòng lặp với var in ra gì, vì sao, sửa thế nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>Closure</b> = hàm + môi trường lexical nơi nó được <b>định nghĩa</b>. Hàm nhớ scope lúc khai báo chứ không phải lúc gọi. Thực tế mọi hàm trong JS đều là closure.</li>
+      <li>Biến bị closure giữ vẫn <b>sống</b> sau khi hàm cha đã return — đó chính là cách tạo <b>private state</b> mà bên ngoài không có đường chạm vào.</li>
+      <li>Vòng lặp kinh điển: <code>var</code> chỉ có <b>một binding</b> dùng chung cho cả vòng lặp nên callback in ra giá trị cuối. <code>let</code> tạo <b>binding mới mỗi lần lặp</b> nên in đúng.</li>
+      <li>Ứng dụng thật hay kể trong phỏng vấn: counter, hàm <code>once</code>, memoize giữ <code>cache</code>, debounce/throttle giữ <code>timer</code>, module pattern bằng IIFE, currying.</li>
+      <li><b>Rò rỉ bộ nhớ</b>: closure giữ tham chiếu tới cả scope chứ không riêng biến nó dùng, nên vô tình giữ sống DOM node hay mảng lớn. Quên <code>removeEventListener</code> là ca hay gặp.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ var: một binding dùng chung → in 3, 3, 3</span>
+for (<span class="k">var</span> i = 0; i &lt; 3; i++) setTimeout(() =&gt; console.log(i), 0);
+
+<span class="c good">// ✅ let: mỗi vòng lặp một binding riêng → in 0, 1, 2</span>
+for (<span class="k">let</span> j = 0; j &lt; 3; j++) setTimeout(() =&gt; console.log(j), 0);
+
+<span class="c">// private state: count không có đường nào chạm từ bên ngoài</span>
+<span class="k">function</span> makeCounter() {
+  <span class="k">let</span> count = 0;
+  <span class="k">return</span> { inc: () =&gt; ++count, get: () =&gt; count };
+}
+<span class="k">const</span> c = makeCounter();
+c.inc(); c.inc();
+console.log(c.count, c.get());   <span class="c">// undefined 2</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Hỏi vặn: chỉ đổi <code>var</code> thành <code>let</code> sao lại đúng? Vì mỗi vòng lặp <code>let</code> tạo binding mới, callback đóng vào binding riêng của nó. Trước ES6 phải bọc IIFE để tự tạo scope.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Đưa ví dụ nghề nghiệp thay vì định nghĩa suông: debounce giữ <code>timer</code>, memoize giữ <code>cache</code>, <code>once</code> giữ cờ <code>called</code>. Người phỏng vấn muốn nghe bạn đã dùng closure để giải quyết việc gì.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

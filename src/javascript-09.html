@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>JavaScript 09 — Debounce vs Throttle</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">JavaScript</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">09 / 10</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Debounce vs Throttle</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Debounce và throttle khác nhau ở chỗ nào?</span></div>
+      <div class="q"><i>?</i><span>Search box gõ liên tục thì nên dùng cái nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>Debounce</b>: dồn nhiều lần gọi thành <b>một</b>, chỉ chạy sau khi đã <b>im lặng</b> đủ <code>delay</code>. Gõ liên tục thì không chạy lần nào cho tới lúc ngừng gõ.</li>
+      <li><b>Throttle</b>: cho chạy <b>tối đa một lần mỗi khoảng</b>, gọi bao nhiêu cũng vậy. Kéo scroll 10 giây với <code>gap = 200ms</code> thì chạy khoảng 50 lần, đều đặn.</li>
+      <li>Chọn theo câu hỏi: "có cần phản hồi <b>trong lúc</b> đang diễn ra không?" Cần → throttle (scroll, resize, mousemove). Chỉ cần <b>kết quả cuối</b> → debounce (search box, autosave).</li>
+      <li><code>leading</code> = chạy ngay ở lần gọi đầu, <code>trailing</code> = chạy thêm lần cuối sau khi ngừng. Debounce mặc định trailing; throttle thường bật cả hai để không mất sự kiện cuối.</li>
+      <li>Luôn trả về hàm <code>cancel</code> và gọi nó khi unmount hoặc rời trang. Timer còn treo sẽ chạy trên component đã chết và giữ closure không cho GC thu hồi.</li>
+    </ul>
+    <pre class="code"><span class="k">function</span> debounce(fn, delay = 300) {
+  <span class="k">let</span> t;
+  <span class="k">const</span> run = (...a) =&gt; {
+    clearTimeout(t);  t = setTimeout(() =&gt; fn(...a), delay);
+  };
+  run.cancel = () =&gt; clearTimeout(t);      <span class="c">// nhớ gọi khi unmount</span>
+  <span class="k">return</span> run;                              <span class="c">// im lặng đủ delay mới chạy</span>
+}
+<span class="k">function</span> throttle(fn, gap = 300) {
+  <span class="k">let</span> last = 0;
+  <span class="k">return</span> (...a) =&gt; {
+    <span class="k">if</span> (Date.now() - last &lt; gap) <span class="k">return</span>;   <span class="c good">// ✅ tối đa 1 lần mỗi gap</span>
+    last = Date.now(); fn(...a);
+  };
+}</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Lỗi kinh điển: tạo hàm debounce <b>bên trong</b> render hoặc bên trong handler. Mỗi lần gọi là một closure mới với <code>t</code> riêng, <code>clearTimeout</code> chẳng huỷ được gì và hàm vẫn chạy đủ số lần. Phải tạo <b>một lần duy nhất</b>.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Với search box nên ghép debounce cùng <code>AbortController</code>: debounce giảm số request, abort chặn response cũ về muộn ghi đè lên kết quả mới. Thiếu vế thứ hai vẫn còn race condition.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

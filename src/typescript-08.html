@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>TypeScript 08 — Conditional types · infer · khi nào quá đà</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">TypeScript</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">08 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Conditional types · infer · khi nào quá đà</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Distributive conditional type nghĩa là gì?</span></div>
+      <div class="q"><i>?</i><span>infer dùng để làm gì, cho một ví dụ?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><code>T extends U ? X : Y</code> là <code>if</code> ở tầng type. Chữ <code>extends</code> ở đây nghĩa là “gán được vào”, không phải kế thừa class.</li>
+      <li><b>Distributive</b>: khi T là <b>naked type param</b> và nhận vào một union, điều kiện chạy <b>từng nhánh</b> rồi hợp kết quả lại. <code>Exclude</code> hoạt động đúng nhờ vậy.</li>
+      <li>Muốn <b>tắt</b> distributive thì bọc tuple: <code>[T] extends [U]</code>. Dùng khi cần xét cả union như một khối, ví dụ kiểm tra một type có phải <code>never</code> không.</li>
+      <li><code>infer</code> đặt một ô trống để TS điền type vào khi khớp mẫu — đây là cơ sở của <code>ReturnType</code>, <code>Parameters</code> và <code>Awaited</code>.</li>
+      <li><b>Khi nào là quá đà</b>: type khó hiểu hơn code nó bảo vệ, thông báo lỗi dài mấy chục dòng, đồng đội không sửa nổi. Lúc đó khai type tường minh còn rẻ hơn nhiều.</li>
+    </ul>
+    <pre class="code"><span class="c">// tự viết lại ReturnType</span>
+<span class="k">type</span> MyReturn&lt;T&gt; = T extends (...a: any[]) =&gt; infer R ? R : never;
+<span class="k">type</span> A = MyReturn&lt;() =&gt; string&gt;;    <span class="c">// string</span>
+
+<span class="c">// tự viết lại Awaited (bản rút gọn, mở Promise lồng nhau)</span>
+<span class="k">type</span> MyAwaited&lt;T&gt; = T extends Promise&lt;infer U&gt; ? MyAwaited&lt;U&gt; : T;
+<span class="k">type</span> B = MyAwaited&lt;Promise&lt;Promise&lt;number&gt;&gt;&gt;;   <span class="c">// number</span>
+
+<span class="c">// distributive: chạy từng nhánh của union rồi hợp lại</span>
+<span class="k">type</span> NoStr&lt;T&gt; = T extends string ? never : T;
+<span class="k">type</span> C = NoStr&lt;string | number | boolean&gt;;      <span class="c">// number | boolean</span>
+
+<span class="c bad">// ❌ bọc tuple là tắt distributive → xét cả union một khối</span>
+<span class="k">type</span> D = [string | number] extends [string] ? 1 : 0;   <span class="c">// 0</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Distributive cắn ngược: tự viết <code>T extends null ? never : T</code> rồi truyền <code>never</code> vào sẽ nhận lại <code>never</code>, vì union rỗng phân phối ra rỗng. Nhiều người tưởng đó là bug của TS thay vì đúng quy tắc.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Nêu giới hạn thật: conditional type đệ quy có <b>depth limit</b>, vượt là TS bắn <code>TS2589</code> — “Type instantiation is excessively deep and possibly infinite”. Gặp lỗi đó thì đơn giản hoá type, đừng lách bằng <code>any</code>.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

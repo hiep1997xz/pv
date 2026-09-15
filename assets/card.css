@@ -1,0 +1,132 @@
+/* ============================================================
+   card.css — Thanh phan cho ANH BIA va THE NOI DUNG
+   ============================================================ */
+
+/* ==================== ANH BIA ==================== */
+.cover-kicker{
+  font-size:26px; color:var(--gray); letter-spacing:.06em; margin-bottom:14px;
+}
+.cover-title{
+  display:inline-block;
+  background:var(--yellow);
+  border:3px solid #111;
+  border-radius:10px;
+  padding:10px 34px 16px;
+  box-shadow:6px 7px 0 rgba(0,0,0,.16);
+  margin-bottom:26px;
+}
+.cover-title b{
+  font-size:96px; font-weight:800; color:var(--blue);
+  letter-spacing:-.02em; line-height:1.05; display:block;
+}
+.cover-sub{ font-size:45px; font-weight:800; line-height:1.28; margin-bottom:6px; }
+.cover-sub2{ font-size:36px; font-weight:700; color:var(--ink); margin-bottom:26px; }
+
+.toc{ list-style:none; display:flex; flex-direction:column; gap:12px; font-size:25px; }
+.toc li{
+  font-size:1em; font-weight:600; color:var(--blue);
+  display:flex; align-items:center; gap:13px;
+}
+.toc li span.ic{ font-size:1em; width:1.3em; text-align:center; }
+.toc li small{ font-size:.76em; font-weight:500; color:var(--gray); }
+
+.cover-note{
+  position:absolute; left:calc(var(--gutter) + 34px); bottom:52px; width:640px;
+  font-size:24px; font-weight:600; color:var(--ink); line-height:1.5;
+}
+.cover-note em{ color:var(--red); font-style:normal; }
+
+/* Hop ghi chu dan noi (sticky) tren anh bia */
+.sticky{
+  position:absolute;
+  background:#EAF2FF;
+  border:2px solid #9CC0F0;
+  border-radius:10px;
+  padding:16px 20px;
+  box-shadow:4px 5px 0 rgba(0,0,0,.10);
+  font-size:21px; font-weight:600; line-height:1.72;
+  z-index:4;
+}
+.sticky.warm{ background:#FFF3D6; border-color:#EFC45F; }
+.sticky .ok{ color:var(--green); }
+
+/* The nhan mau xoay nhe, xep doc ben phai */
+.chips{ position:absolute; right:44px; z-index:4; display:flex; flex-direction:column; gap:14px; align-items:flex-end; }
+.chip{
+  font-size:20px; font-weight:700; padding:8px 16px; border-radius:7px;
+  border:2px solid rgba(0,0,0,.34); box-shadow:3px 3px 0 rgba(0,0,0,.13);
+}
+
+/* ==================== THE NOI DUNG ==================== */
+.card-head{ display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+.badge{
+  font-size:19px; font-weight:800; padding:6px 15px; border-radius:20px;
+  border:2px solid rgba(0,0,0,.28); letter-spacing:.02em;
+}
+.badge.topic{ background:#DCE9FF; color:#12408F; }
+.badge.junior{ background:#D6F5E3; color:#0A6B42; }
+.badge.mid{    background:#FFE9C7; color:#8A5200; }
+.badge.senior{ background:#F3DDFF; color:#5B21B6; }
+.card-no{ margin-left:auto; font-size:22px; font-weight:800; color:var(--gray); }
+
+.q-box{
+  background:#FFF8DC;
+  border:3px solid #111;
+  border-left:11px solid var(--yellow);
+  border-radius:9px;
+  padding:16px 20px;
+  box-shadow:4px 5px 0 rgba(0,0,0,.14);
+  margin-bottom:20px;
+}
+.q-box .q{ font-size:26px; font-weight:800; line-height:1.38; display:flex; gap:10px; }
+.q-box .q + .q{ margin-top:9px; padding-top:9px; border-top:2px dashed #D9C88A; }
+.q-box .q i{ font-style:normal; color:var(--red); font-weight:800; }
+
+.sec{ font-size:23px; font-weight:800; color:var(--blue); margin:0 0 9px; display:flex; align-items:center; gap:9px; }
+.pts{ list-style:none; display:flex; flex-direction:column; gap:9px; margin-bottom:17px; }
+.pts li{ font-size:22px; line-height:1.52; padding-left:28px; position:relative; }
+.pts li::before{ content:'▸'; position:absolute; left:4px; top:0; color:var(--blue); font-weight:800; }
+.pts li b{ color:#0B2E5E; font-weight:800; }
+.pts li code, .note code, .ic-code{
+  font-family:'Noto Sans Mono',monospace; font-size:19px;
+  background:#EDF1F8; border:1px solid #C7D3E6; border-radius:5px; padding:1px 6px; color:#12408F;
+  white-space:nowrap;
+}
+
+/* Khoi code nen toi */
+pre.code{
+  background:#14243C; color:#E8F0FC; border-radius:10px;
+  padding:15px 18px; margin-bottom:17px;
+  font-family:'Noto Sans Mono','DejaVu Sans Mono',monospace;
+  font-size:18px; line-height:1.55; overflow:hidden;
+  tab-size:2;
+  box-shadow:4px 5px 0 rgba(0,0,0,.18);
+  white-space:pre;
+}
+/* Khoi ve so do bang ky tu khung: line-height phai bang 1 thi net doc
+   moi noi lien giua cac dong. Da kiem chung: dau tieng Viet khong bi cat. */
+pre.code.diagram{
+  line-height:1;
+  padding-top:21px;      /* line-height 1 khong con dem dong -> tu bu bang padding */
+  padding-bottom:21px;
+}
+pre.code.diagram .c{ font-style:normal; }
+
+pre.code .c{ color:#8FA6C4; font-style:italic; }  /* chu thich */
+pre.code .k{ color:#FF9CC8; }                      /* tu khoa */
+pre.code .s{ color:#A5E8A0; }                      /* chuoi */
+pre.code .f{ color:#7FD4FF; }                      /* ten ham */
+pre.code .bad{ color:#FF8B7A; }
+pre.code .good{ color:#9BE88F; }
+
+/* Hop canh bao / meo - xep sat day the */
+.notes{ margin-top:6px; display:flex; flex-direction:column; gap:12px; }
+.note{
+  border-radius:9px; padding:13px 17px; font-size:21px; line-height:1.5;
+  border:2px solid; box-shadow:3px 4px 0 rgba(0,0,0,.11);
+}
+.note b{ font-weight:800; }
+.note.trap{ background:#FFE9E4; border-color:#E88C78; }
+.note.trap b{ color:#B93316; }
+.note.tip{ background:#E6F6EC; border-color:#7FC4A0; }
+.note.tip b{ color:#0B6B43; }

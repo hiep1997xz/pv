@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Debug &amp; Fix 06 — Race condition khi fetch</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Debug & Fix</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">06 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Race condition khi fetch</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Gõ tìm kiếm nhanh lại ra kết quả của từ khoá cũ, vì sao?</span></div>
+      <div class="q"><i>?</i><span>Chống double submit form thì làm ở client hay server?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Dấu hiệu: ô search gõ nhanh, kết quả hiển thị lại là của từ khoá trước đó; bấm chuyển tab liên tục thì dữ liệu tab cũ nhấp nháy đè lên tab mới.</li>
+      <li>Nguyên nhân: mỗi lần tham số đổi là một request mới, nhưng <b>response về không theo thứ tự gửi</b>. Request cũ về sau sẽ ghi đè state của request mới.</li>
+      <li>Sửa tối thiểu: cờ <code>ignore</code> trong effect, cleanup đặt <code>ignore = true</code> — response cũ về vẫn bị bỏ qua, không cần huỷ request.</li>
+      <li>Tốt hơn: <code>AbortController</code> huỷ hẳn request cũ, đỡ tốn băng thông và kết nối. Nhớ bỏ qua <code>AbortError</code>, đó là hành vi mong muốn chứ không phải lỗi.</li>
+      <li>Cùng một gốc là <b>double submit</b>: bấm gửi hai lần tạo hai đơn. Khoá nút bằng <code>isSubmitting</code> ở client, nhưng phải có <b>idempotency key</b> ở server mới chắc.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ gõ nhanh: response của "ab" về sau "abc" → hiện sai kết quả</span>
+useEffect(() =&gt; {
+  fetch(<span class="s">`/api/search?q=${q}`</span>).then(r =&gt; r.json()).then(setList);
+}, [q]);
+
+<span class="c good">// ✅ AbortController: huỷ request cũ khi q đổi hoặc unmount</span>
+useEffect(() =&gt; {
+  <span class="k">const</span> ac = <span class="k">new</span> AbortController();
+  fetch(<span class="s">`/api/search?q=${q}`</span>, { signal: ac.signal })
+    .then(r =&gt; r.json())
+    .then(setList)
+    .catch(e =&gt; { <span class="k">if</span> (e.name !== <span class="s">'AbortError'</span>) setErr(e); });
+
+  <span class="k">return</span> () =&gt; ac.abort();
+}, [q]);</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Chỉ debounce ô input là chưa đủ. Debounce giảm <b>số lượng</b> request chứ không quyết định <b>thứ tự</b> response — mạng chậm một nhịp là request cuối vẫn có thể về trước. Phải có <code>ignore</code> hoặc <code>abort</code> mới chắc.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> React Query / SWR lo sẵn việc này: cache theo <b>query key</b>, tự dedupe request trùng và chỉ nhận kết quả của key đang active. Trả lời "dùng React Query" thì phải nói kèm <b>vì sao nó an toàn</b>, không thì thành học vẹt.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

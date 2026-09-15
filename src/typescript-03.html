@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>TypeScript 03 — Generic · ràng buộc extends · suy luận kiểu</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">TypeScript</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">03 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Generic · ràng buộc extends · suy luận kiểu</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Generic giải quyết gì mà any không làm được?</span></div>
+      <div class="q"><i>?</i><span>Khi nào một hàm KHÔNG cần generic?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Generic giữ <b>mối liên hệ</b> giữa đầu vào và đầu ra. <code>any</code> làm mất type ở đầu ra; generic thì truyền <code>number</code> vào là nhận <code>number</code> ra.</li>
+      <li>TS <b>tự suy luận</b> type param từ đối số, hiếm khi phải viết tay. Chỉ viết rõ khi suy luận ra hẹp/rộng không như ý.</li>
+      <li><b>Ràng buộc</b> bằng <code>extends</code>: <code>&lt;T extends { id: string }&gt;</code> cho phép dùng field trong thân hàm mà vẫn giữ nguyên type gốc của caller.</li>
+      <li><b>Default type param</b> <code>&lt;T = string&gt;</code> để caller bỏ qua. Generic dùng được cả trong interface và class, như <code>Map&lt;K, V&gt;</code> hay <code>Array&lt;T&gt;</code>.</li>
+      <li><b>Không cần generic</b> khi type param chỉ xuất hiện <b>đúng một lần</b> trong signature — lúc đó nó là <code>any</code> trá hình, thay bằng union hoặc kiểu cụ thể.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ any: nhận gì cũng được, trả về any — mất sạch type</span>
+<span class="k">function</span> firstAny(arr: any[]): any { <span class="k">return</span> arr[0]; }
+
+<span class="c good">// ✅ generic: type đầu ra bám theo đầu vào</span>
+<span class="k">function</span> first&lt;T&gt;(arr: T[]): T | undefined { <span class="k">return</span> arr[0]; }
+<span class="k">const</span> n = first([1, 2, 3]);       <span class="c">// n: number | undefined</span>
+
+<span class="c">// ràng buộc extends để đụng được field bên trong</span>
+<span class="k">function</span> byId&lt;T extends { id: string }&gt;(list: T[], id: string) {
+  <span class="k">return</span> list.find(x =&gt; x.id === id);    <span class="c">// trả về T | undefined</span>
+}
+
+<span class="c bad">// ❌ generic thừa: T chỉ xuất hiện một lần</span>
+<span class="k">function</span> log&lt;T&gt;(x: T) { console.log(x); }</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> <code>arr[0]</code> của <code>T[]</code> được TS coi là <code>T</code> chứ không phải <code>T | undefined</code> — mảng rỗng là nổ lúc runtime mà compiler vẫn im. Bật <b>noUncheckedIndexedAccess</b> mới có undefined trong type.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Phân biệt hai vai của <code>extends</code>: trong generic là <b>ràng buộc</b>, trong conditional type là <b>phép so khớp</b>. Cùng một từ khoá, hai nghĩa khác nhau — hỏi tới là lộ ngay ai chỉ học thuộc.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

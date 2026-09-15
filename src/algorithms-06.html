@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Thuật Toán 06 — Sorting · Binary search</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Thuật Toán</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">06 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Sorting · Binary search</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>[10, 9, 1].sort() trả về gì?</span></div>
+      <div class="q"><i>?</i><span>Binary search cần điều kiện gì mới dùng được?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><code>Array.prototype.sort</code> là <b>O(n log n)</b>. V8 cài bằng <b>TimSort</b>: ổn định (stable) và rất nhanh với dữ liệu đã gần sắp xếp.</li>
+      <li>Nhớ nhanh: <b>merge sort</b> O(n log n) mọi trường hợp, tốn O(n) bộ nhớ, stable · <b>quicksort</b> trung bình O(n log n) nhưng xấu nhất <b>O(n²)</b> · bubble/insertion O(n²).</li>
+      <li><b>Binary search</b> chỉ đúng khi dữ liệu <b>đã sắp xếp</b>, hoặc rộng hơn là khi điều kiện có tính <b>đơn điệu</b>. Mỗi bước loại một nửa → <b>O(log n)</b>, O(1) bộ nhớ nếu viết bằng vòng lặp.</li>
+      <li>Hai biến thể phải nhớ: <b>lower bound</b> = vị trí đầu tiên có giá trị ≥ x, <b>upper bound</b> = vị trí đầu tiên &gt; x. Hiệu hai cái chính là số lần x xuất hiện.</li>
+      <li>Chỉ tìm <b>một</b> phần tử trong mảng chưa sắp xếp thì quét thẳng O(n) nhanh hơn là sort O(n log n) rồi mới binary search.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ sort mặc định đổi phần tử sang CHUỖI rồi mới so sánh</span>
+console.log([10, 9, 1].sort());                <span class="c">// [ 1, 10, 9 ]</span>
+<span class="c good">// ✅ với số phải truyền comparator</span>
+console.log([10, 9, 1].sort((a, b) =&gt; a - b)); <span class="c">// [ 1, 9, 10 ]</span>
+
+<span class="c">// Binary search tìm BIÊN TRÁI (vị trí đầu tiên &gt;= x) — O(log n), O(1)</span>
+<span class="k">function</span> lowerBound(a, x) {
+  <span class="k">let</span> lo = 0, hi = a.length;                   <span class="c">// hi là biên mở</span>
+  while (lo &lt; hi) {
+    <span class="k">const</span> mid = (lo + hi) &gt;&gt; 1;
+    <span class="k">if</span> (a[mid] &lt; x) lo = mid + 1; <span class="k">else</span> hi = mid;
+  }
+  <span class="k">return</span> lo;
+}
+console.log(lowerBound([1, 2, 2, 2, 5], 2));   <span class="c">// 1</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Bẫy số một của JS: <code>[10, 9, 1].sort()</code> ra <code>[1, 10, 9]</code>, vì mặc định sort đổi phần tử sang <b>chuỗi</b> rồi so theo UTF-16 — "10" đứng trước "9". Với số luôn phải truyền <code>(a, b) =&gt; a - b</code>.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> <code>sort</code> sửa mảng <b>tại chỗ</b> và trả về chính mảng đó, không phải bản sao — muốn giữ bản gốc thì <code>[...a].sort()</code> hoặc <code>toSorted()</code> (ES2023). Nhắc đúng <code>toSorted</code> là điểm cộng.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

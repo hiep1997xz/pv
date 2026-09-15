@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Debug &amp; Fix 08 — Layout shift · z-index · overflow</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Debug & Fix</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">08 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Layout shift · z-index · overflow</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>CLS cao thì bạn tìm nguyên nhân bằng cách nào?</span></div>
+      <div class="q"><i>?</i><span>Đặt z-index 9999 rồi mà vẫn bị che, vì sao?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Đo CLS: Lighthouse cho số trong phòng lab, thư viện <code>web-vitals</code> gửi số thật từ người dùng, còn Performance panel chỉ đúng phần tử nào đã dịch chuyển.</li>
+      <li>Dịch chuyển đến từ: ảnh và iframe <b>không đặt width/height</b> nên cao 0 rồi đột ngột giãn · font swap đổi metric chữ · banner chèn động phía trên nội dung.</li>
+      <li>Sửa: luôn khai kích thước hoặc <code>aspect-ratio</code> · <code>next/font</code> tự khớp metric chữ fallback · chừa sẵn chỗ bằng skeleton <b>đúng kích thước thật</b>, không phải skeleton cho có.</li>
+      <li><code>z-index</code> chỉ so sánh được <b>trong cùng một stacking context</b>. Cha có <code>transform</code>, <code>filter</code>, <code>opacity</code> nhỏ hơn 1, hay <code>position: fixed</code> là tạo context mới — con nằm trọn trong đó.</li>
+      <li><code>overflow: hidden</code> ở cha cắt cụt dropdown, tooltip; lồng nhiều vùng cuộn thì scroll bị kẹt. Gọn nhất: render qua <code>createPortal</code> ra <code>body</code>, định vị bằng Floating UI.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ ảnh không khai kích thước → nội dung nhảy khi ảnh tải xong</span>
+&lt;img src=<span class="s">"/banner.jpg"</span> alt=<span class="s">""</span> /&gt;
+
+<span class="c good">// ✅ chừa chỗ trước: next/image bắt buộc width/height hoặc fill</span>
+&lt;Image src=<span class="s">"/banner.jpg"</span> alt=<span class="s">""</span> width={1200} height={400} /&gt;
+
+<span class="c bad">// ❌ .card tạo stacking context mới → tooltip 9999 vẫn bị che</span>
+<span class="c">// .card    { opacity: .99 }</span>
+<span class="c">// .tooltip { z-index: 9999 }</span>
+<span class="c">// .header  { position: sticky; z-index: 10 }</span>
+
+<span class="c good">// ✅ đẩy tooltip ra ngoài cây, thoát cả stacking context lẫn overflow</span>
+createPortal(&lt;Tooltip /&gt;, document.body);</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Hiểu nhầm kinh điển: tưởng <code>z-index: 9999</code> thì luôn nổi lên trên. Nếu cha đã nằm trong một stacking context thấp hơn thì cả cây con bị nhốt trong đó, số to đến mấy cũng vô nghĩa. Mở tab Layers hoặc Computed để truy ra cha nào tạo context.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Bẫy ngầm: <code>overflow: hidden</code> không chỉ cắt hình, nó còn biến phần tử thành scroll container và làm hỏng <code>position: sticky</code> của con. Gặp sticky "không chịu dính", đi ngược lên cha tìm <code>overflow</code> trước tiên.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

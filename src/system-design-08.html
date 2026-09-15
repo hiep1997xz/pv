@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>System Design 08 — Kiến trúc frontend quy mô lớn</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">System Design</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">08 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Kiến trúc frontend quy mô lớn</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Khi nào micro-frontend thật sự đáng dùng?</span></div>
+      <div class="q"><i>?</i><span>BFF giải quyết vấn đề gì cho team frontend?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>Micro-frontend</b> chỉ đáng khi nhiều team cần <b>deploy độc lập</b> trên cùng một sản phẩm. Với một team thì nó chỉ thêm việc: nhiều pipeline, trùng dependency, khó debug xuyên app.</li>
+      <li><b>Module federation</b> (Webpack 5, Rspack) cho phép app này nạp bundle app kia lúc chạy, chia sẻ dependency. React phải khai báo <b>singleton</b>, nếu không sẽ có hai bản React cùng lúc.</li>
+      <li><b>Design system</b> dùng chung là điều kiện bắt buộc: token màu và khoảng cách, component headless, phát hành theo <b>semver</b>. Thiếu nó thì mỗi micro-frontend một kiểu giao diện.</li>
+      <li><b>BFF</b> — mỗi loại client một backend riêng, gộp nhiều service thành đúng payload màn hình cần. Client hết gọi N+1, và frontend đổi payload không phải chờ team backend.</li>
+      <li>Versioning: thêm field thì tương thích ngược; xoá hoặc đổi nghĩa field là <b>breaking</b> → ra <code>/v2</code>, chạy song song. Rollout bằng <b>feature flag</b> + canary, tách deploy khỏi release.</li>
+    </ul>
+    <pre class="code diagram">              ┌───────────────┐
+ web    ─────▸│   BFF (web)   │──┐   <span class="c">// mỗi client một payload riêng</span>
+              └───────────────┘  │
+                                 ├──▸ user-svc ▸ order-svc ▸ price-svc
+              ┌───────────────┐  │
+ mobile ─────▸│ BFF (mobile)  │──┘   <span class="c">// client gọi 1 lần, hết N+1</span>
+              └───────────────┘
+
+<span class="c good">// ✅ module federation (Webpack 5): remote + React để singleton</span>
+remotes: { cart: <span class="s">'cart@https://cdn.example.com/cart/remoteEntry.js'</span> },
+shared:  { react: { singleton: true, requiredVersion: <span class="s">'^18.3.0'</span> } },
+
+<span class="c good">// ✅ tách deploy khỏi release: bật dần bằng cờ, tắt cờ là rollback</span>
+<span class="k">if</span> (flags.on(<span class="s">'checkout-v2'</span>, user)) <span class="k">return</span> &lt;CheckoutV2 /&gt;;
+<span class="k">return</span> &lt;CheckoutV1 /&gt;;            <span class="c">// rollout 1% ▸ 10% ▸ 100%</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Đề xuất micro-frontend cho một team 5 người là mất điểm ngay: chi phí build, chia sẻ state, trùng dependency lớn hơn hẳn lợi ích. Tiêu chí thật là <b>số team cần deploy độc lập</b>, không phải codebase to.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Nêu chỉ số thay vì cảm tính: LCP, INP, kích thước bundle, tỉ lệ lỗi JS. Mọi thay đổi kiến trúc frontend nên chứng minh được bằng một trong các số đó, đo trên người dùng thật bằng RUM.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

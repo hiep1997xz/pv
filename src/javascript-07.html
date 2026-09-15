@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>JavaScript 07 — Event loop · macrotask · microtask</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">JavaScript</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">07 / 10</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Event loop · macrotask · microtask</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>setTimeout(fn, 0) có chạy ngay lập tức không?</span></div>
+      <div class="q"><i>?</i><span>Thứ tự in của setTimeout và Promise.then là gì?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>JS chạy <b>một luồng</b> với một call stack. Việc bất đồng bộ do host (browser / Node) lo; xong thì callback được xếp vào <b>queue</b> chứ không chen ngang stack đang chạy.</li>
+      <li>Vòng lặp: chạy hết call stack → <b>vét sạch microtask queue</b> → (browser) render một frame → lấy <b>đúng một</b> macrotask chạy → quay lại vét microtask.</li>
+      <li><b>Microtask</b>: <code>.then/.catch/.finally</code>, phần sau <code>await</code>, <code>queueMicrotask</code>, <code>MutationObserver</code>. <b>Macrotask</b>: <code>setTimeout</code>, <code>setInterval</code>, I/O, event handler.</li>
+      <li>Microtask luôn chạy <b>trước</b> macrotask kế tiếp. Microtask sinh ra microtask mới phải chạy hết trong cùng lượt vét — đệ quy microtask sẽ treo tab, đệ quy <code>setTimeout</code> thì không.</li>
+      <li><code>setTimeout(fn, 0)</code> nghĩa là "xếp hàng sớm nhất có thể", không phải "chạy ngay": phải đợi stack rỗng và đợi microtask xong. Browser còn kẹp tối thiểu 4ms khi lồng quá 5 tầng.</li>
+    </ul>
+    <pre class="code">console.log(<span class="s">'1'</span>);
+setTimeout(() =&gt; console.log(<span class="s">'2'</span>), 0);            <span class="c">// macrotask</span>
+Promise.resolve().then(() =&gt; console.log(<span class="s">'3'</span>));   <span class="c">// microtask</span>
+queueMicrotask(() =&gt; console.log(<span class="s">'4'</span>));           <span class="c">// microtask</span>
+
+(<span class="k">async</span> () =&gt; {
+  console.log(<span class="s">'5'</span>);     <span class="c">// thân async chạy ĐỒNG BỘ tới await đầu tiên</span>
+  <span class="k">await</span> null;
+  console.log(<span class="s">'6'</span>);     <span class="c">// phần sau await = microtask</span>
+})();
+
+console.log(<span class="s">'7'</span>);
+
+<span class="c good">// ✅ Thứ tự in thật:  1  5  7  3  4  6  2</span>
+<span class="c bad">// ❌ Đáp án sai hay gặp: 1 5 7 2 3 4 6 (tưởng timeout 0 chạy trước)</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Rất nhiều người nói <code>await</code> làm cả hàm thành bất đồng bộ từ dòng đầu. Sai — thân hàm <code>async</code> chạy <b>đồng bộ</b> tới <code>await</code> đầu tiên, phần còn lại mới thành microtask. Và <code>async</code> không tạo thread mới.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Nếu ứng tuyển backend Node: mỗi phase của event loop Node đều vét microtask, <code>process.nextTick</code> có queue riêng chạy <b>trước cả</b> promise microtask, còn <code>setImmediate</code> nằm ở phase khác <code>setTimeout</code>.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

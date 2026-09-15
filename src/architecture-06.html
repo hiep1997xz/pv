@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Kiến Trúc FE 06 — Code review · Convention · ADR</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Kiến Trúc FE</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">06 / 06</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Code review · Convention · ADR</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Bạn review code thì nhìn vào những gì trước tiên?</span></div>
+      <div class="q"><i>?</i><span>Làm sao góp ý mà không làm đồng nghiệp khó chịu?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>PR nhỏ</b> là yếu tố số một: dưới ~400 dòng thì review thật, PR 2000 dòng chỉ nhận được “LGTM”. Một PR giải quyết một việc; refactor tách khỏi thay đổi hành vi.</li>
+      <li>Review cái <b>máy không làm được</b>: đúng đắn của logic, <b>điều kiện biên</b> (rỗng, lỗi, loading, race), bảo mật, khả năng bảo trì. Format để <b>Prettier/ESLint</b> lo, đừng comment tay.</li>
+      <li>Tự động hoá phần cơ học: <b>Prettier</b> + <b>ESLint</b> + <b>husky</b> + <b>lint-staged</b> chạy pre-commit, <b>commitlint</b> ép <b>conventional commits</b>, <b>CODEOWNERS</b> tự gán đúng người vào đúng thư mục.</li>
+      <li>Góp ý: nhận xét <b>vào code, không vào người</b>; hỏi thay vì phán (“list rỗng thì sao?”); phân loại rõ <b>blocking</b> hay <b>nit</b> để biết cái nào phải sửa; khen đoạn viết tốt cũng là review.</li>
+      <li><b>ADR</b> (Architecture Decision Record): mỗi quyết định lớn ghi một file md ngắn — bối cảnh, lựa chọn, quyết định, hệ quả. Sáu tháng sau không ai phải đoán “vì sao chọn cái này”.</li>
+    </ul>
+    <pre class="code"># .github/CODEOWNERS — tự gán reviewer theo đường dẫn
+/packages/ui/         @design-system
+/apps/web/checkout/   @payments @security
+
+# conventional commits — máy đọc được để sinh CHANGELOG
+feat(cart): thêm mã giảm giá            <span class="c good">// ✅ bump minor</span>
+fix(auth): chặn refresh token hết hạn   <span class="c good">// ✅ bump patch</span>
+feat(api)!: bỏ endpoint /v1/orders      <span class="c good">// ✅ major (dấu !)</span>
+sua loi                                 <span class="c bad">// ❌ không parse được</span>
+
+# .husky/pre-commit — máy lo format, người lo logic
+npx lint-staged
+
+# ADR: mỗi quyết định lớn một file, đánh số tăng dần
+docs/adr/0007-chon-react-query-thay-redux.md</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Hai kiểu reviewer đều bị trừ điểm: người duyệt mọi thứ trong 10 giây, và người bắt bẻ dấu phẩy rồi bỏ qua lỗi race condition. Nếu bạn để lại 30 comment về style, hãy nói thật: đó là dấu hiệu repo <b>thiếu Prettier</b>, không phải dev kém.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Con số tham khảo hay được trích: review hiệu quả nhất khi PR dưới ~400 dòng và phiên review dưới ~60 phút — quá ngưỡng thì tỉ lệ phát hiện lỗi rơi mạnh. Thêm quy ước SLA review trong ngày để PR không nằm chờ làm cả team nghẽn.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

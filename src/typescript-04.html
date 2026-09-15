@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>TypeScript 04 — Utility types dùng thật trong dự án</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">TypeScript</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">04 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Utility types dùng thật trong dự án</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Partial, Pick, Omit khác nhau chỗ nào?</span></div>
+      <div class="q"><i>?</i><span>ReturnType lấy được kiểu trả về bằng cách nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Nhóm sửa field: <code>Partial&lt;T&gt;</code> cho mọi field optional, <code>Required&lt;T&gt;</code> ngược lại, <code>Readonly&lt;T&gt;</code> khoá ghi. Dùng nhiều nhất là <code>Partial</code> cho payload update.</li>
+      <li>Nhóm chọn field: <code>Pick&lt;T, K&gt;</code> giữ những field liệt kê, <code>Omit&lt;T, K&gt;</code> bỏ chúng đi. Hay dùng để dựng type cho props UI từ type model.</li>
+      <li><code>Record&lt;K, V&gt;</code> dựng object có key cố định, ví dụ <code>Record&lt;Role, Perm&gt;</code> — thêm role mới mà quên khai là TS báo lỗi ngay.</li>
+      <li>Nhóm lọc union: <code>Exclude&lt;T, U&gt;</code> bỏ nhánh khớp U, <code>Extract&lt;T, U&gt;</code> giữ nhánh khớp, <code>NonNullable&lt;T&gt;</code> bỏ null và undefined.</li>
+      <li>Nhóm rút kiểu từ hàm: <code>ReturnType&lt;typeof f&gt;</code>, <code>Parameters&lt;typeof f&gt;</code>, <code>Awaited&lt;T&gt;</code> mở Promise. Rất hợp để type hoá kết quả API mà khỏi khai lại.</li>
+    </ul>
+    <pre class="code"><span class="k">type</span> User = { id: string; name: string; email: string; age: number };
+
+<span class="k">type</span> UserPatch = Partial&lt;Omit&lt;User, <span class="s">'id'</span>&gt;&gt;;  <span class="c">// payload update</span>
+<span class="k">type</span> UserCard = Pick&lt;User, <span class="s">'id'</span> | <span class="s">'name'</span>&gt;;   <span class="c">// props cho UI</span>
+
+<span class="k">type</span> Role = <span class="s">'admin'</span> | <span class="s">'editor'</span> | <span class="s">'viewer'</span>;
+<span class="k">const</span> perms: Record&lt;Role, string[]&gt; = {
+  admin: [<span class="s">'*'</span>], editor: [<span class="s">'write'</span>], viewer: [<span class="s">'read'</span>],  <span class="c">// thiếu 1 → lỗi</span>
+};
+
+<span class="k">async</span> <span class="k">function</span> getUser(id: string) { <span class="k">return</span> { id, name: <span class="s">'a'</span> }; }
+<span class="k">type</span> Fetched = Awaited&lt;ReturnType&lt;typeof getUser&gt;&gt;;
+
+<span class="k">type</span> Oops = Omit&lt;User, <span class="s">'emial'</span>&gt;;   <span class="c bad">// ❌ gõ sai key vẫn compile trót lọt</span>
+<span class="k">type</span> Nope = Pick&lt;User, <span class="s">'emial'</span>&gt;;   <span class="c good">// ✅ Pick gạch đỏ ngay: TS2344</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> <code>Omit</code> có lỗ hổng: key truyền vào <b>không</b> bị ràng buộc theo <code>keyof T</code>, nên gõ sai tên field vẫn compile trót lọt và type ra thừa field. <code>Pick</code> thì báo <code>TS2344</code>. Đổi tên field xong nhớ rà lại mọi chỗ Omit.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> <code>Partial</code> chỉ nông <b>một tầng</b>, object lồng bên trong vẫn bắt buộc đủ field. Cần sâu thì tự viết mapped type đệ quy — đừng tưởng <code>Partial</code> lo hết cho mình.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

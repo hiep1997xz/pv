@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Thực Chiến 05 — Realtime · WebSocket · SSE · Polling</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Thực Chiến</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">05 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Realtime · WebSocket · SSE · Polling</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Khi nào chọn SSE thay vì WebSocket?</span></div>
+      <div class="q"><i>?</i><span>Mất kết nối 30 giây thì làm sao không mất tin nhắn?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>Polling</b> hợp khi dữ liệu đổi chậm và trễ vài giây chấp nhận được. Đơn giản nhất, không phải nuôi kết nối — đừng vội chê.</li>
+      <li><b>SSE</b> một chiều server → client, chạy trên HTTP thường: tự reconnect sẵn, có <code>Last-Event-ID</code>, qua proxy dễ. Hợp notification, feed, tiến độ job.</li>
+      <li><b>WebSocket</b> hai chiều, độ trễ thấp, hợp chat và collab. Đổi lại phải tự làm reconnect, heartbeat, auth và scale khó hơn hẳn.</li>
+      <li>Reconnect phải có <b>exponential backoff + jitter</b>, không thì server vừa sống lại là cả vạn client đập vào cùng lúc. <b>Heartbeat</b> ping/pong để phát hiện kết nối đã chết.</li>
+      <li>Đồng bộ lại sau mất kết nối: mỗi message có <code>seq</code>/id, reconnect thì gửi id cuối đã nhận để server bù phần thiếu. Client phải <b>dedupe</b> vì giao hàng là at-least-once.</li>
+    </ul>
+    <pre class="code"><span class="k">let</span> retry = 0, lastId = <span class="s">''</span>;
+<span class="k">function</span> connect() {
+  <span class="k">const</span> ws = <span class="k">new</span> WebSocket(<span class="s">`${URL}?since=${lastId}`</span>);  <span class="c">// bù phần thiếu</span>
+  ws.onopen = () =&gt; { retry = 0; };
+  ws.onmessage = (e) =&gt; {
+    <span class="k">const</span> m = JSON.parse(e.data);
+    <span class="k">if</span> (seen.has(m.id)) <span class="k">return</span>;      <span class="c good">// ✅ dedupe: at-least-once</span>
+    seen.add(m.id); lastId = m.id; push(m);
+  };
+  <span class="c bad">// ❌ reconnect ngay lập tức → cả vạn client đập vào server vừa sống</span>
+  ws.onclose = () =&gt; {
+    <span class="k">const</span> ms = Math.min(30_000, 2 ** retry++ * 1000);
+    setTimeout(connect, ms * (0.5 + Math.random()));  <span class="c good">// ✅ có jitter</span>
+  };
+}</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Scale WebSocket qua nhiều server: không sticky session thì reconnect rơi sang node khác, mà danh sách subscribe nằm trong RAM node cũ → client kết nối thành công nhưng <b>im lặng mãi mãi</b>. Cần Redis pub/sub để fan-out giữa các node.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> SSE hay bị proxy buffer lại làm message kẹt — tắt <code>proxy_buffering</code> của Nginx hoặc gửi header <code>X-Accel-Buffering: no</code>. Load balancer cũng thường cắt kết nối idle sau 60s, đó là lý do thật sự cần heartbeat.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

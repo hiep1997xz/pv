@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Docker 08 — Bảo mật · Production</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Docker</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">08 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Bảo mật · Production</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Vì sao không nên chạy container bằng root?</span></div>
+      <div class="q"><i>?</i><span>Đưa secret vào container thế nào cho an toàn?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Mặc định tiến trình trong container là <b>root</b>. Thoát được container là thành root trên host. Luôn tạo user thường và thêm <code>USER</code> trong Dockerfile.</li>
+      <li><b>Không</b> đặt secret vào <code>ENV</code> hay <code>ARG</code> — chúng nằm lại trong <code>docker history</code>, ai đọc được image là đọc được. Mount file lúc chạy hoặc dùng secret của orchestrator.</li>
+      <li>Ghim base image theo <b>digest</b> chứ đừng dùng <code>latest</code>. <code>latest</code> hôm nay và tháng sau là hai image hoàn toàn khác nhau.</li>
+      <li>Siết quyền lúc chạy: <code>--read-only</code>, <code>--cap-drop ALL</code> rồi thêm lại đúng quyền cần, và đặt giới hạn <code>--memory</code>, <code>--cpus</code>.</li>
+      <li>Quét lỗ hổng ngay trong CI trước khi push: <code>docker scout cves</code> hoặc <code>trivy image</code>. Đừng để tới lúc đã lên production mới quét.</li>
+    </ul>
+    <pre class="code"># --- Dockerfile ---
+FROM node:22-alpine
+RUN addgroup -S app &amp;&amp; adduser -S app -G app
+USER app                    # ✅ không chạy bằng root
+HEALTHCHECK CMD wget -qO- localhost:3000/health || exit 1
+CMD [<span class="s">"node"</span>, <span class="s">"dist/index.js"</span>]
+
+# ❌ secret nằm lại trong docker history, ai có image là đọc được
+# ENV API_KEY=sk_live_abc123
+
+# --- lúc chạy: siết quyền, mount secret dạng file ---
+docker run --read-only --cap-drop ALL --memory 512m \
+  -v app-secrets:/run/secrets:ro myapp
+
+docker scout cves myapp     # quét trước khi push lên registry</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Đừng trả lời “container cô lập rồi thì chạy root cũng không sao”. Container <b>dùng chung kernel</b> với host — root trong container là root thật, chỉ đang bị namespace che. Thoát ra được là chiếm luôn máy chủ.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Nêu được vấn đề <b>PID 1</b>: tiến trình chạy ở PID 1 không có handler mặc định cho <code>SIGTERM</code>, nên <code>docker stop</code> phải chờ hết 10 giây rồi mới giết. Tự bắt tín hiệu, hoặc chạy với <code>--init</code>.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

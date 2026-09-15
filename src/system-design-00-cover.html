@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>System Design — Toàn tập</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page fixed">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="tape" style="top:-14px;left:330px;transform:rotate(-2.4deg)"></div>
+  
+  <svg width="286" height="286" viewBox="-150 -150 300 300"
+       style="position:absolute;left:246px;top:918px;color:#0F766E;opacity:.30;z-index:1">
+    
+    <g fill="none" stroke="currentColor" stroke-width="10">
+      <rect x="-90" y="-128" width="180" height="62" rx="12"/>
+      <rect x="-90" y="-31" width="180" height="62" rx="12"/>
+      <rect x="-90" y="66" width="180" height="62" rx="12"/>
+      <path d="M0 -66 V-31 M0 31 V66"/>
+    </g>
+    <g fill="currentColor">
+      <path d="M-11 -40 L11 -40 L0 -24 Z"/><path d="M-11 57 L11 57 L0 73 Z"/>
+    </g>
+  </svg>
+  <div class="body"><div class="fit">
+    <div class="cover-kicker cursive" style="font-size:34px">( Cẩm nang )</div>
+    <div class="cover-title"><b>System Design</b></div>
+    <div class="cover-sub">Toàn Tập <span class="hl">Đầy Đủ</span></div>
+    <div class="cover-sub2"><span class="under-red">Khung trả lời & bài thiết kế thật</span></div>
+    <ul class="toc">
+      <li><span class="ic">🧭</span>Khung trả lời 4 bước <small>· Mid</small></li>
+      <li><span class="ic">📐</span>Ước lượng QPS · dung lượng · băng thông <small>· Mid</small></li>
+      <li><span class="ic">⚖️</span>Load balancer · app stateless <small>· Mid</small></li>
+      <li><span class="ic">🗃️</span>Cache nhiều tầng · CDN · invalidation <small>· Mid</small></li>
+      <li><span class="ic">💾</span>Chọn DB · index · read replica <small>· Mid</small></li>
+      <li><span class="ic">🔪</span>Sharding & cái giá phải trả <small>· Mid</small></li>
+      <li><span class="ic">📬</span>Message queue · xử lý bất đồng bộ <small>· Senior</small></li>
+      <li><span class="ic">🚦</span>Rate limit · idempotency · retry <small>· Senior</small></li>
+      <li><span class="ic">📰</span>Bài thật: thiết kế News Feed <small>· Senior</small></li>
+      <li><span class="ic">🧱</span>Kiến trúc frontend quy mô lớn <small>· Senior</small></li>
+      <li><span class="ic">🐞</span>Bẫy hay mắc khi vẽ kiến trúc <small>· All</small></li>
+      <li><span class="ic">💬</span>Câu hỏi thật theo từng cấp độ <small>· All</small></li>
+    </ul>
+  </div></div>
+  <div class="cover-note">~ Hỏi trước, <em>vẽ sau</em> — không rõ yêu cầu thì<br>kiến trúc nào cũng sai. Nói ra <em>đánh đổi</em>. ♥</div>
+  <div class="sticky" style="right:44px;bottom:398px;width:318px"><div><span class="ok">✓</span> Giải thích dễ hiểu</div><div><span class="ok">✓</span> Có code thật</div><div><span class="ok">✓</span> Bẫy phỏng vấn</div><div><span class="ok">✓</span> Câu trả lời mẫu</div></div>
+  <div class="chips" style="bottom:88px">
+    <span class="chip" style="background:#DCE9FF;transform:rotate(-1.8deg)">Khái niệm</span>
+    <span class="chip" style="background:#D6F5E3;transform:rotate(1.6deg)">Code mẫu</span>
+    <span class="chip" style="background:#FFDCD4;transform:rotate(-1.8deg)">Bẫy thường gặp</span>
+    <span class="chip" style="background:#FFE9C7;transform:rotate(1.6deg)">Câu hỏi thật</span>
+    <span class="chip" style="background:#F3DDFF;transform:rotate(-1.8deg)">Mẹo ghi điểm</span>
+  </div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

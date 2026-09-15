@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Docker 01 — Container vs máy ảo · Image vs Container</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Docker</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">01 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Container vs máy ảo · Image vs Container</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Container khác máy ảo ở điểm nào?</span></div>
+      <div class="q"><i>?</i><span>Image và container khác nhau thế nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Container <b>không có kernel riêng</b>. Nó dùng chung kernel của host, chỉ bị cô lập bằng <b>namespace</b> (thấy được gì) và <b>cgroup</b> (dùng được bao nhiêu CPU/RAM).</li>
+      <li>Máy ảo phải bật cả một hệ điều hành đầy đủ — nặng vài GB, khởi động vài chục giây. Container chỉ là một tiến trình — vài chục MB, bật trong mili giây.</li>
+      <li><b>Image</b> là bản đóng gói chỉ đọc, xếp thành nhiều <b>layer</b>. <b>Container</b> = image + một layer ghi được nằm trên cùng.</li>
+      <li>Xoá container là mất sạch layer ghi đó. Thứ gì cần sống lâu hơn container thì phải nằm ở <b>volume</b>.</li>
+      <li>Một image chạy được nhiều container độc lập, và các container <b>dùng chung</b> layer chỉ đọc nên tốn rất ít đĩa.</li>
+    </ul>
+    <pre class="code">docker run -d --name web -p 8080:80 nginx:1.27-alpine
+docker ps            # container đang chạy
+docker images        # image đang có trên máy
+
+# ❌ sửa file trong container rồi tưởng là đã lưu
+docker exec -it web sh -c <span class="s">'echo hi &gt; /tmp/a.txt'</span>
+docker rm -f web     # xoá container → mất luôn /tmp/a.txt
+
+# ✅ muốn giữ dữ liệu thì gắn volume vào
+docker run -d --name web -v web-data:/data nginx:1.27-alpine</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Câu vặn hay gặp: container có phải máy ảo siêu nhẹ không? → <b>Không</b>. Nó là tiến trình của host và dùng chung kernel. Nên image Linux không chạy thẳng trên Windows hay macOS — phải có một lớp máy ảo Linux ở giữa.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Nêu được ba thứ dựng nên container: <b>namespace</b> cô lập tầm nhìn, <b>cgroup</b> giới hạn tài nguyên, <b>union filesystem</b> xếp layer. Trả lời đúng ba từ này là qua được câu mở màn.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

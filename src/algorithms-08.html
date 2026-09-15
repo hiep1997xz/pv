@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Thuật Toán 08 — Quy hoạch động · memoization</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Thuật Toán</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">08 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Quy hoạch động · memoization</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Làm sao biết một bài nên giải bằng DP?</span></div>
+      <div class="q"><i>?</i><span>Memoization và tabulation khác nhau ra sao?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Nhận diện DP qua hai dấu hiệu: <b>overlapping subproblems</b> (một bài con bị tính lại nhiều lần) và <b>optimal substructure</b> (lời giải tối ưu ghép từ lời giải tối ưu của bài con).</li>
+      <li>Thiếu overlapping subproblems thì đó là <b>divide and conquer</b> (merge sort), không phải DP. Nếu chọn cục bộ luôn cho kết quả tối ưu thì dùng <b>greedy</b>, rẻ hơn nhiều.</li>
+      <li><b>Top-down (memoization)</b>: giữ nguyên đệ quy, thêm cache. Dễ viết, chỉ tính đúng những bài con thực sự cần, nhưng vẫn tốn call stack.</li>
+      <li><b>Bottom-up (tabulation)</b>: vòng lặp điền bảng từ base case đi lên. Không lo vỡ stack và thường nhanh hơn vì bỏ được chi phí gọi hàm.</li>
+      <li>Leo cầu thang chính là Fibonacci: đệ quy trần <b>O(2^n)</b>, thêm memo còn <b>O(n)</b>. Vì mỗi bước chỉ cần 2 giá trị liền trước, bỏ mảng dp đi là còn <b>O(1) bộ nhớ</b>.</li>
+    </ul>
+    <pre class="code"><span class="c">// Leo cầu thang bottom-up, giữ 2 biến — O(n) thời gian, O(1) bộ nhớ</span>
+<span class="k">function</span> climb(n) {
+  <span class="k">if</span> (n &lt;= 2) <span class="k">return</span> n;
+  <span class="k">let</span> a = 1, b = 2;                        <span class="c">// f(1) = 1, f(2) = 2</span>
+  for (<span class="k">let</span> i = 3; i &lt;= n; i++) [a, b] = [b, a + b];
+  <span class="k">return</span> b;
+}
+<span class="c">// Coin change: ít xu nhất — O(amt · số loại xu), O(amt) bộ nhớ</span>
+<span class="k">function</span> coinChange(coins, amt) {
+  <span class="k">const</span> dp = Array(amt + 1).fill(Infinity); dp[0] = 0;
+  for (<span class="k">let</span> i = 1; i &lt;= amt; i++) for (<span class="k">const</span> c of coins)
+    <span class="k">if</span> (c &lt;= i) dp[i] = Math.min(dp[i], dp[i - c] + 1);
+  <span class="k">return</span> dp[amt] === Infinity ? -1 : dp[amt];
+}
+console.log(climb(10), coinChange([1, 5, 6, 9], 11));   <span class="c">// 89 2</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Bẫy coin change: tham lam “lấy đồng lớn nhất trước” là <b>sai</b>. Với <code>coins = [1, 5, 6, 9]</code> và số tiền <b>11</b>, greedy ra 9+1+1 = 3 đồng, còn đáp án đúng là 5+6 = <b>2 đồng</b>. Greedy chỉ đúng với vài bộ mệnh giá đặc biệt.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Trình bày DP theo đúng 4 bước: định nghĩa <b>trạng thái</b> (<code>dp[i]</code> nghĩa là gì) → <b>công thức truy hồi</b> → <b>base case</b> → <b>thứ tự duyệt</b>. Nói xong 4 bước rồi mới gõ code, người phỏng vấn theo được ngay.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

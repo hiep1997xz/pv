@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Next.js 03 — Data fetching · revalidate</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Next.js</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">03 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Data fetching · revalidate</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Next 15 còn cache fetch mặc định nữa không?</span></div>
+      <div class="q"><i>?</i><span>revalidateTag và revalidatePath khác nhau ra sao?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Fetch ngay trong Server Component bằng <code>async/await</code>, không cần <code>useEffect</code>. Hai component cùng cần một dữ liệu thì cứ gọi lại — <b>request memoization</b> dedupe trong một lần render.</li>
+      <li><b>Next 14</b>: <code>fetch</code> mặc định là <code>force-cache</code>. <b>Next 15 đổi mặc định sang không cache</b> — muốn cache phải khai báo rõ <code>cache: 'force-cache'</code> hoặc <code>next.revalidate</code>.</li>
+      <li>Revalidate theo thời gian: <code>next: { revalidate: 60 }</code> cho một fetch, hoặc <code>export const revalidate</code> cho cả segment.</li>
+      <li>Revalidate theo tag: gắn <code>next: { tags: [...] }</code> rồi gọi <code>revalidateTag()</code> lúc dữ liệu đổi. Chính xác hơn xoá theo path vì tag đi theo dữ liệu, không theo URL.</li>
+      <li>Gọi DB qua ORM/SDK thì <b>không</b> đi qua Data Cache. Muốn cache và gắn tag cho loại này thì bọc bằng <code>unstable_cache</code>.</li>
+    </ul>
+    <pre class="code"><span class="c">// Next 15: fetch KHÔNG còn cache mặc định</span>
+<span class="k">const</span> a = <span class="k">await</span> fetch(url);        <span class="c bad">// ❌ đi mạng lại mỗi request</span>
+
+<span class="c good">// ✅ cache + tự làm mới sau 60 giây</span>
+<span class="k">const</span> b = <span class="k">await</span> fetch(url, { next: { revalidate: 60 } });
+
+<span class="c good">// ✅ cache + gắn tag để sau này xoá đúng phần cần xoá</span>
+<span class="k">const</span> c = <span class="k">await</span> fetch(url, { next: { tags: [<span class="s">'posts'</span>] } });
+
+<span class="c">// Server Action: ghi xong thì xoá đúng tag đó</span>
+<span class="s">'use server'</span>;
+<span class="k">export</span> <span class="k">async</span> <span class="k">function</span> createPost(data) {
+  <span class="k">await</span> db.post.create({ data });
+  revalidateTag(<span class="s">'posts'</span>);
+}</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Nâng 14 lên 15 mà quên đọc changelog: trang đang static bỗng gọi API mỗi request, hoá đơn API tăng vọt. Chiều ngược lại, người quen Next 15 sang dự án Next 14 lại thấy dữ liệu cũ dai dẳng vì fetch bị cache mặc định.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> <code>revalidatePath</code> xoá theo đường dẫn, <code>revalidateTag</code> xoá mọi fetch mang tag đó dù nằm ở route nào. Dự án thật nên đặt tag theo entity (<code>posts</code>, <code>post:12</code>) để xoá đúng phần cần xoá.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

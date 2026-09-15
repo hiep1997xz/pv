@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Kiến Trúc FE 02 — Chiến lược test cho frontend</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Kiến Trúc FE</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">02 / 06</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Chiến lược test cho frontend</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Bạn phân bổ unit / integration / e2e như thế nào?</span></div>
+      <div class="q"><i>?</i><span>Thế nào là test chi tiết cài đặt?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>Kim tự tháp</b> cổ điển: nhiều unit, ít e2e. Với frontend, <b>testing trophy</b> (Kent C. Dodds) hợp hơn — phần phình to là <b>integration</b>, vì bug thật hay nằm ở chỗ các mảnh ghép với nhau.</li>
+      <li><b>Unit</b> cho hàm thuần: reducer, format tiền, validate. <b>Integration</b> render cả màn hình, mock API ở ranh giới network. <b>e2e</b> chỉ vài luồng sinh tiền: đăng nhập, thanh toán.</li>
+      <li>Test <b>hành vi</b>, không test cài đặt: assert cái người dùng thấy, không assert state nội bộ hay số lần hàm private được gọi. Refactor mà test vẫn xanh thì test mới có giá trị.</li>
+      <li>Thứ tự ưu tiên query của <b>Testing Library</b>: <code>getByRole</code> → <code>getByLabelText</code> → <code>getByText</code>, cuối cùng mới <code>getByTestId</code>. Query theo role ép bạn viết markup accessible.</li>
+      <li>Mock ở <b>ranh giới hệ thống</b> (network qua <b>MSW</b>), không mock module nội bộ. Mock càng sâu, test càng tách rời thực tế.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ test cài đặt: đổi tên biến nội bộ là test đỏ ngay</span>
+expect(wrapper.state(<span class="s">'isOpen'</span>)).toBe(true);
+expect(mockFormatTien).toHaveBeenCalledTimes(3);
+
+<span class="c good">// ✅ test hành vi: thao tác theo role, assert thứ hiện trên màn hình</span>
+<span class="k">await</span> user.click(screen.getByRole(<span class="s">'button'</span>, { name: /Đặt hàng/ }));
+expect(<span class="k">await</span> screen.findByText(<span class="s">'Đặt hàng thành công'</span>)).toBeVisible();
+
+<span class="c good">// ✅ mock ở ranh giới network bằng MSW — code thật giữ nguyên</span>
+<span class="k">const</span> server = setupServer(
+  http.get(<span class="s">'/api/cart'</span>, () =&gt; HttpResponse.json({ items: [] }))
+);
+beforeAll(() =&gt; server.listen());
+afterEach(() =&gt; server.resetHandlers());</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Nói “mục tiêu là 100% coverage” là <b>mất điểm</b>. Coverage chỉ đo dòng code <b>được chạy qua</b>, không đo có assert đúng hay không — test rỗng vẫn cho 100%. Đặt ngưỡng ~80% cho business logic và nói rõ mình bỏ qua config, generated code.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Câu chốt đắt giá: “viết test nào mà khi nó đỏ, tôi <b>tin là app thật sự hỏng</b>”. Test flaky còn hại hơn không có test vì team sẽ quen tay retry cho xanh rồi merge.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

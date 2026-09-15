@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>JavaScript 08 — Promise · async/await · xử lý lỗi</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">JavaScript</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">08 / 10</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Promise · async/await · xử lý lỗi</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Promise.all và allSettled khác nhau thế nào?</span></div>
+      <div class="q"><i>?</i><span>Xử lý lỗi với async/await sao cho đúng?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Promise có 3 trạng thái: pending → fulfilled hoặc rejected. Chuyển <b>đúng một lần</b> rồi khoá vĩnh viễn. <code>then</code> luôn trả về promise mới nên chain được.</li>
+      <li><code>async</code> luôn trả về promise. <code>await</code> chỉ tạm dừng <b>hàm đó</b>, không chặn luồng chính. <code>try/catch</code> quanh <code>await</code> bắt được reject; thiếu <code>await</code> thì lỗi rơi ra ngoài <code>try</code>.</li>
+      <li><code>Promise.all</code> reject ngay khi <b>một</b> cái hỏng (fail-fast) — các cái còn lại vẫn chạy nhưng kết quả bị bỏ. <code>allSettled</code> luôn resolve, trả mảng <code>{status, value}</code>.</li>
+      <li><code>race</code> theo cái <b>xong trước</b>, kể cả khi cái đó reject. <code>any</code> lấy cái <b>fulfilled</b> đầu tiên, hỏng hết mới ném <code>AggregateError</code>.</li>
+      <li>Tuần tự vs song song: <code>await a(); await b();</code> chạy nối tiếp. Hai việc độc lập thì gom vào <code>Promise.all</code> để chạy cùng lúc — đây là câu hỏi tối ưu rất hay bị hỏi.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ tuần tự: 200ms, dù hai việc chẳng liên quan gì nhau</span>
+<span class="k">const</span> u1 = <span class="k">await</span> getUser();
+<span class="k">const</span> p1 = <span class="k">await</span> getPosts();
+
+<span class="c good">// ✅ song song: 100ms</span>
+<span class="k">const</span> [u2, p2] = <span class="k">await</span> Promise.all([getUser(), getPosts()]);
+
+<span class="c bad">// ❌ thiếu await → reject lọt ra ngoài, thành unhandled rejection</span>
+try { run(); } catch (e) { console.log(<span class="s">'không bắt được'</span>); }
+
+<span class="c good">// ✅ có await thì reject mới rơi đúng vào catch</span>
+try { <span class="k">await</span> run(); } catch (e) { console.log(e.message); }
+
+<span class="k">const</span> rs = <span class="k">await</span> Promise.allSettled([getUser(), getPosts()]);
+console.log(rs.map(r =&gt; r.status));   <span class="c">// ['fulfilled', 'rejected']</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Sai lầm phổ biến nhất: <code>arr.forEach(async ...)</code>. <code>forEach</code> không đợi promise nên hàm chạy tiếp ngay, lỗi bên trong thành unhandled rejection. Phải dùng <code>for...of</code> + <code>await</code>, hoặc <code>Promise.all(arr.map(f))</code>.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Promise bị reject mà không ai <code>catch</code> → Node hiện tại mặc định <b>kill process</b>, browser thì log <code>unhandledrejection</code>. Luôn đóng chain bằng <code>catch</code>, và bắt sự kiện toàn cục để log lại những ca lọt lưới.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

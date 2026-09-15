@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Thuật Toán 04 — Chuỗi · palindrome · anagram</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Thuật Toán</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">04 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Chuỗi · palindrome · anagram</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Kiểm tra hai chuỗi có phải anagram của nhau?</span></div>
+      <div class="q"><i>?</i><span>Vì sao nối chuỗi trong vòng lặp hay bị chê?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Chuỗi trong JS <b>immutable</b>: không sửa được một ký tự tại chỗ. Mọi thao tác “đổi” đều tạo chuỗi mới, nên luôn tính thêm <b>O(n) bộ nhớ</b> cho kết quả.</li>
+      <li>Đảo chuỗi: <code>[...s].reverse().join("")</code> — O(n). Dùng spread chứ đừng dùng <code>split("")</code>, vì spread tách theo code point nên emoji không bị vỡ.</li>
+      <li>Palindrome: chuẩn hoá trước (thường hoá, bỏ ký tự không phải chữ/số), rồi <b>two pointer</b> từ hai đầu — O(n) thời gian và <b>O(1)</b> bộ nhớ nếu so sánh trực tiếp.</li>
+      <li>Anagram: đúng khi <b>bảng tần suất ký tự</b> giống nhau — O(n) bằng một Map. Cách sort rồi so chuỗi cũng đúng nhưng chậm hơn: <b>O(n log n)</b>.</li>
+      <li>Chuỗi con dài nhất không lặp ký tự là bài <b>sliding window</b> + Map lưu vị trí gần nhất — O(n) thời gian, O(k) bộ nhớ với k là số ký tự khác nhau.</li>
+    </ul>
+    <pre class="code"><span class="c">// Đảo chuỗi — O(n); chuỗi JS immutable nên bắt buộc tạo chuỗi mới</span>
+<span class="k">const</span> rev = s =&gt; [...s].reverse().join(<span class="s">''</span>);
+console.log(rev(<span class="s">'algorithm'</span>));                     <span class="c">// mhtirogla</span>
+
+<span class="c">// Palindrome: chuẩn hoá rồi two pointer — O(n) thời gian, O(1) bộ nhớ</span>
+<span class="k">function</span> isPal(s, t = s.toLowerCase().replace(/[^a-z0-9]/g, <span class="s">''</span>)) {
+  for (<span class="k">let</span> l = 0, r = t.length - 1; l &lt; r; l++, r--)
+    <span class="k">if</span> (t[l] !== t[r]) <span class="k">return</span> false;
+  <span class="k">return</span> true;
+}
+console.log(isPal(<span class="s">'A man, a plan, a canal: Panama'</span>));   <span class="c">// true</span>
+
+<span class="c">// Anagram: sắp xếp ký tự làm key — O(k log k) cho mỗi từ</span>
+<span class="k">const</span> key = s =&gt; [...s].sort().join(<span class="s">''</span>);
+console.log(key(<span class="s">'listen'</span>) === key(<span class="s">'silent'</span>));      <span class="c">// true</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Bẫy Unicode: <code>"👍".length</code> ra <b>2</b> chứ không phải 1, vì JS đếm theo UTF-16 code unit. <code>"👍".split("")</code> cắt emoji thành 2 surrogate rác, đảo xong là hỏng chữ. Dùng <code>[..."👍"]</code> mới đúng 1 phần tử.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Về nối chuỗi trong vòng lặp: về mặt khái niệm mỗi lần <code>+=</code> tạo chuỗi mới nên là O(n²); thực tế V8 tối ưu bằng rope nên vẫn nhanh. Gom vào mảng rồi <code>join</code> một lần vẫn là cách an toàn và rõ ý hơn.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

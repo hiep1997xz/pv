@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>ReactJS 04 — Virtual DOM · Reconciliation · key</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">ReactJS</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">04 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Virtual DOM · Reconciliation · key</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Virtual DOM hoạt động thế nào?</span></div>
+      <div class="q"><i>?</i><span>Vì sao không nên dùng index làm key?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>VDOM</b> là cây object mô tả UI. Mỗi lần render dựng cây mới, React <b>diff</b> với cây cũ rồi chỉ vá đúng phần khác vào DOM thật.</li>
+      <li>Thuật toán diff dựa trên 2 giả định: khác <b>type</b> thẻ → huỷ cả cây con dựng lại; cùng cha thì dùng <b>key</b> để ghép node cũ với node mới.</li>
+      <li><b>key</b> phải <b>ổn định</b> và <b>duy nhất giữa các anh em ruột</b> — lấy <code>id</code> từ dữ liệu, không lấy <code>Math.random()</code>.</li>
+      <li>Dùng index: chèn/xoá/sắp xếp làm index lệch → React tái dùng <b>nhầm</b> node → state nội bộ (chữ trong input, focus, animation) dính sai hàng.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ thêm phần tử vào đầu danh sách → chữ trong input lệch hàng</span>
+{todos.map((t, i) =&gt; &lt;TodoRow key={i} todo={t} /&gt;)}
+
+<span class="c good">// ✅ key gắn liền với dữ liệu, xáo trộn thế nào cũng đúng</span>
+{todos.map(t =&gt; &lt;TodoRow key={t.id} todo={t} /&gt;)}</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Chỉ nói “index gây bug” là chưa đủ điểm. Phải chỉ rõ <b>bug gì</b>: React ghép nhầm node cũ với item mới nên <b>state nội bộ và DOM node bị gán sai hàng</b>.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Nêu ngoại lệ để thể hiện hiểu sâu: index <b>chấp nhận được</b> khi danh sách tĩnh, không thêm/xoá/sắp xếp, và item không giữ state riêng.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

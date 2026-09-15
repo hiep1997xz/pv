@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Debug &amp; Fix 03 — Hydration mismatch · Next.js SSR</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Debug & Fix</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">03 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Hydration mismatch · Next.js SSR</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Hydration mismatch là gì và vì sao nó nguy hiểm?</span></div>
+      <div class="q"><i>?</i><span>Kể vài nguyên nhân khiến HTML server khác client?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>React báo <b>Hydration failed because the initial UI does not match what was rendered on the server</b>, overlay của Next.js in kèm diff giữa hai bên.</li>
+      <li>Nguyên nhân 1 — giá trị thay đổi theo thời gian hoặc ngẫu nhiên: <code>Date.now()</code>, <code>Math.random()</code>, <code>toLocaleString()</code> (phụ thuộc múi giờ và locale của máy chạy).</li>
+      <li>Nguyên nhân 2 — đụng API chỉ có ở client ngay lúc render: <code>window</code>, <code>document</code>, <code>localStorage</code>. Server không có chúng nên HTML hai bên lệch nhau.</li>
+      <li>Nguyên nhân 3 — HTML lồng sai, React cảnh báo <b>validateDOMNesting</b>: thẻ <code>&lt;div&gt;</code> nằm trong <code>&lt;p&gt;</code>, <code>&lt;a&gt;</code> lồng <code>&lt;a&gt;</code>. Trình duyệt tự nắn lại cây DOM, thành ra khác cây React dựng.</li>
+      <li>Sửa: phần chỉ có ở client đẩy vào <code>useEffect</code> · <code>suppressHydrationWarning</code> chỉ đặt đúng node text đó · component cần <code>window</code> thì <code>dynamic(..., { ssr: false })</code>.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ server render 20:00, client hydrate 20:01 → HTML lệch</span>
+<span class="k">function</span> Clock() {
+  <span class="k">return</span> &lt;span&gt;{<span class="k">new</span> Date().toLocaleTimeString()}&lt;/span&gt;;
+}
+
+<span class="c good">// ✅ lần render đầu giống server, điền giá trị thật sau mount</span>
+<span class="k">function</span> Clock() {
+  <span class="k">const</span> [time, setTime] = useState&lt;string | null&gt;(null);
+  useEffect(() =&gt; setTime(<span class="k">new</span> Date().toLocaleTimeString()), []);
+  <span class="k">return</span> &lt;span suppressHydrationWarning&gt;{time ?? <span class="s">'--:--:--'</span>}&lt;/span&gt;;
+}
+
+<span class="c good">// ✅ component bắt buộc có window thì tắt hẳn SSR</span>
+<span class="k">const</span> Chart = dynamic(() =&gt; <span class="k">import</span>(<span class="s">'./Chart'</span>), { ssr: false });</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> React <b>không</b> vá riêng chỗ lệch. Gặp mismatch nó bỏ HTML của server rồi render lại toàn bộ cây từ client — mất sạch lợi ích SSR và màn hình nháy một nhịp. <code>suppressHydrationWarning</code> chỉ tắt cảnh báo cho node đó, không sửa nguyên nhân.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Tránh cờ <code>mounted</code> rải khắp nơi: <code>useSyncExternalStore</code> có tham số <code>getServerSnapshot</code> riêng cho lần render ở server, nên dữ liệu ngoài React vẫn khớp hai bên mà không cần render hai lần bằng tay.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

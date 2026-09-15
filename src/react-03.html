@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>ReactJS 03 — useEffect dùng cho đúng</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">ReactJS</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">03 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">useEffect dùng cho đúng</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Dependency array hoạt động ra sao?</span></div>
+      <div class="q"><i>?</i><span>Khi nào KHÔNG nên dùng useEffect?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><code>[]</code> chạy một lần sau mount · <code>[a, b]</code> chạy lại khi a hoặc b đổi (so sánh <code>Object.is</code>) · bỏ trống thì chạy sau <b>mọi</b> lần render.</li>
+      <li>Hàm <code>return</code> trong effect là <b>cleanup</b>: chạy trước lần effect kế tiếp và khi unmount. Dùng để huỷ timer, huỷ subscribe, huỷ request.</li>
+      <li>Effect chỉ để <b>đồng bộ với hệ thống bên ngoài</b> (fetch, subscribe, DOM, timer). Dữ liệu <b>suy ra được</b> từ state/props thì tính thẳng lúc render — đừng nhét vào effect.</li>
+      <li>Fetch trong effect bắt buộc chống <b>race condition</b> bằng cờ <code>ignore</code> hoặc <code>AbortController</code>.</li>
+    </ul>
+    <pre class="code">useEffect(() =&gt; {
+  <span class="k">let</span> ignore = false;                    <span class="c">// cờ chống race condition</span>
+  fetch(<span class="s">`/api/user/${id}`</span>)
+    .then(r =&gt; r.json())
+    .then(d =&gt; { <span class="k">if</span> (!ignore) setUser(d); });
+
+  <span class="k">return</span> () =&gt; { ignore = true; };       <span class="c">// cleanup khi id đổi / unmount</span>
+}, [id]);</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Thiếu cleanup là trượt: đổi <code>id</code> nhanh → response <b>cũ</b> về sau response <b>mới</b> → màn hình hiện dữ liệu của user trước đó.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Nhắc <b>StrictMode</b> ở React 18 cố tình chạy effect 2 lần trong dev để lộ effect thiếu cleanup — đó là tính năng, không phải bug.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

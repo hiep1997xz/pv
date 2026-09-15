@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Kiến Trúc FE 05 — CI/CD · Performance budget</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Kiến Trúc FE</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">05 / 06</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">CI/CD · Performance budget</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Pipeline CI của bạn gồm những bước nào, theo thứ tự?</span></div>
+      <div class="q"><i>?</i><span>Làm sao chặn bundle phình to qua từng PR?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Thứ tự theo <b>fail fast</b>: rẻ chạy trước — lint, typecheck → unit/integration test → build → security scan → e2e trên bản build. Hỏng sớm thì biết sớm, khỏi đợi 15 phút.</li>
+      <li><b>Preview deployment</b> cho mỗi PR (Vercel, Netlify, namespace k8s riêng): reviewer bấm link xem thật, QA test trước khi merge. Đây là thứ nâng chất lượng review nhiều nhất.</li>
+      <li><b>Performance budget</b> phải là <b>gate tự động</b>, không phải lời nhắc: <code>size-limit</code> đặt ngưỡng KB gzip cho từng entry, vượt là fail PR. <b>Lighthouse CI</b> đặt ngưỡng LCP/CLS/INP.</li>
+      <li>Build một lần, <b>promote artifact</b> qua các môi trường — không build lại cho production. Build lại là bạn deploy một thứ chưa ai test.</li>
+      <li><b>Blue-green</b> hoặc canary để rollback tức thì (đổi con trỏ). Điều kiện: <b>migration tương thích ngược</b> theo expand-contract — thêm cột trước, đọc cả cũ lẫn mới, xoá ở release sau.</li>
+    </ul>
+    <pre class="code"># .github/workflows/ci.yml — rẻ trước, đắt sau (fail fast)
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with: { node-version: <span class="s">'22'</span>, cache: <span class="s">'pnpm'</span> }
+      - run: pnpm lint &amp;&amp; pnpm typecheck   # ~20s, chặn sớm
+      - run: pnpm test -- --coverage
+      - run: pnpm build
+      - run: npx size-limit                # ❌ vượt ngưỡng = fail PR
+      - run: npx lhci autorun              # Lighthouse CI
+
+<span class="c">// .size-limit.json — ngân sách KB gzip cho từng entry</span>
+[{ <span class="s">"path"</span>: <span class="s">"dist/main.*.js"</span>, <span class="s">"limit"</span>: <span class="s">"170 KB"</span> }]</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Đừng nói “có cảnh báo khi bundle tăng”. Cảnh báo là thứ ai cũng lướt qua. Ngân sách chỉ có tác dụng khi nó <b>chặn merge</b>. Và đừng để <code>continue-on-error: true</code> ở bước test — bằng không có CI.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Nói rõ ngưỡng đến từ đâu: budget nên suy từ <b>mục tiêu thời gian tải trên mạng 4G của người dùng thật</b> (dữ liệu RUM), không phải con số bịa. Thêm: tách <b>deploy</b> khỏi <b>release</b> bằng feature flag để rollback không cần redeploy.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>
