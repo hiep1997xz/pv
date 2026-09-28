@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Node.js 03 — Async · Lỗi · Error middleware</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Node.js</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">03 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Async · Lỗi · Error middleware</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Vì sao try/catch không bắt được lỗi trong callback?</span></div>
+      <div class="q"><i>?</i><span>Gặp uncaughtException thì nên xử lý thế nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><code>try/catch</code> chỉ bao được phần chạy <b>đồng bộ</b> bên trong nó. Callback của <code>setTimeout</code> hay của stream chạy ở tick sau, lúc đó stack cũ đã tan — lỗi bay thẳng ra ngoài.</li>
+      <li>Với <code>async/await</code> thì <code>try/catch</code> lại bắt được, nhưng bắt buộc phải có <code>await</code>. Quên <code>await</code> là promise reject lọt ra thành <code>unhandledRejection</code>.</li>
+      <li>Express 4 <b>không</b> tự bắt promise reject trong handler: phải <code>.catch(next)</code> hoặc bọc bằng một hàm wrapper. Express 5 thì bắt được, nên hỏi rõ phiên bản trước khi trả lời.</li>
+      <li>Error middleware của Express phải khai báo <b>đủ 4 tham số</b> <code>(err, req, res, next)</code> — thiếu một cái là Express coi nó như middleware thường và không bao giờ gọi tới.</li>
+      <li><code>uncaughtException</code> nghĩa là process đang ở trạng thái <b>không xác định</b>. Đúng bài: ghi log, đóng kết nối, rồi <code>process.exit(1)</code> để orchestrator dựng lại bản sạch.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ try/catch không với tới callback chạy ở tick sau</span>
+try {
+  setTimeout(() =&gt; { throw <span class="k">new</span> Error(<span class="s">'boom'</span>); }, 0);
+} catch (e) { console.log(<span class="s">'không bao giờ vào đây'</span>); }
+
+<span class="c good">// ✅ error middleware của Express: bắt buộc đủ 4 tham số</span>
+app.use((err, req, res, next) =&gt; {
+  logger.error({ err, reqId: req.id });
+  res.status(err.status ?? 500).json({ error: <span class="s">'Lỗi hệ thống'</span> });
+});
+process.on(<span class="s">'unhandledRejection'</span>, (reason) =&gt; { throw reason; });
+process.on(<span class="s">'uncaughtException'</span>, (err) =&gt; {
+  logger.fatal({ err });
+  process.exit(1);     <span class="c good">// ✅ ghi log rồi THOÁT, không chạy tiếp</span>
+});</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Tưởng bắt <code>uncaughtException</code> rồi chạy tiếp là app “sống sót”. Không — nó chỉ giấu lỗi: kết nối có thể đang treo, biến đang dở dang, rò rỉ tích dần. Restart sạch luôn an toàn hơn chạy tiếp trong trạng thái hỏng.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Phân biệt <b>operational error</b> (DB timeout, input sai — xử lý rồi trả lỗi cho client) với <b>programmer error</b> (đọc thuộc tính của <code>undefined</code> — để nó nổ và restart). Trộn hai loại này là nguồn gốc của bug khó tìm.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

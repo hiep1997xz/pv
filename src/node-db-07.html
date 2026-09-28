@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Node + DB 07 — Bulk insert · Cursor · Read replica</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Node + DB</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">07 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Bulk insert · Cursor · Read replica</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Import 100k dòng mà Node hết RAM thì xử lý sao?</span></div>
+      <div class="q"><i>?</i><span>Query nặng giữ connection cả phút, chặn bằng gì?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>Bulk insert</b>: insert từng dòng trong vòng lặp là N round-trip và N transaction ngầm. Gộp thành lô 500–1000 dòng bằng <code>createMany</code>. File thật lớn thì dùng <code>COPY</code>.</li>
+      <li>Đừng <code>findMany()</code> cả bảng vào RAM. Duyệt bằng <b>cursor</b> (<code>WHERE id &gt; $last ORDER BY id</code>) hoặc stream từng dòng. <code>OFFSET</code> lớn vẫn bắt Postgres đọc rồi vứt bỏ đúng ngần ấy dòng.</li>
+      <li>Đặt <b><code>statement_timeout</code></b> cho connection của web app (vài giây) để một query đi lạc không giam connection mãi. Job nền thì cấu hình riêng, dài hơn — không dùng chung một giá trị.</li>
+      <li><b>Retry có exponential backoff + jitter</b>, nhưng chỉ retry thao tác <b>idempotent</b> và lỗi <b>tạm thời</b> (mất kết nối, deadlock). Retry một <code>INSERT</code> đơn hàng là tạo ra hai đơn.</li>
+      <li><b>Read replica</b>: pool thứ hai trỏ vào replica, route query chỉ-đọc sang đó. Bẫy <b>replication lag</b>: ghi xong đọc ngay từ replica sẽ không thấy — vừa ghi thì phải đọc từ primary.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ pg: 100k round-trip, mỗi dòng một transaction ngầm</span>
+for (<span class="k">const</span> r of rows)
+  <span class="k">await</span> pool.query(<span class="s">'INSERT INTO t(a,b) VALUES ($1,$2)'</span>, [r.a, r.b]);
+<span class="c good">// ✅ Prisma: chia lô 1000 dòng, một câu lệnh cho cả lô</span>
+for (<span class="k">const</span> lo of chunk(rows, 1000))
+  <span class="k">await</span> prisma.t.createMany({ data: lo, skipDuplicates: true });
+
+<span class="c good">// ✅ duyệt bảng lớn bằng cursor — RAM không phình theo số dòng</span>
+<span class="k">let</span> last = 0;
+for (;;) {
+  <span class="k">const</span> { rows: page } = <span class="k">await</span> pool.query(
+    <span class="s">'SELECT * FROM t WHERE id &gt; $1 ORDER BY id LIMIT 1000'</span>, [last]);
+  <span class="k">if</span> (!page.length) break;
+  last = page[page.length - 1].id;   <span class="c">// OFFSET lớn thì vẫn đọc rồi bỏ</span>
+}</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Retry mù là bẫy lớn nhất: request timeout <b>không</b> có nghĩa là DB chưa ghi. Rất có thể <code>INSERT</code> đã thành công, chỉ là response không về kịp — retry xong thành hai đơn hàng. Chỉ retry khi thao tác idempotent hoặc có unique key chặn.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Về replication lag: “read your own writes” là ràng buộc <b>nghiệp vụ</b>, không phải chi tiết kỹ thuật. Sau khi user ghi, route request của chính user đó về primary trong vài giây; phần còn lại vẫn đọc từ replica.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

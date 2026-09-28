@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Node.js 04 — HTTP server · Middleware · Validate</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Node.js</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">04 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">HTTP server · Middleware · Validate</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Thứ tự đăng ký middleware ảnh hưởng thế nào?</span></div>
+      <div class="q"><i>?</i><span>Khi nào trả 401, khi nào 403, khi nào 422?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Middleware là một <b>chuỗi</b> chạy đúng theo thứ tự <code>app.use</code>. Không gọi <code>next()</code> mà cũng không trả response thì request <b>treo</b> tới khi client timeout.</li>
+      <li>Parse body phải đăng ký <b>trước</b> route, error middleware phải đăng ký <b>sau cùng</b>. Đặt nhầm chỗ là <code>req.body</code> thành <code>undefined</code>, hoặc lỗi không ai bắt.</li>
+      <li>Validate ở <b>biên</b> bằng schema (zod, Valibot): từ handler trở vào coi như dữ liệu đã sạch và đúng kiểu. Luôn đặt <code>limit</code> cho body để chặn payload khổng lồ.</li>
+      <li>Status code: <b>400</b> body sai cú pháp · <b>401</b> chưa đăng nhập · <b>403</b> đã đăng nhập nhưng không đủ quyền · <b>404</b> không tồn tại · <b>409</b> xung đột · <b>422</b> đúng cú pháp nhưng sai nghiệp vụ.</li>
+      <li><b>CORS</b> là cơ chế của <b>trình duyệt</b> nhưng phải sửa ở <b>server</b> bằng header. Liệt kê origin cụ thể; đã bật <code>credentials</code> thì <b>không được</b> để origin là <code>*</code>.</li>
+    </ul>
+    <pre class="code"><span class="k">const</span> app = express();
+app.use(express.json({ limit: <span class="s">'100kb'</span> }));  <span class="c good">// ✅ parse body TRƯỚC route</span>
+
+<span class="k">const</span> Body = z.object({
+  email: z.string().email(),
+  age: z.number().int().min(18),
+});
+
+app.post(<span class="s">'/users'</span>, <span class="k">async</span> (req, res) =&gt; {
+  <span class="k">const</span> p = Body.safeParse(req.body);
+  <span class="k">if</span> (!p.success) <span class="k">return</span> res.status(400).json(p.error.issues);
+  <span class="k">if</span> (<span class="k">await</span> exists(p.data.email)) <span class="k">return</span> res.status(409).end();
+  res.status(201).json(<span class="k">await</span> create(p.data));
+});
+app.use(errorHandler);     <span class="c good">// ✅ error middleware đăng ký SAU CÙNG</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Câu vặn hay gặp: “thêm <code>cors()</code> rồi mà trình duyệt vẫn chặn?” → thường là request <b>preflight</b> <code>OPTIONS</code> bị một route khác hoặc auth middleware nuốt trước, nên header CORS không kịp gắn vào response.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> So sánh Express với <b>Fastify</b>: Fastify nhanh hơn chủ yếu nhờ tuần tự hoá JSON theo schema đã biên dịch sẵn, và validate bằng JSON Schema là một phần của framework chứ không phải thư viện gắn thêm.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

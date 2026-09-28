@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Node + DB 01 — Connection pool · Rò rỉ connection</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Node + DB</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">01 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Connection pool · Rò rỉ connection</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>App chạy vài tiếng rồi mọi request treo, nghi gì đầu tiên?</span></div>
+      <div class="q"><i>?</i><span>Pool size nên đặt bao nhiêu và dựa vào đâu?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Mở một connection tới Postgres là TCP handshake + xác thực + fork một process phía server — tốn hàng chục ms. <b>Pool</b> giữ sẵn N connection, query xong thì <b>trả lại</b> chứ không đóng.</li>
+      <li>Pool size <b>không phải càng to càng tốt</b>. Mỗi connection là một process của Postgres; tổng pool của <b>mọi</b> instance phải nhỏ hơn <code>max_connections</code>. Khởi đầu cỡ <b>số core × 2</b> rồi đo.</li>
+      <li><b>Connection leak</b>: lấy bằng <code>pool.connect()</code> nhưng nhánh throw không gọi <code>release()</code> → pool cạn dần, request sau xếp hàng rồi timeout. Luôn <code>release()</code> trong <code>finally</code>.</li>
+      <li><code>connectionTimeoutMillis</code> = chờ mượn connection bao lâu thì bỏ cuộc (chống treo vô hạn). <code>idleTimeoutMillis</code> = connection rảnh bao lâu thì đóng, trả tài nguyên lại cho DB.</li>
+      <li>Serverless: mỗi instance có pool riêng, scale lên 200 instance là 200 pool → nổ <code>max_connections</code> ngay. Đặt <b>PgBouncer</b> ở giữa để gom lại thành một pool chung.</li>
+    </ul>
+    <pre class="code"><span class="c">// pg — một Pool dùng chung cả app: import { Pool } from 'pg'</span>
+<span class="k">export</span> <span class="k">const</span> pool = <span class="k">new</span> Pool({
+  max: 20,                    <span class="c">// tổng mọi instance &lt; max_connections</span>
+  idleTimeoutMillis: 30_000,      <span class="c">// connection rảnh 30s thì đóng</span>
+  connectionTimeoutMillis: 5_000, <span class="c">// chờ mượn quá 5s thì báo lỗi</span>
+});
+
+<span class="c bad">// ❌ throw ở giữa → connection này không bao giờ quay về pool</span>
+<span class="k">const</span> c = <span class="k">await</span> pool.connect();
+<span class="k">await</span> c.query(<span class="s">'UPDATE ...'</span>);   <span class="c">// câu này ném lỗi là rò rỉ luôn</span>
+c.release();
+
+<span class="c good">// ✅ release trong finally, chạy cả khi throw</span>
+<span class="k">const</span> c2 = <span class="k">await</span> pool.connect();
+try { <span class="k">await</span> c2.query(<span class="s">'UPDATE ...'</span>); } finally { c2.release(); }</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Quên <code>release()</code> ở nhánh lỗi là bug kinh điển: chạy dev không thấy gì, lên production vài giờ thì mọi request treo ở <code>connectionTimeoutMillis</code>. Dấu hiệu nhận ra: <code>pool.idleCount</code> về 0 còn <code>pool.waitingCount</code> tăng đều.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Query đơn lẻ thì dùng thẳng <code>pool.query()</code> — <code>pg</code> tự mượn và tự trả connection, không thể rò rỉ. Chỉ cần <code>pool.connect()</code> khi làm transaction hoặc khi nhiều câu bắt buộc đi trên cùng một connection.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

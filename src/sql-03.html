@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>SQL 03 — GROUP BY · HAVING · Aggregate</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">SQL</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">03 / 10</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">GROUP BY · HAVING · Aggregate</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>WHERE và HAVING khác nhau thế nào?</span></div>
+      <div class="q"><i>?</i><span>COUNT(*) khác COUNT(cot) ở điểm nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Thứ tự chạy thật: <code>FROM</code> → <code>WHERE</code> → <code>GROUP BY</code> → <code>HAVING</code> → <code>SELECT</code> → <code>ORDER BY</code> → <code>LIMIT</code>. Nhớ đúng thứ tự này là gỡ được gần hết câu hỏi về GROUP BY.</li>
+      <li><code>WHERE</code> lọc <b>từng dòng trước khi gộp</b>, <code>HAVING</code> lọc <b>từng nhóm sau khi gộp</b>. Điều kiện không đụng hàm tổng hợp thì để ở WHERE — lọc sớm, nhóm ít đi, nhanh hơn.</li>
+      <li><code>COUNT(*)</code> đếm mọi dòng. <code>COUNT(cot)</code> <b>bỏ qua NULL</b> của cột đó. <code>SUM</code>, <code>AVG</code>, <code>MAX</code> cũng bỏ qua NULL — nên <code>AVG</code> là chia cho số dòng có giá trị, không phải tổng số dòng.</li>
+      <li>Cột nằm trong <code>SELECT</code> mà không có trong <code>GROUP BY</code> và không bọc hàm tổng hợp thì PostgreSQL <b>báo lỗi</b>. MySQL tắt <code>ONLY_FULL_GROUP_BY</code> sẽ trả bừa một giá trị bất kỳ trong nhóm.</li>
+      <li>Alias đặt ở SELECT dùng được trong <code>GROUP BY</code> và <code>ORDER BY</code>, nhưng <b>không</b> dùng được trong <code>WHERE</code> và <code>HAVING</code> — vì hai chỗ đó chạy trước SELECT.</li>
+    </ul>
+    <pre class="code"><span class="c bad">-- ❌ LEFT JOIN + COUNT(*) → user không có đơn nào vẫn ra 1</span>
+SELECT u.name, COUNT(*) AS so_don
+FROM users u LEFT JOIN orders o ON o.user_id = u.id
+GROUP BY u.name;
+
+<span class="c good">-- ✅ đếm cột của bảng phải, NULL bị bỏ qua → đúng 0</span>
+SELECT u.name, COUNT(o.id) AS so_don
+FROM users u LEFT JOIN orders o ON o.user_id = u.id
+GROUP BY u.name;
+
+<span class="c">-- WHERE lọc dòng trước khi gộp, HAVING lọc nhóm sau khi gộp</span>
+SELECT user_id, SUM(amount) AS tong
+FROM orders
+WHERE status = <span class="s">'paid'</span>
+GROUP BY user_id HAVING SUM(amount) &gt; 200;</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> <code>LEFT JOIN</code> rồi <code>COUNT(*)</code> trả về <b>1</b> cho nhóm không có bản ghi nào, vì dòng toàn NULL vẫn là một dòng. Phải đếm đúng cột bên phải, <code>COUNT(o.id)</code>, mới ra <b>0</b>. Kiểu sai này rất khó phát hiện.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Cần vừa đếm vừa lọc thì dùng <code>FILTER</code>: <code>COUNT(*) FILTER (WHERE ...)</code> — gọn hơn nhiều so với <code>SUM(CASE WHEN ... THEN 1 END)</code>. MySQL không có FILTER, phải quay lại kiểu CASE.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

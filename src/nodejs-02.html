@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Node.js 02 — Module · Cấu hình · Biến môi trường</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Node.js</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">02 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Module · Cấu hình · Biến môi trường</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>CommonJS và ESM khác nhau ra sao khi chạy trong Node?</span></div>
+      <div class="q"><i>?</i><span>Config đọc từ env thì validate ở đâu và lúc nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>CommonJS</b>: <code>require</code> đồng bộ, nạp lúc chạy, <code>module.exports</code> là object sửa được. <b>ESM</b>: <code>import</code> tĩnh, phân tích lúc parse, binding là <b>live</b> và chỉ đọc.</li>
+      <li>Node chọn loại theo đuôi file và <code>"type"</code> trong package.json: <code>.mjs</code> luôn ESM, <code>.cjs</code> luôn CommonJS, <code>.js</code> thì theo <code>"type": "module"</code> có hay không.</li>
+      <li>ESM <code>import</code> được CommonJS; chiều ngược lại phải dùng <code>await import()</code>. Trong ESM không có <code>__dirname</code> — thay bằng <code>import.meta.dirname</code>.</li>
+      <li>Trường <code>"exports"</code> khai báo <b>điểm vào công khai</b> của package và <b>chặn</b> import sâu vào file nội bộ, nhờ vậy đổi cấu trúc thư mục không làm vỡ người dùng.</li>
+      <li>Đọc env <b>một lần</b> lúc khởi động, validate rồi <code>Object.freeze</code>. Thiếu biến thì <b>thoát ngay</b> (fail fast) — thà chết lúc deploy còn hơn 500 lúc 2 giờ sáng.</li>
+    </ul>
+    <pre class="code"><span class="c">// package.json: { "type": "module", "exports": "./src/index.js" }</span>
+<span class="k">const</span> need = [<span class="s">'DATABASE_URL'</span>, <span class="s">'JWT_SECRET'</span>];
+<span class="k">const</span> missing = need.filter((k) =&gt; !process.env[k]);
+
+<span class="k">if</span> (missing.length) {
+  console.error(<span class="s">'Thiếu biến môi trường: '</span> + missing.join(<span class="s">', '</span>));
+  process.exit(1);        <span class="c good">// ✅ fail fast, chết ngay lúc khởi động</span>
+}
+
+<span class="k">export</span> <span class="k">const</span> config = Object.freeze({
+  port: Number(process.env.PORT ?? 3000),
+  dbUrl: process.env.DATABASE_URL,
+  isProd: process.env.NODE_ENV === <span class="s">'production'</span>,
+});
+<span class="c bad">// ❌ rải process.env khắp code → thiếu biến, vào nhánh đó mới nổ</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> File <code>.env</code> chỉ dành cho máy local và <b>không bao giờ</b> commit; production dùng secret của nền tảng. Hỏi vặn hay gặp: “lỡ commit rồi thì sao?” → xoá khỏi repo là chưa đủ, phải <b>rotate</b> toàn bộ key đã lộ.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Gom mọi biến vào <b>một module config duy nhất</b>: chỉ chỗ đó biết tên biến, test thì thay config rất dễ, và lỗi thiếu biến lộ ra ngay lúc boot. Từ Node 20 đã có <code>--env-file</code> sẵn, không cần dotenv nữa.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

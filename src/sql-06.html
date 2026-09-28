@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>SQL 06 — Transaction · ACID · Isolation level</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">SQL</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">06 / 10</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Transaction · ACID · Isolation level</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Bốn mức isolation chống được những hiện tượng nào?</span></div>
+      <div class="q"><i>?</i><span>Mức isolation mặc định của PostgreSQL là gì?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>ACID</b>: Atomicity (ăn cả hoặc ngã về không), Consistency (không phá ràng buộc), Isolation (transaction không giẫm chân nhau), Durability (commit xong là còn, kể cả mất điện).</li>
+      <li>Ba hiện tượng theo chuẩn: <b>dirty read</b> đọc dữ liệu chưa commit · <b>non-repeatable read</b> đọc lại cùng một dòng ra giá trị khác · <b>phantom read</b> chạy lại cùng câu lọc thì có thêm dòng.</li>
+      <li>Bốn mức tăng dần: <code>READ UNCOMMITTED</code> → <code>READ COMMITTED</code> → <code>REPEATABLE READ</code> → <code>SERIALIZABLE</code>. Càng cao càng an toàn, đổi lại càng hay phải chờ hoặc bị huỷ transaction.</li>
+      <li>PostgreSQL mặc định <b>READ COMMITTED</b>; MySQL InnoDB mặc định <b>REPEATABLE READ</b>. PostgreSQL không có READ UNCOMMITTED thật — khai báo mức đó thì vẫn chạy như READ COMMITTED.</li>
+      <li><code>REPEATABLE READ</code> của PostgreSQL dựa trên snapshot nên chặn luôn cả phantom read, chặt hơn chuẩn. Đổi lại, ghi đè dòng người khác vừa sửa sẽ nhận lỗi <code>could not serialize access</code>.</li>
+    </ul>
+    <pre class="code">BEGIN ISOLATION LEVEL REPEATABLE READ;
+SELECT bal FROM acc WHERE id = 1;    <span class="c">-- đọc ra 100</span>
+<span class="c">-- lúc này transaction khác UPDATE rồi COMMIT, bal chỉ còn 80</span>
+UPDATE acc SET bal = bal - 10 WHERE id = 1;
+<span class="c bad">-- ❌ ERROR: could not serialize access due to concurrent update</span>
+ROLLBACK;                            <span class="c">-- app phải tự retry lại</span>
+
+<span class="c good">-- ✅ READ COMMITTED (mặc định): mỗi câu lệnh thấy bản mới nhất</span>
+BEGIN;
+UPDATE acc SET bal = bal - 10 WHERE id = 1;   <span class="c">-- tính trên bal mới</span>
+COMMIT;</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> <b>Lost update</b>: đọc <code>bal</code> về biến trong app, trừ trong code rồi <code>UPDATE ... SET bal = 90</code>. Hai request chạy song song thì bản ghi sau đè bản trước, tiền bốc hơi. Sửa bằng <code>SET bal = bal - 10</code> ngay trong SQL, hoặc khoá dòng bằng <code>FOR UPDATE</code>.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Isolation cao không thay được khoá. <code>SERIALIZABLE</code> ở PostgreSQL có thể huỷ transaction bất kỳ lúc nào với mã lỗi <code>40001</code>, nên chọn mức này thì app <b>bắt buộc</b> phải có vòng retry.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

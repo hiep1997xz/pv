@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>SQL 08 — Window function · PARTITION BY</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">SQL</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">08 / 10</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Window function · PARTITION BY</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>ROW_NUMBER, RANK, DENSE_RANK khác nhau ra sao?</span></div>
+      <div class="q"><i>?</i><span>Lấy bản ghi mới nhất của mỗi nhóm bằng cách nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Window function tính trên một “cửa sổ” các dòng liên quan nhưng <b>không gộp dòng lại</b> — khác hẳn <code>GROUP BY</code>. Số dòng đầu ra đúng bằng số dòng đầu vào.</li>
+      <li>Khi giá trị bằng nhau (100, 100, 90, 80): <code>ROW_NUMBER</code> ra 1-2-3-4 (không bao giờ trùng) · <code>RANK</code> ra 1-1-3-4 (nhảy số) · <code>DENSE_RANK</code> ra 1-1-2-3 (không nhảy).</li>
+      <li><code>PARTITION BY</code> chia dòng thành nhóm rồi đánh số lại từ đầu trong mỗi nhóm. <code>ORDER BY</code> nằm trong <code>OVER()</code> quyết định thứ tự đánh số, độc lập với ORDER BY của cả câu.</li>
+      <li>Lấy bản ghi mới nhất mỗi nhóm: <code>ROW_NUMBER()</code> với <code>PARTITION BY user_id</code> và <code>ORDER BY created_at DESC</code>, rồi lọc <code>rn = 1</code> ở tầng ngoài.</li>
+      <li>Running total là <code>SUM(x) OVER (ORDER BY id)</code>. Khung mặc định là <code>RANGE</code> nên các dòng <b>bằng nhau</b> ở cột ORDER BY bị cộng gộp chung một lượt — cần chính xác từng dòng thì ghi rõ <code>ROWS</code>.</li>
+    </ul>
+    <pre class="code"><span class="c">-- điểm 100, 100, 90, 80 cho ra ba kiểu thứ hạng khác nhau:</span>
+<span class="c">-- ROW_NUMBER → 1 2 3 4 · RANK → 1 1 3 4 · DENSE_RANK → 1 1 2 3</span>
+
+<span class="c good">-- ✅ lấy đơn hàng mới nhất của từng user</span>
+SELECT user_id, id, created_at FROM (
+  SELECT o.*, ROW_NUMBER() OVER (
+           PARTITION BY user_id ORDER BY created_at DESC) AS rn
+  FROM orders o
+) x WHERE rn = 1;
+
+<span class="c bad">-- ❌ WHERE ROW_NUMBER() OVER (...) = 1  → lỗi, window chạy SAU WHERE</span>
+
+<span class="c">-- running total — ghi rõ ROWS để không cộng gộp dòng bằng nhau</span>
+SELECT id, SUM(amount) OVER (ORDER BY id ROWS UNBOUNDED PRECEDING)
+FROM orders;</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Lọc ngay cùng tầng là hỏng cả hai đường: <code>WHERE rn = 1</code> báo <code>column "rn" does not exist</code>, còn nhét thẳng hàm vào WHERE thì báo <code>not allowed in WHERE</code>. Window function chạy <b>sau</b> WHERE nên bắt buộc bọc thêm một tầng subquery hoặc CTE.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> PostgreSQL có <code>DISTINCT ON (user_id)</code> lấy dòng đầu của mỗi nhóm, ngắn hơn ROW_NUMBER nhiều; ghép với <code>ORDER BY user_id</code>, <code>created_at DESC</code> là ra bản ghi mới nhất. MySQL không có cú pháp này.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

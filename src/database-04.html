@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Database 04 — Phi chuẩn hoá · Counter · Materialized view</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Database</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">04 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Phi chuẩn hoá · Counter · Materialized view</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Khi nào bạn cố ý phi chuẩn hoá dữ liệu?</span></div>
+      <div class="q"><i>?</i><span>Lưu cột đếm sẵn thì rủi ro ở đâu?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Quy tắc: <b>chuẩn hoá trước, phi chuẩn hoá sau — và chỉ khi có số đo</b>. Phải thấy query chậm thật trên <code>EXPLAIN ANALYZE</code> rồi mới đổi tính đúng đắn lấy tốc độ đọc.</li>
+      <li>Nhân bản có chủ đích: chép <code>product_name</code> và <code>unit_price</code> vào <code>order_items</code>. Đây không phải tối ưu tốc độ mà là <b>ảnh chụp lịch sử</b> — giá đổi sau này không được làm sai hoá đơn cũ.</li>
+      <li><b>Counter</b> (<code>comment_count</code>) tránh được <code>COUNT(*)</code> mỗi lần đọc, nhưng phải cập nhật trong <b>cùng transaction</b> với việc chèn comment, và phải dùng phép cộng chứ không đọc-rồi-ghi-đè.</li>
+      <li><b>Materialized view</b> lưu sẵn kết quả một query nặng thành bảng. Dữ liệu <b>cũ</b> cho tới lúc <code>REFRESH</code>; bản thường khoá đọc lúc refresh, bản <code>CONCURRENTLY</code> thì cần unique index.</li>
+      <li>Mọi dữ liệu nhân bản đều phải có đường <b>hàn gắn</b>: một job định kỳ so counter với <code>COUNT(*)</code> thật rồi sửa lệch. Không có job đó thì sai số tồn tại vĩnh viễn và không ai biết.</li>
+    </ul>
+    <pre class="code"><span class="c good">// ✅ counter cộng dồn, nằm cùng transaction với việc chèn comment</span>
+BEGIN;
+INSERT INTO comments (post_id, body) VALUES (42, <span class="s">'hay'</span>);
+UPDATE posts SET comment_count = comment_count + 1 WHERE id = 42;
+COMMIT;
+
+<span class="c bad">// ❌ đọc trước rồi ghi đè: hai transaction song song đè nhau, mất 1</span>
+UPDATE posts SET comment_count = 11 WHERE id = 42;
+
+<span class="c good">// ✅ job hàn gắn chạy đêm, kéo mọi chỗ đã trôi lệch về đúng</span>
+UPDATE posts p SET comment_count = c.n
+FROM (SELECT post_id, count(*) n FROM comments GROUP BY 1) c
+WHERE c.post_id = p.id AND p.comment_count &lt;&gt; c.n;</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Counter trôi lệch là lỗi kinh điển: cập nhật ngoài transaction, hoặc ghi đè bằng giá trị vừa đọc nên hai request song song đè nhau. Vài tháng sau bài hiện "12 bình luận" mà mở ra chỉ có 9 — và không ai biết sai từ lúc nào.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Trước khi phi chuẩn hoá, thử hết các cách rẻ hơn đã: thêm đúng index, viết lại query, dùng covering index. Phi chuẩn hoá là lựa chọn cuối vì nó thêm vĩnh viễn một chỗ có thể sai lệch — và chỗ đó sẽ lệch.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Node.js 07 — Scale · cluster · Graceful shutdown</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Node.js</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">07 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Scale · cluster · Graceful shutdown</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>cluster và worker_threads khác nhau thế nào?</span></div>
+      <div class="q"><i>?</i><span>Graceful shutdown gồm những bước nào theo thứ tự?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><code>cluster</code> fork ra <b>nhiều process</b>, mỗi process một event loop và một vùng nhớ riêng, cùng chia tải trên một cổng. Dùng để tận dụng hết nhân CPU cho tải <b>I/O-bound</b>.</li>
+      <li><code>worker_threads</code> tạo <b>thread</b> trong cùng process, chia sẻ được bộ nhớ qua <code>SharedArrayBuffer</code>. Dùng cho việc <b>CPU-bound</b>: resize ảnh, nén, hash, tính toán nặng.</li>
+      <li>Chọn sai là mất điểm: việc nặng CPU mà chỉ fork thêm process thì từng process vẫn đơ; việc I/O mà tạo thread thì tốn công vô ích, vì I/O đã bất đồng bộ sẵn.</li>
+      <li>App phải <b>stateless</b>: session, cache, hàng đợi job đẩy ra Redis hay DB. Giữ trong RAM thì mỗi worker một bản khác nhau, scale lên 3 pod là user đăng nhập lúc được lúc không.</li>
+      <li><b>Graceful shutdown</b> khi nhận <code>SIGTERM</code>: (1) health check trả fail, (2) ngừng nhận kết nối mới, (3) đợi request đang chạy xong, (4) đóng pool DB, (5) hết deadline thì thoát cứng.</li>
+    </ul>
+    <pre class="code"><span class="k">import</span> cluster <span class="k">from</span> <span class="s">'node:cluster'</span>;
+<span class="k">import</span> { availableParallelism } <span class="k">from</span> <span class="s">'node:os'</span>;
+<span class="k">if</span> (cluster.isPrimary) {
+  for (<span class="k">let</span> i = 0; i &lt; availableParallelism(); i++) cluster.fork();
+  cluster.on(<span class="s">'exit'</span>, () =&gt; cluster.fork());  <span class="c">// worker chết thì dựng lại</span>
+} <span class="k">else</span> {
+  <span class="k">const</span> server = app.listen(3000);
+  process.on(<span class="s">'SIGTERM'</span>, () =&gt; {
+    ready = false;                  <span class="c good">// ✅ readiness fail trước vài giây</span>
+    server.close(<span class="k">async</span> () =&gt; {      <span class="c">// ngừng nhận kết nối mới</span>
+      <span class="k">await</span> pool.end(); process.exit(0);   <span class="c">// đóng pool DB rồi thoát</span>
+    });
+    setTimeout(() =&gt; process.exit(1), 15_000).unref();  <span class="c">// deadline</span>
+  });
+}</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Bỏ qua <code>SIGTERM</code> thì Kubernetes chờ hết grace period rồi <code>SIGKILL</code>: request đang dở bị cắt ngang, transaction treo. Trong Docker, tiến trình Node còn phải là <b>PID 1</b> hoặc có init, không thì signal chẳng tới nơi.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Phân biệt <b>liveness</b> (process còn sống — hỏng thì restart) với <b>readiness</b> (sẵn sàng nhận traffic — hỏng thì chỉ rút khỏi load balancer). Để liveness gọi thẳng vào DB là sai: một hiccup của DB sẽ restart cả cụm.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Node.js 08 — Hiệu năng · Memory leak · Quan sát</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Node.js</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">08 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Hiệu năng · Memory leak · Quan sát</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>App chậm mà CPU thấp, bạn tìm nguyên nhân thế nào?</span></div>
+      <div class="q"><i>?</i><span>Memory leak trong Node thường đến từ đâu?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Đo trước, tối ưu sau. Bốn số cần nhìn: <b>event loop lag</b>, p95/p99 theo từng endpoint, RSS và heap used, số kết nối đang xếp hàng chờ trong pool DB.</li>
+      <li><code>monitorEventLoopDelay</code> cho biết event loop bị giữ bao lâu. p99 lag vài trăm ms nghĩa là có việc đồng bộ nặng — thường là <code>JSON.parse</code>, regex tham lam, hoặc vòng lặp trên mảng to.</li>
+      <li>Nguồn leak hay gặp: cache toàn cục chỉ thêm không xoá, <code>emitter.on</code> đăng ký lại mỗi request mà quên <code>off</code>, closure giữ tham chiếu tới object lớn, timer không <code>clearInterval</code>.</li>
+      <li>Bắt leak bằng <b>heap snapshot</b>: chụp hai lần cách nhau rồi so phần tăng thêm trong Chrome DevTools. <code>v8.writeHeapSnapshot()</code> chụp được ngay trên production, không cần dựng lại.</li>
+      <li><b>Structured logging</b> (JSON) kèm <b>correlation id</b> đi theo request qua mọi service. Dùng <code>AsyncLocalStorage</code> để khỏi phải nhét id vào chữ ký của mọi hàm.</li>
+    </ul>
+    <pre class="code"><span class="k">import</span> { monitorEventLoopDelay } <span class="k">from</span> <span class="s">'node:perf_hooks'</span>;
+<span class="k">import</span> { AsyncLocalStorage } <span class="k">from</span> <span class="s">'node:async_hooks'</span>;
+<span class="k">const</span> h = monitorEventLoopDelay({ resolution: 20 });
+h.enable();
+setInterval(() =&gt; {
+  console.log({ lagP99ms: +(h.percentile(99) / 1e6).toFixed(1) });
+  h.reset();
+}, 10_000).unref();
+
+<span class="k">const</span> als = <span class="k">new</span> AsyncLocalStorage();   <span class="c">// correlation id đi theo request</span>
+app.use((req, res, next) =&gt;
+  als.run({ reqId: req.get(<span class="s">'x-request-id'</span>) ?? randomUUID() }, next));
+
+<span class="c good">// ✅ mọi lời gọi ra ngoài đều phải có hạn, nếu không sẽ treo vô hạn</span>
+<span class="k">await</span> fetch(url, { signal: AbortSignal.timeout(3000) });</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Đừng nói “RSS tăng là leak”. V8 chỉ gom rác khi thấy cần, RSS lên rồi phẳng ra là bình thường. Leak thật là heap used <b>sau full GC</b> vẫn tăng đều qua nhiều giờ — ép GC rồi mới đo thì kết luận mới đứng được.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> <code>AbortSignal.timeout</code> là cách ngắn nhất để mọi lời gọi ra ngoài đều có hạn. Thiếu timeout thì một dependency chậm sẽ giữ hết kết nối trong pool và kéo sập cả những endpoint chẳng liên quan gì tới nó.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

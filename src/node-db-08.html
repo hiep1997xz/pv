@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Node + DB 08 — Race condition · Idempotency</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Node + DB</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">08 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Race condition · Idempotency</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Hai request cùng trừ tiền một lúc thì chuyện gì xảy ra?</span></div>
+      <div class="q"><i>?</i><span>User bấm nút thanh toán hai lần, chặn thế nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>Lost update</b>: hai request cùng đọc <code>balance</code> ra 100, cùng trừ 30, cùng ghi 70. Trừ hai lần mà chỉ mất 30. Mọi vòng đọc-sửa-ghi ở tầng app đều có khe hở này.</li>
+      <li>Cách rẻ nhất là để DB tự tính: <code>SET balance = balance - $2</code> kèm điều kiện <code>WHERE balance &gt;= $2</code>. Một câu, nguyên tử, xong. Xem <code>rowCount</code> bằng 0 là biết không đủ tiền.</li>
+      <li><b>Pessimistic</b>: <code>SELECT ... FOR UPDATE</code> trong transaction khoá dòng lại, request thứ hai phải chờ. Đúng nhưng giảm throughput, và dễ deadlock nếu khoá nhiều dòng khác thứ tự.</li>
+      <li><b>Optimistic</b>: thêm cột <code>version</code>, update với <code>WHERE id = $1 AND version = $2</code>. <code>rowCount</code> bằng 0 nghĩa là có người sửa trước → đọc lại rồi thử lại. Hợp khi tranh chấp hiếm xảy ra.</li>
+      <li><b>Unique constraint</b> là chốt chặn cuối và là chốt duy nhất đáng tin. Kiểm tra “đã tồn tại chưa” bằng <code>SELECT</code> rồi mới <code>INSERT</code> vẫn thua race — cứ <code>INSERT</code> rồi bắt mã lỗi <code>23505</code>.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ đọc rồi ghi ở tầng app: 2 request song song mất 1 lần trừ</span>
+<span class="k">const</span> a = <span class="k">await</span> tx.acc.findUnique({ where: { id } });
+<span class="k">await</span> tx.acc.update({ where: { id }, data: { balance: a.balance - n } });
+
+<span class="c good">// ✅ pg: để Postgres tự tính — một câu nguyên tử, khỏi cần khoá</span>
+<span class="k">const</span> r = <span class="k">await</span> pool.query(
+  <span class="s">'UPDATE acc SET balance = balance - $2 WHERE id=$1 AND balance &gt;= $2'</span>,
+  [id, n]);
+<span class="k">if</span> (!r.rowCount) throw <span class="k">new</span> Error(<span class="s">'số dư không đủ'</span>);
+
+<span class="c good">// ✅ idempotency key: lần bấm thứ hai đụng unique index rồi dừng</span>
+<span class="k">const</span> p = <span class="k">await</span> pool.query(
+  <span class="s">'INSERT INTO pay(key,order_id) VALUES ($1,$2) ON CONFLICT DO NOTHING'</span>,
+  [idemKey, orderId]);
+<span class="k">if</span> (!p.rowCount) <span class="k">return</span> ketQuaCu(idemKey);   <span class="c">// trùng key = đã xử lý</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Kiểm tra bằng <code>SELECT</code> rồi mới <code>INSERT</code> không bao giờ đúng: hai request cùng <code>SELECT</code> thấy trống, cùng <code>INSERT</code>, ra hai bản ghi. Chỉ unique constraint trong DB mới chặn nổi — code ở tầng app thì không.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Idempotency key nên do <b>client sinh</b> (một UUID gắn với lần bấm nút) và gửi qua header, chứ không phải server tự đoán. Lưu luôn <b>kết quả</b> của lần xử lý đầu, để lần gọi lại trả về đúng response cũ thay vì trả lỗi.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

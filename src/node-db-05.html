@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Node + DB 05 — Migration &amp; Seed khi deploy</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Node + DB</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">05 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Migration & Seed khi deploy</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Migration chạy ở bước nào trong quy trình deploy?</span></div>
+      <div class="q"><i>?</i><span>Sửa migration đã chạy trên production được không?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Công cụ: <code>prisma migrate deploy</code>, <code>drizzle-kit migrate</code>, <code>knex migrate:latest</code>, <code>node-pg-migrate</code>. Cái nào cũng giữ một bảng lịch sử để không chạy lại migration cũ.</li>
+      <li>Chạy migration ở <b>một job riêng trong pipeline</b>, xong mới cho pod mới nhận traffic. <b>Không</b> gọi trong <code>app.listen()</code>: 4 instance khởi động cùng lúc là 4 tiến trình cùng <code>ALTER TABLE</code>.</li>
+      <li><b>Không bao giờ sửa migration đã chạy trên production.</b> Lịch sử và checksum lệch thì công cụ hoặc báo lỗi, hoặc tệ hơn là bỏ qua âm thầm. Sai thì viết một migration mới đè lên.</li>
+      <li>Migration phải <b>tương thích ngược</b> với code đang chạy, vì lúc rollout code cũ và mới sống chung vài phút. Đổi tên cột = thêm cột mới → ghi cả hai → chuyển đọc → xoá cột cũ.</li>
+      <li><b>Seed</b> chia hai loại: dữ liệu tham chiếu (role, config) chạy mọi môi trường; dữ liệu giả chỉ ở dev/test. Test phải chạy trên <b>Postgres thật</b> — mock DB thì không kiểm tra được gì.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ src/main.ts — 4 pod khởi động cùng lúc = 4 lần ALTER TABLE</span>
+<span class="k">await</span> migrateOnBoot();
+app.listen(3000);
+
+<span class="c good">// ✅ một job riêng trong pipeline, xong mới rollout pod mới</span>
+<span class="c">//   deploy.sh:</span>
+<span class="c">//     npx prisma migrate deploy    # 1 job duy nhất, chờ chạy xong</span>
+<span class="c">//     kubectl rollout restart deploy/api</span>
+
+<span class="c good">// ✅ đổi tên cột an toàn: 3 lần deploy, không lần nào gãy code cũ</span>
+<span class="c">// 1) ALTER TABLE users ADD COLUMN full_name text;  (code cũ vẫn chạy)</span>
+<span class="c">// 2) app ghi cả name lẫn full_name + backfill dữ liệu cũ</span>
+<span class="c">// 3) app đọc full_name → deploy → ALTER TABLE users DROP COLUMN name;</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Chạy migration lúc app khởi động với nhiều instance: hai tiến trình cùng vào một migration, một cái chết vì “relation already exists” rồi crash-loop, hoặc hai cái khoá bảng lẫn nhau. Sự cố 2 giờ sáng thường bắt đầu đúng từ đây.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Từ Postgres 11, <code>ADD COLUMN</code> có <code>DEFAULT</code> không còn viết lại cả bảng nữa. Nhưng <code>CREATE INDEX</code> vẫn khoá ghi — dùng <code>CREATE INDEX CONCURRENTLY</code>, và nhớ là nó <b>không chạy được bên trong transaction</b>.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

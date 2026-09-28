@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>SQL 01 — SELECT · WHERE · Bẫy NULL</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">SQL</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">01 / 10</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">SELECT · WHERE · Bẫy NULL</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>NULL = NULL trả về true hay false?</span></div>
+      <div class="q"><i>?</i><span>Vì sao điều kiện “khác giá trị” lại bỏ sót dòng NULL?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>NULL nghĩa là <b>không biết</b>, không phải 0 cũng không phải chuỗi rỗng. Mọi so sánh với NULL (<code>=</code>, <code>&lt;&gt;</code>, <code>&gt;</code>) đều cho ra NULL, mà <code>WHERE</code> chỉ giữ dòng ra <b>true</b>.</li>
+      <li>Nên <code>status &lt;&gt; 'paid'</code> <b>bỏ sót sạch</b> các dòng <code>status IS NULL</code>. Muốn lấy đủ thì viết <code>IS DISTINCT FROM</code>, hoặc thêm <code>OR status IS NULL</code>.</li>
+      <li>Kiểm tra NULL chỉ có một cách: <code>IS NULL</code> / <code>IS NOT NULL</code>. Viết <code>= NULL</code> không báo lỗi, chỉ lặng lẽ không khớp dòng nào.</li>
+      <li><code>COALESCE(a, b)</code> trả giá trị non-NULL đầu tiên — dùng để <b>hiển thị</b> giá trị thay thế, không phải để che chỗ dữ liệu bị thiếu.</li>
+      <li><code>ORDER BY</code> chạy xong mới tới <code>LIMIT</code>/<code>OFFSET</code>. Không có ORDER BY thì thứ tự dòng <b>không đảm bảo</b>; luôn thêm cột tie-break như <code>id</code> để phân trang không lặp dòng.</li>
+    </ul>
+    <pre class="code"><span class="c bad">-- ❌ mất sạch dòng email IS NULL, mà không báo lỗi gì</span>
+SELECT id, name FROM users WHERE email &lt;&gt; <span class="s">'an@ex.com'</span>;
+
+<span class="c good">-- ✅ cách 1: nói rõ là muốn lấy cả dòng NULL</span>
+SELECT id, name FROM users
+WHERE email IS DISTINCT FROM <span class="s">'an@ex.com'</span>;
+
+<span class="c good">-- ✅ cách 2: không lọc mất dòng, chỉ đổi cách hiển thị</span>
+SELECT id, COALESCE(email, <span class="s">'(chưa có)'</span>) AS email
+FROM users
+ORDER BY name, id        <span class="c">-- id là tie-break, phân trang mới ổn định</span>
+LIMIT 20 OFFSET 0;</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Đếm dòng <code>status &lt;&gt; 'paid'</code> rồi cộng với số dòng <code>= 'paid'</code> — tổng lại <b>nhỏ hơn</b> <code>COUNT(*)</code>. Phần hụt chính là các dòng NULL. SQL không báo lỗi, báo cáo cứ thế sai.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> <code>IS DISTINCT FROM</code> coi hai NULL là bằng nhau, rất hợp khi viết điều kiện so dữ liệu cũ với dữ liệu mới. MySQL không có cú pháp này, thay bằng toán tử <code>&lt;=&gt;</code>.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

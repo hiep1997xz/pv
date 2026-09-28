@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>SQL 05 — Index · Đọc EXPLAIN ANALYZE</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">SQL</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">05 / 10</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Index · Đọc EXPLAIN ANALYZE</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Index (a, b) có phục vụ được WHERE b = ? không?</span></div>
+      <div class="q"><i>?</i><span>Vì sao bọc hàm lên cột lại làm mất index?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>B-tree</b> là loại index mặc định, phục vụ <code>=</code>, khoảng <code>&lt;</code> <code>&gt;</code> <code>BETWEEN</code> và cả <code>ORDER BY</code>. Cột chọn lọc kém (chỉ vài giá trị khác nhau) thì đánh index gần như vô ích.</li>
+      <li><b>Quy tắc tiền tố trái</b>: index <code>(a, b, c)</code> phục vụ <code>WHERE a</code>, <code>WHERE a AND b</code>, <code>WHERE a AND b AND c</code> — nhưng <b>không</b> phục vụ <code>WHERE b</code> đứng một mình.</li>
+      <li>Bọc hàm lên cột là index <b>chết</b>: <code>WHERE lower(email) = ...</code> rơi về Seq Scan. Cứu bằng <b>expression index</b>: <code>CREATE INDEX ...</code> đánh thẳng lên <code>(lower(email))</code>.</li>
+      <li><b>Covering index</b>: index chứa đủ mọi cột câu lệnh cần → PostgreSQL đọc thẳng từ index, kế hoạch hiện <code>Index Only Scan</code>, khỏi chạm bảng. Gắn thêm cột phụ bằng <code>INCLUDE (...)</code>.</li>
+      <li>Đọc <code>EXPLAIN ANALYZE</code>: <code>Seq Scan</code> là quét cả bảng, <code>Index Scan</code> là dò index. So <code>rows=</code> (ước lượng) với <code>actual rows=</code> (thật) — lệch nhiều là thống kê đã cũ.</li>
+    </ul>
+    <pre class="code">EXPLAIN ANALYZE SELECT * FROM users WHERE email = <span class="s">'a@ex.com'</span>;
+<span class="c good">-- ✅ Index Scan using idx_users_email   (actual rows=1)</span>
+
+<span class="c bad">-- ❌ bọc hàm lên cột → Seq Scan, quét trọn bảng</span>
+SELECT 1 FROM users WHERE lower(email) = <span class="s">'a@ex.com'</span>;
+
+<span class="c good">-- ✅ expression index cứu đúng câu ở trên</span>
+CREATE INDEX idx_users_email_lower ON users (lower(email));
+
+<span class="c">-- composite index: thứ tự cột quyết định tất cả</span>
+CREATE INDEX idx_u_city_name ON users (city, name);
+<span class="c good">-- ✅ WHERE city = 'HN'                → dùng được</span>
+<span class="c good">-- ✅ WHERE city = 'HN' AND name = 'x' → dùng được</span>
+<span class="c bad">-- ❌ WHERE name = 'x'                 → bỏ qua index, Seq Scan</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Đánh index rồi vẫn chậm thì soi ba thứ: điều kiện có bọc hàm lên cột không, cột lọc có phải <b>tiền tố trái</b> của composite index không, và kiểu dữ liệu hai vế có khớp không — ép kiểu ngầm cũng đủ làm planner bỏ index.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Index không miễn phí: mỗi <code>INSERT</code>/<code>UPDATE</code> phải cập nhật <b>mọi</b> index của bảng. Trước khi thêm cái mới, dọn cái thừa — soi <code>pg_stat_user_indexes</code>, cột <code>idx_scan</code> bằng 0 là chưa ai dùng.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

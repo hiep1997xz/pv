@@ -16,6 +16,8 @@ const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, 
  * Phai quet MOT LUOT va dung THU TU nay:
  *  - Chuoi dung truoc comment: neu khong, `'https://x'` se bi cat tu dau `//`
  *    va nua sau chuoi bien thanh comment.
+ *  - Nhan ca comment JS (//) lan comment SQL (--). Rieng `--` phai co khoang
+ *    trang dung truoc va dung sau, neu khong `i--;` trong JS se bi coi la comment.
  *  - Comment dung truoc tu khoa: chu trong comment khong duoc to mau tu khoa.
  *  - Tu khoa khong duoc dung trong duong dan: `/var/lib` la thu muc, khong phai
  *    tu khoa `var`. Nen loai tru khi lien ke voi / . - hoac ky tu chu.
@@ -23,7 +25,7 @@ const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, 
  *    se to trung chu "class" nam trong the <span class="s"> vua chen.
  */
 const TOKEN =
-  /(`[^`]*`|'[^']*'|"[^"]*")|(\/\/.*)|(?<![\w/.-])(const|let|var|function|return|if|else|export|import|from|new|await|async|class|type|interface)(?![\w/.-])/g;
+  /(`[^`]*`|'[^']*'|"[^"]*")|(\/\/.*|(?<=^|\s)--\s.*)|(?<![\w/.-])(const|let|var|function|return|if|else|export|import|from|new|await|async|class|type|interface)(?![\w/.-])/g;
 
 /** Khoi code co ky tu ve khung (┌ ─ │ └ ├ ...) thi la so do, can line-height rieng */
 const isDiagram = (code) => /[─-╿]/.test(code);
@@ -167,6 +169,37 @@ const MARKS = {
     </g>
     <path d="M-58 -64 L6 0 M6 -64 L-58 0" stroke="currentColor"
           stroke-width="11" stroke-linecap="round"/>`],
+
+  sql: ['#A16207', `
+    <rect x="-130" y="-100" width="260" height="200" rx="14"
+          fill="none" stroke="currentColor" stroke-width="11"/>
+    <path d="M-130 -42 H130" stroke="currentColor" stroke-width="11"/>
+    <g stroke="currentColor" stroke-width="8" opacity=".85">
+      <path d="M-130 14 H130 M-130 62 H130 M-44 -42 V100 M44 -42 V100"/>
+    </g>
+    <rect x="-118" y="-88" width="236" height="34" rx="6" fill="currentColor"/>`],
+
+  database: ['#475569', `
+    <g fill="none" stroke="currentColor" stroke-width="12">
+      <ellipse cy="-76" rx="104" ry="34"/>
+      <path d="M-104 -76 V76 a104 34 0 0 0 208 0 V-76"/>
+      <path d="M-104 -22 a104 34 0 0 0 208 0"/>
+      <path d="M-104 30 a104 34 0 0 0 208 0"/>
+    </g>`],
+
+  nodejs: ['#4D8B31', `
+    <path d="M0 -132 L114 -66 V66 L0 132 L-114 66 V-66 Z"
+          fill="none" stroke="currentColor" stroke-width="13"/>
+    <path d="M0 -62 L54 -31 V31 L0 62 L-54 31 V-31 Z" fill="currentColor"/>`],
+
+  'node-db': ['#86198F', `
+    <g fill="none" stroke="currentColor" stroke-width="10">
+      <path d="M-82 -80 L-20 -45 V25 L-82 60 L-144 25 V-45 Z"/>
+      <path d="M-16 -10 H34" stroke-width="12"/>
+      <ellipse cx="94" cy="-48" rx="50" ry="19"/>
+      <path d="M44 -48 V44 a50 19 0 0 0 100 0 V-48"/>
+      <path d="M44 -2 a50 19 0 0 0 100 0"/>
+    </g>`],
 
   docker: ['#0B72C4', `
     <g fill="currentColor">

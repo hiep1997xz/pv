@@ -33,7 +33,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: <span class="s">'22'</span>, cache: <span class="s">'pnpm'</span> }
       - run: pnpm lint &amp;&amp; pnpm typecheck   # ~20s, chặn sớm
-      - run: pnpm test -- --coverage
+      - run: pnpm test <span class="c">-- --coverage</span>
       - run: pnpm build
       - run: npx size-limit                # ❌ vượt ngưỡng = fail PR
       - run: npx lhci autorun              # Lighthouse CI

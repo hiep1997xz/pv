@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Database 06 — Ràng buộc · Toàn vẹn ở tầng DB</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Database</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">06 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Ràng buộc · Toàn vẹn ở tầng DB</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Vì sao ràng buộc phải đặt ở DB, không chỉ ở app?</span></div>
+      <div class="q"><i>?</i><span>CHECK và unique partial index dùng khi nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>DB là <b>hàng rào cuối</b>. App có nhiều bản chạy song song, có job nền, có script import chạy tay, có người vào <code>psql</code> sửa trực tiếp — validate ở app chỉ bảo vệ đúng một đường vào.</li>
+      <li><b>Race condition</b>: kiểm tra "email tồn tại chưa" ở app rồi mới <code>INSERT</code> là sai kinh điển — hai request cùng lúc đều thấy chưa tồn tại. Chỉ <code>UNIQUE</code> ở DB mới chặn nổi vì nó nguyên tử.</li>
+      <li><code>NOT NULL</code> nên là mặc định. Cột nullable bắt mọi query phải xử lý <code>NULL</code> và làm hỏng so sánh: <code>status &lt;&gt; 'paid'</code> <b>không</b> trả về dòng có <code>status</code> là <code>NULL</code>.</li>
+      <li><code>CHECK</code> cho quy tắc gói gọn trong một dòng: <code>total &gt; 0</code>, <code>status IN (...)</code>, <code>ends_at &gt; starts_at</code>. Rẻ, chạy ngay lúc ghi, và tự tài liệu hoá schema cho người sau.</li>
+      <li><b>Unique partial index</b> cho quy tắc có điều kiện: mỗi user chỉ một địa chỉ mặc định, mỗi phòng chỉ một booking đang hoạt động. Ép ở app là chắc chắn sẽ lọt.</li>
+    </ul>
+    <pre class="code">ALTER TABLE orders
+  ADD CONSTRAINT orders_total_positive CHECK (total &gt; 0),
+  ADD CONSTRAINT orders_status_valid
+    CHECK (status IN (<span class="s">'pending'</span>, <span class="s">'paid'</span>, <span class="s">'cancelled'</span>));
+
+<span class="c good">// ✅ mỗi user chỉ một địa chỉ mặc định — ép ở DB, không ở app</span>
+CREATE UNIQUE INDEX one_default_address
+  ON addresses (user_id) WHERE is_default;
+
+<span class="c bad">// ❌ kiểm tra ở app rồi mới ghi: hai request song song cùng lọt</span>
+<span class="c">//   SELECT 1 FROM users WHERE email = $1;  → rỗng thì INSERT</span>
+<span class="c good">// ✅ để DB chặn, app bắt lỗi unique_violation (SQLSTATE 23505)</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Chỉ validate ở tầng app thì sớm muộn cũng có dữ liệu bẩn: email trùng do hai request vào cùng lúc, đơn hàng <code>total = 0</code> do một script import chạy tay. Lúc phát hiện đã hàng nghìn dòng, và thêm ràng buộc vào bảng bẩn sẽ fail.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Thêm ràng buộc vào bảng lớn đang chạy thì dùng <code>NOT VALID</code>: <code>ADD CONSTRAINT ... NOT VALID</code> có hiệu lực ngay với dòng mới mà không quét cả bảng, sau đó chạy <code>VALIDATE CONSTRAINT</code> — bước này không chặn đọc ghi.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Database 02 — Kiểu dữ liệu · Tiền · Thời gian · jsonb</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Database</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">02 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Kiểu dữ liệu · Tiền · Thời gian · jsonb</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Vì sao không được dùng float để lưu tiền?</span></div>
+      <div class="q"><i>?</i><span>timestamptz khác timestamp ở chỗ nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>Tiền tuyệt đối không dùng float</b>. <code>float8</code> là nhị phân, không biểu diễn chính xác 0.1 — cộng dồn là lệch. Dùng <code>numeric(12,2)</code>, hoặc <code>bigint</code> theo đơn vị nhỏ nhất.</li>
+      <li><code>timestamptz</code> là <b>thời điểm tuyệt đối</b> (lưu UTC, hiển thị theo timezone của session). <code>timestamp</code> không timezone — chỉ là ngày giờ trần, hai server khác múi giờ hiểu khác nhau.</li>
+      <li><code>text</code> thay <code>varchar(n)</code>: ở Postgres hai kiểu lưu y hệt nhau, <code>varchar(n)</code> không nhanh hơn, chỉ là <code>text</code> kèm một ràng buộc độ dài mà sau này muốn nới ra thì phải <code>ALTER</code>.</li>
+      <li><code>jsonb</code> thay <code>json</code>: <code>json</code> giữ nguyên văn bản gốc nên phải parse lại mỗi lần đọc. <code>jsonb</code> đã parse sẵn thành nhị phân — truy vấn nhanh, index được bằng GIN.</li>
+      <li><b>enum</b> gọn và nhanh nhưng thêm giá trị phải <code>ALTER TYPE</code>, bỏ giá trị thì rất phiền, và không gắn được thuộc tính kèm theo. Tập giá trị hay đổi → <b>bảng tra</b> + FK.</li>
+    </ul>
+    <pre class="code">CREATE TABLE payments (
+  id          bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  amount      numeric(12,2) NOT NULL,   <span class="c">// hoặc bigint, đơn vị xu</span>
+  currency    char(3) NOT NULL,
+  meta        jsonb NOT NULL DEFAULT <span class="s">'{}'</span>::jsonb,
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+
+<span class="c bad">// ❌ float là nhị phân: cộng dồn lệch xu, đối soát không khớp</span>
+SELECT 0.1::float8 + 0.2::float8;    <span class="c">// 0.30000000000000004</span>
+<span class="c good">// ✅ numeric tính đúng theo hệ thập phân</span>
+SELECT 0.1::numeric + 0.2::numeric;  <span class="c">// 0.3</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Lưu tiền bằng <code>float</code> thì lỗi chỉ lộ sau vài tháng: tổng báo cáo lệch với cổng thanh toán vài nghìn đồng, không truy được dòng nào sai. Sửa thì phải đổi kiểu cột và migrate lại toàn bộ bảng giao dịch.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> <code>timestamptz</code> <b>không lưu</b> timezone gốc, nó chỉ lưu một thời điểm. Nếu nghiệp vụ cần biết user đặt lịch ở múi giờ nào (báo thức, lịch họp lặp lại) thì phải lưu thêm một cột <code>text</code> chứa tên vùng, ví dụ <code>Asia/Ho_Chi_Minh</code>.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

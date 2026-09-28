@@ -27,8 +27,12 @@ xdg-open out/index.html  # xem nhanh tất cả ảnh
 | Debug & Fix | `content/debugging.mjs` | 8 | Hydration, leak, CORS, race |
 | Kiến trúc FE | `content/architecture.mjs` | 6 | Thư mục, test, monorepo, CI/CD |
 | Docker | `content/docker.mjs` | 8 | Container/VM → bảo mật production |
+| SQL | `content/sql.mjs` | 10 | JOIN, CTE, index, transaction, window function |
+| Database | `content/database.mjs` | 8 | Schema, kiểu dữ liệu, migration, replication |
+| Node.js | `content/nodejs.mjs` | 8 | Event loop Node, async, HTTP, stream, scale |
+| Node + DB | `content/node-db.mjs` | 8 | Pool, ORM, N+1, transaction, Redis, race |
 
-**Tổng: 80 thẻ + 10 bìa = 90 ảnh.**
+**Tổng: 114 thẻ + 14 bìa = 128 ảnh.**
 
 ## Cấu trúc
 

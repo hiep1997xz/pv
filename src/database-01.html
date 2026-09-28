@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Database 01 — Chuẩn hoá · Khoá chính · Khoá ngoại</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Database</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">01 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Chuẩn hoá · Khoá chính · Khoá ngoại</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Chuẩn hoá 1NF, 2NF, 3NF nói gọn là gì?</span></div>
+      <div class="q"><i>?</i><span>Nên dùng ID tự tăng hay UUID làm khoá chính?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>1NF</b>: mỗi ô một giá trị, đừng nhét <code>"a,b,c"</code> vào một cột. <b>2NF</b>: cột thường phải phụ thuộc <b>cả</b> khoá chính. <b>3NF</b>: cột thường không phụ thuộc cột thường khác.</li>
+      <li>Mục đích thật của chuẩn hoá: <b>mỗi sự thật chỉ lưu một chỗ</b>, sửa một nơi là xong, không có hai bản sao lệch nhau. Cái giá phải trả là query phải join nhiều hơn.</li>
+      <li><b>PK tự tăng</b> (<code>identity</code>, <code>bigserial</code>): 8 byte, ghi tuần tự nên index gọn — nhưng đoán được và lộ quy mô. <b>UUID</b> không đoán được, sinh được ở client, đổi lại 16 byte.</li>
+      <li><b>FK</b> giữ <b>toàn vẹn tham chiếu</b>: không tạo được dòng con trỏ tới cha không tồn tại, và không xoá được cha khi con còn treo. Đây là thứ tầng app không tự đảm bảo nổi.</li>
+      <li><code>ON DELETE CASCADE</code> xoá cha là con bay theo — tiện nhưng phá dữ liệu âm thầm. <code>RESTRICT</code> chặn lại, bắt bạn xử lý tay. Mặc định nên chọn <code>RESTRICT</code>.</li>
+    </ul>
+    <pre class="code">CREATE TABLE users (
+  id     bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  email  text NOT NULL UNIQUE
+);
+
+CREATE TABLE orders (
+  id       bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id  bigint NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+  total    numeric(12,2) NOT NULL
+);
+
+<span class="c bad">// ❌ CASCADE: xoá 1 user là bay sạch đơn hàng, sổ sách hết đối soát</span>
+<span class="c">//   user_id bigint REFERENCES users(id) ON DELETE CASCADE</span>
+<span class="c good">// ✅ RESTRICT: muốn xoá user thì phải xử lý đơn hàng trước đã</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> <code>ON DELETE CASCADE</code> qua nhiều tầng bảng: xoá một tenant kéo cascade xuống hàng chục bảng con, khoá lâu và <b>không hoàn tác được</b>. Đường lui duy nhất là restore backup.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Chọn UUID thì nói luôn cái giá: <b>UUIDv4</b> ngẫu nhiên nên mỗi lần chèn rơi vào một trang B-tree khác nhau — index phân mảnh, cache kém. <b>UUIDv7</b> nhúng timestamp ở đầu nên chèn gần như tuần tự, giữ lại được ưu điểm của ID tăng dần.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

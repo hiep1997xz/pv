@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Node.js 01 — Event loop phía Node · các phase</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Node.js</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">01 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Event loop phía Node · các phase</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>setImmediate và setTimeout(fn, 0) khác nhau chỗ nào?</span></div>
+      <div class="q"><i>?</i><span>process.nextTick chạy trước hay sau Promise.then?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Mỗi vòng lặp đi qua các phase theo thứ tự cố định: <b>timers</b> → pending callbacks → idle/prepare → <b>poll</b> → <b>check</b> → close callbacks, rồi quay lại từ đầu.</li>
+      <li><code>setTimeout</code> chạy ở phase <b>timers</b>, <code>setImmediate</code> ở phase <b>check</b>. Đang trong một I/O callback (tức đang ở phase poll) thì <code>setImmediate</code> <b>luôn</b> chạy trước.</li>
+      <li>Ở top level thứ tự cặp đó <b>không bảo đảm</b>: còn tuỳ lúc event loop tới phase timers thì 1ms đã trôi qua chưa. Script 2 dòng chạy 100 lần sẽ ra cả hai thứ tự.</li>
+      <li><code>process.nextTick</code> có queue riêng và được vét <b>trước</b> microtask của Promise. Cả hai queue đều vét sau mỗi callback, không phải chỉ vét giữa các phase.</li>
+      <li>Node chỉ có <b>một luồng</b> chạy JS. Một vòng <code>for</code> nặng hay <code>JSON.parse</code> file 50MB là <b>chặn cả server</b> — mọi request khác nằm chờ, kể cả health check.</li>
+    </ul>
+    <pre class="code"><span class="k">const</span> fs = require(<span class="s">'node:fs'</span>);      <span class="c">// .cjs — output thật ở dưới</span>
+setTimeout(() =&gt; console.log(<span class="s">'timeout'</span>), 0);     <span class="c">// phase timers</span>
+setImmediate(() =&gt; console.log(<span class="s">'immediate'</span>));    <span class="c">// phase check</span>
+<span class="c bad">// ❌ ở top level thứ tự cặp trên KHÔNG bảo đảm, đừng dựa vào nó</span>
+
+fs.readFile(__filename, () =&gt; {                  <span class="c">// callback ở phase poll</span>
+  setTimeout(() =&gt; console.log(<span class="s">'t2'</span>), 0);
+  setImmediate(() =&gt; console.log(<span class="s">'i2'</span>));
+  <span class="c good">// ✅ trong I/O callback: i2 LUÔN chạy trước t2</span>
+});
+
+process.nextTick(() =&gt; console.log(<span class="s">'nextTick'</span>));
+Promise.resolve().then(() =&gt; console.log(<span class="s">'promise'</span>));
+console.log(<span class="s">'sync'</span>);
+<span class="c good">// ✅ ba dòng trên in ra:  sync  →  nextTick  →  promise</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Nhiều người tưởng “Node bất đồng bộ nên không bao giờ bị chặn”. Sai: chỉ <b>I/O</b> mới bất đồng bộ, code JS của bạn vẫn chạy một luồng. Một vòng lặp nặng làm p99 của <b>mọi</b> endpoint khác tăng theo.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Chi tiết ghi điểm: ở <b>top level của file ESM</b>, <code>nextTick</code> lại chạy <b>sau</b> <code>Promise.then</code>, vì việc đánh giá module ESM vốn đã nằm trong một promise job. Trong CommonJS và trong mọi callback thì nextTick vẫn trước.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

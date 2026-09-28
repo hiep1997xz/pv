@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>SQL 02 — JOIN · Điều kiện ở ON hay ở WHERE</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">SQL</span>
+      <span class="badge junior">JUNIOR</span>
+      <span class="card-no">02 / 10</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">JOIN · Điều kiện ở ON hay ở WHERE</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>LEFT JOIN khác INNER JOIN ở chỗ nào?</span></div>
+      <div class="q"><i>?</i><span>Đặt điều kiện ở ON và ở WHERE khác nhau ra sao?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><code>INNER JOIN</code> chỉ giữ dòng khớp cả hai bên. <code>LEFT JOIN</code> giữ toàn bộ bảng trái, bên phải không khớp thì điền NULL. <code>RIGHT JOIN</code> là ảnh gương, <code>FULL JOIN</code> giữ cả hai phía.</li>
+      <li>Với LEFT JOIN, điều kiện lọc bảng phải đặt ở <code>ON</code> — nó được áp <b>trước khi ghép</b>, nên dòng trái không khớp vẫn còn lại kèm NULL.</li>
+      <li>Cùng điều kiện đó chuyển sang <code>WHERE</code> thì áp <b>sau khi ghép</b>: dòng NULL bị loại, và LEFT JOIN <b>âm thầm biến thành INNER JOIN</b>.</li>
+      <li>Join 1-n làm <b>nhân bản dòng</b> bên trái: một user có 3 order thì ra 3 dòng. Cộng tiền hay đếm trên kết quả này là tính trùng.</li>
+      <li>Muốn tránh nhân bản thì gộp bảng con <b>trước</b> trong một CTE rồi mới join vào bảng chính, hoặc dùng <code>LEFT JOIN LATERAL</code>.</li>
+    </ul>
+    <pre class="code"><span class="c good">-- ✅ điều kiện ở ON: user không có đơn paid vẫn còn trong kết quả</span>
+SELECT u.id, u.name, o.id AS order_id
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.id AND o.status = <span class="s">'paid'</span>;
+
+<span class="c bad">-- ❌ cùng điều kiện nhưng để ở WHERE → LEFT hoá thành INNER</span>
+SELECT u.id, u.name, o.id AS order_id
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.id
+WHERE o.status = <span class="s">'paid'</span>;     <span class="c">-- mọi dòng o.* NULL bị loại sạch</span>
+
+<span class="c good">-- ✅ anti-join: tìm user chưa từng đặt đơn nào</span>
+SELECT u.id FROM users u
+LEFT JOIN orders o ON o.user_id = u.id
+WHERE o.id IS NULL;</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Bạn LEFT JOIN để giữ mọi user, rồi thêm <code>WHERE o.status = 'paid'</code> cho gọn — user không có đơn biến mất hết mà không có lỗi nào. Ngoại lệ duy nhất được đặt ở WHERE là <code>o.id IS NULL</code>, đó chính là mẫu anti-join.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Join 1-n rồi <code>SUM()</code> là cộng trùng tiền. Gộp bảng con trong <b>CTE</b> trước (một dòng một user) rồi mới <code>LEFT JOIN</code> vào — vừa đúng số, vừa dễ đọc hơn subquery lồng.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

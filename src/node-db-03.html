@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Node + DB 03 — N+1 query · Phát hiện và sửa</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Node + DB</span>
+      <span class="badge mid">MIDDLE</span>
+      <span class="card-no">03 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">N+1 query · Phát hiện và sửa</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>API list chậm dần khi dữ liệu lớn, kiểm tra gì trước?</span></div>
+      <div class="q"><i>?</i><span>Làm sao chứng minh được code đang bị N+1?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li>Dấu hiệu: một request bắn ra hàng trăm query gần giống hệt nhau, chỉ khác giá trị id. Thời gian phản hồi tăng <b>tuyến tính</b> theo số dòng — 10 dòng thì mượt, 500 dòng thì treo.</li>
+      <li>Nguyên nhân luôn giống nhau: lấy danh sách xong rồi <code>for</code> / <code>map</code> qua từng phần tử và query tiếp <b>bên trong vòng lặp</b>. 1 query cha + N query con.</li>
+      <li>Cách sửa: <b>eager load</b> (<code>include</code> của Prisma, <code>relations</code> của TypeORM), hoặc tự gom id rồi bắn <b>một</b> câu <code>WHERE id IN (...)</code> và ghép lại bằng <code>Map</code> ở tầng app.</li>
+      <li>GraphQL không sửa được bằng eager load vì resolver chạy theo từng field riêng lẻ → dùng <b>DataLoader</b>: gom các key phát sinh trong cùng một tick rồi bắn một query batch duy nhất.</li>
+      <li><b>Cách phát hiện: bật log SQL rồi đếm</b>. Prisma dùng <code>log: ['query']</code>, <code>pg</code> thì bọc <code>pool.query</code>. Có số đếm mới nói được “trước 312 query, sau 2 query” — đó mới là câu trả lời ăn điểm.</li>
+    </ul>
+    <pre class="code"><span class="c bad">// ❌ N+1: 1 query lấy posts + 100 query lấy từng author</span>
+<span class="k">const</span> posts = <span class="k">await</span> prisma.post.findMany({ take: 100 });
+for (<span class="k">const</span> p of posts) {
+  p.author = <span class="k">await</span> prisma.user.findUnique({ where: { id: p.userId } });
+}
+
+<span class="c good">// ✅ cách 1 — eager load, để Prisma tự gom quan hệ</span>
+<span class="k">await</span> prisma.post.findMany({ take: 100, include: { author: true } });
+<span class="c good">// ✅ cách 2 — tự gom id, một câu IN rồi ghép bằng Map</span>
+<span class="k">const</span> ids = [...new Set(posts.map(p =&gt; p.userId))];
+<span class="k">const</span> users = <span class="k">await</span> prisma.user.findMany({
+  where: { id: { in: ids } },
+});
+<span class="k">const</span> byId = <span class="k">new</span> Map(users.map(u =&gt; [u.id, u]));
+posts.forEach(p =&gt; { p.author = byId.get(p.userId); });</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Bẫy ngược: gộp hết vào một câu JOIN nhiều bảng one-to-many cùng lúc làm <b>bung số dòng</b> (10 post × 50 comment = 500 dòng) rồi phải dedupe ở app. Nhiều khi hai query <code>IN</code> riêng lại nhanh hơn một JOIN to.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Chốt bằng con số. Có thể đếm query ngay trong CI: nghe event query của Prisma, cho test fail nếu một endpoint vượt ngưỡng. Như vậy N+1 không lẻn lại được sau mỗi lần refactor.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

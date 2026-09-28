@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>SQL 09 — Pagination · Keyset · Bài toán N+1</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">SQL</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">09 / 10</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Pagination · Keyset · Bài toán N+1</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Vì sao OFFSET càng lớn thì truy vấn càng chậm?</span></div>
+      <div class="q"><i>?</i><span>N+1 query là gì, xử lý thế nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><code>OFFSET n</code> vẫn phải <b>đọc rồi vứt đi</b> n dòng đầu. Trang 1 nhanh, trang 5000 quét gần hết bảng — chi phí tăng tuyến tính theo số trang, không có cách nào nhảy cóc.</li>
+      <li>OFFSET còn bị <b>lệch dữ liệu</b>: giữa hai lần gọi mà có dòng mới chèn vào thì trang sau lặp lại dòng đã hiện, hoặc bỏ sót dòng. Sắp xếp theo <code>created_at DESC</code> là dính ngay.</li>
+      <li><b>Keyset (cursor) pagination</b>: nhớ giá trị cuối trang trước rồi lọc <code>(created_at, id)</code> <code>&lt; (:last_at, :last_id)</code>. Dùng thẳng index, trang nào cũng nhanh như trang một.</li>
+      <li>Đánh đổi: keyset <b>không nhảy thẳng tới trang N</b> và không hiện được tổng số trang. Hợp với feed cuộn vô hạn, không hợp với bảng admin cần bấm số trang.</li>
+      <li><b>N+1</b>: 1 query lấy 100 user, rồi vòng lặp bắn thêm 100 query lấy order. Gộp còn 2 query bằng <code>WHERE user_id = ANY($1)</code> rồi nhóm lại ở app, hoặc 1 query <code>JOIN</code>.</li>
+    </ul>
+    <pre class="code"><span class="c bad">-- ❌ OFFSET lớn: vẫn phải đọc rồi vứt 100000 dòng đầu</span>
+SELECT id, created_at FROM feed
+ORDER BY created_at DESC, id DESC LIMIT 20 OFFSET 100000;
+
+<span class="c good">-- ✅ keyset: bám vào giá trị cuối cùng của trang trước</span>
+SELECT id, created_at FROM feed
+WHERE (created_at, id) &lt; ($1, $2)
+ORDER BY created_at DESC, id DESC LIMIT 20;
+<span class="c">-- index phục vụ đúng câu này: (created_at DESC, id DESC)</span>
+
+<span class="c bad">-- ❌ N+1: 1 query users rồi 100 query orders trong vòng lặp</span>
+<span class="c">-- for (u of users) SELECT * FROM orders WHERE user_id = u.id;</span>
+
+<span class="c good">-- ✅ gộp thành 1 query, app tự nhóm lại theo user_id</span>
+SELECT * FROM orders WHERE user_id = ANY($1);</pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> Feed sắp xếp theo thời gian mà phân trang bằng <code>OFFSET</code>: giữa hai lần tải có bài mới đăng, mọi thứ bị đẩy xuống một bậc, trang sau <b>hiện lại</b> đúng bài người dùng vừa đọc. Trên máy dev gần như không tái hiện được.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Bỏ luôn <code>COUNT(*)</code> đếm tổng ở mỗi lần phân trang — trên bảng lớn nó quét cả bảng, thường tốn hơn chính câu lấy dữ liệu. Chỉ cần biết “còn trang sau không” thì lấy <code>LIMIT 21</code> rồi trả về 20.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>

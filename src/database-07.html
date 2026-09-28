@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Database 07 — Replication · Backup · Khôi phục</title>
+<link rel="stylesheet" href="../assets/paper.css">
+<link rel="stylesheet" href="../assets/card.css">
+<style></style></head>
+<body><div class="page">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  
+  <div class="body"><div class="fit">
+    <div class="card-head">
+      <span class="badge topic">Database</span>
+      <span class="badge senior">SENIOR</span>
+      <span class="card-no">07 / 08</span>
+    </div>
+    <div class="sec" style="font-size:31px;color:var(--ink);margin-bottom:16px">Replication · Backup · Khôi phục</div>
+    <div class="q-box">
+      <div class="q"><i>?</i><span>Replication lag gây ra lỗi gì ở tầng ứng dụng?</span></div>
+      <div class="q"><i>?</i><span>Point-in-time recovery hoạt động thế nào?</span></div>
+    </div>
+    <div class="sec">💡 Trả lời</div>
+    <ul class="pts">
+      <li><b>Async replication</b> (mặc định): primary commit xong là trả lời ngay, WAL đẩy sang replica sau. Primary chết đột ngột thì giao dịch chưa kịp sang replica <b>mất hẳn</b> — đó là RPO.</li>
+      <li><b>Read-your-own-write</b>: user vừa sửa profile, màn hình kế tiếp đọc ở replica đang lag, thấy dữ liệu cũ, tưởng lưu hỏng. Xử lý: ghim user vừa ghi vào primary trong vài giây.</li>
+      <li><b>Failover</b> là promote replica thành primary. Phải chốt trước: ai quyết định, chống <b>split-brain</b> ra sao, app đổi endpoint kiểu gì. Chưa diễn tập thì sự cố sẽ thành sự cố to hơn.</li>
+      <li><b>PITR</b> = base backup + chuỗi WAL liên tục, cho phép tua về <b>đúng một mốc thời gian</b>, ví dụ một phút trước lệnh <code>DELETE</code> chạy nhầm. Replica không làm được việc này.</li>
+      <li><b>Backup chưa thử khôi phục thì coi như chưa có backup.</b> Phải restore thử định kỳ vào môi trường riêng, bấm giờ, rồi ghi lại con số RTO thật — chứ không phải số trong tài liệu.</li>
+    </ul>
+    <pre class="code diagram">┌─────────────────────────┬───────────────────┬─────────────────┐
+│ Sự cố                   │ Replica           │ Backup          │
+├─────────────────────────┼───────────────────┼─────────────────┤
+│ Mất ổ đĩa, chết node    │ cứu được          │ cứu được        │
+│ DELETE nhầm, DROP TABLE │ xoá theo ngay     │ cứu được (PITR) │
+│ Dữ liệu hỏng âm thầm    │ nhân bản luôn lỗi │ cứu được        │
+│ Xoá nhầm cả cụm         │ mất sạch          │ nếu để offsite  │
+└─────────────────────────┴───────────────────┴─────────────────┘
+<span class="c good">// ✅ PITR: base backup + WAL liên tục → tua về đúng mốc</span>
+<span class="c">//   recovery_target_time = '2026-03-14 09:59:00+07'</span>
+<span class="c">// ▸ RPO = chấp nhận mất bao nhiêu dữ liệu</span>
+<span class="c">// ▸ RTO = bao lâu thì hệ thống sống lại được</span></pre>
+    <div class="notes">
+      <div class="note trap"><b>⚠ Bẫy phỏng vấn:</b> "Bên em có replica rồi nên không cần backup" là câu trượt. Replica nhân bản luôn cả lệnh <code>DELETE</code> nhầm, chỉ chậm hơn vài trăm mili giây. Và backup chưa từng restore thử thì đêm sự cố mới biết nó hỏng từ ba tháng trước.</div>
+      <div class="note tip"><b>💬 Nói thêm để ghi điểm:</b> Nói được cặp số <b>RPO</b> và <b>RTO</b> rồi suy ngược ra kiến trúc: RPO gần 0 thì buộc phải có synchronous replication (đổi lại latency ghi tăng, replica chết là ghi treo); RTO vài phút thì phải có replica sẵn sàng promote, restore từ backup không kịp.</div>
+    </div>
+  </div></div>
+</div><script>
+document.fonts.ready.then(function () {
+  var page = document.querySelector('.page');
+  var box = document.querySelector('.body');
+  var fit = document.querySelector('.fit');
+
+  var toc = document.querySelector('.toc');
+  var sticky = document.querySelector('.sticky');
+  if (toc && sticky) {
+    var sr = sticky.getBoundingClientRect();
+    for (var fs = 25; fs >= 19; fs--) {
+      toc.style.fontSize = fs + 'px';
+      var hit = Array.prototype.some.call(toc.querySelectorAll('li'), function (li) {
+        var r = li.getBoundingClientRect();
+        return r.right > sr.left - 18 && r.bottom > sr.top && r.top < sr.bottom;
+      });
+      if (!hit) break;
+    }
+  }
+
+  if (page.classList.contains('fixed') && box && fit) {
+    var cs = getComputedStyle(box);
+    var avail = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var h = fit.scrollHeight;
+    if (h > avail) {
+      var sc = avail / h;
+      fit.style.transformOrigin = 'top left';
+      fit.style.transform = 'scale(' + sc + ')';
+      fit.style.width = (100 / sc) + '%';
+    }
+  }
+
+  // Tu soi loi bo cuc roi bao ra ngoai qua <title> — de render.sh in canh bao.
+  // Do that trong trinh duyet, chinh xac hon la doan qua so cot trong nguon.
+  var warn = [];
+
+  document.querySelectorAll('pre.code').forEach(function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 1) warn.push('code-tran-ngang');
+  });
+
+  if (fit && fit.style.transform) {
+    var sc = parseFloat(fit.style.transform.replace(/[^0-9.]/g, ''));
+    if (sc < 0.94) warn.push('noi-dung-bi-thu-nho-' + Math.round(sc * 100) + '%');
+  }
+
+  var pw = page.getBoundingClientRect().width;
+  page.querySelectorAll('.body *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && (r.right > pw + 1 || r.left < -1)) warn.push('tran-le');
+  });
+
+  document.title = 'H=' + Math.ceil(page.getBoundingClientRect().height)
+    + (warn.length ? ';WARN=' + Array.from(new Set(warn)).join(',') : '');
+});
+</script></body></html>
