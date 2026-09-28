@@ -1,0 +1,1761 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CV Hà Tiến Hiệp — bản tiếng Việt & mổ xẻ dự án</title>
+<link rel="stylesheet" href="assets/fonts.css">
+<style>
+:root{
+  --paper:#FFFCF3; --card:#FFFFFF; --ink:#16325C; --ink-2:#3C5478; --muted:#6B7C96;
+  --blue:#1A56DB; --blue-soft:#EAF0FE; --red:#D93025; --red-soft:#FDECEA;
+  --green:#0B8A55; --green-soft:#E6F5EE; --purple:#7C3AED; --purple-soft:#F1EBFE;
+  --orange:#E8890C; --orange-soft:#FEF3E2; --line:#E2E0D6; --line-2:#D9E4F5;
+  --code-bg:#F4F6FB; --shadow:0 1px 2px rgba(22,50,92,.06), 0 8px 24px rgba(22,50,92,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#11151C; --card:#171C25; --ink:#E8EDF6; --ink-2:#BBC7DA; --muted:#8C9AB0;
+    --blue:#7FA6FF; --blue-soft:#1A2540; --red:#FF8A80; --red-soft:#2E1C1B;
+    --green:#5FD8A4; --green-soft:#12271F; --purple:#C4A8FF; --purple-soft:#211A33;
+    --orange:#F7B65C; --orange-soft:#2C2115; --line:#252C38; --line-2:#252C38;
+    --code-bg:#0D1117; --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#11151C; --card:#171C25; --ink:#E8EDF6; --ink-2:#BBC7DA; --muted:#8C9AB0;
+  --blue:#7FA6FF; --blue-soft:#1A2540; --red:#FF8A80; --red-soft:#2E1C1B;
+  --green:#5FD8A4; --green-soft:#12271F; --purple:#C4A8FF; --purple-soft:#211A33;
+  --orange:#F7B65C; --orange-soft:#2C2115; --line:#252C38; --line-2:#252C38;
+  --code-bg:#0D1117; --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Be Vietnam Pro',system-ui,-apple-system,sans-serif;
+  font-size:16px;line-height:1.68;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:0 96px;
+  display:grid;grid-template-columns:230px minmax(0,1fr);gap:48px;align-items:start}
+.wrap > *{min-width:0}
+@media (max-width:980px){.wrap{grid-template-columns:minmax(0,1fr);gap:0}}
+
+/* ---------- Thanh mục lục ---------- */
+nav.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 20px);
+  max-height:calc(100vh - 60px);overflow:auto;padding:20px 0;font-size:13.5px}
+@media (max-width:980px){nav.toc{position:static;max-height:none;border-bottom:1px solid var(--line);margin-bottom:8px}}
+nav.toc b{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin:18px 0 8px;font-weight:700}
+nav.toc b:first-child{margin-top:0}
+nav.toc a{display:block;padding:5px 10px;margin-left:-10px;border-radius:7px;
+  color:var(--ink-2);text-decoration:none;border-left:2px solid transparent}
+nav.toc a:hover{background:var(--blue-soft);color:var(--blue)}
+
+/* ---------- Khối chung ---------- */
+header.top{padding:56px 0 8px;border-bottom:3px solid var(--ink);margin-bottom:36px}
+header.top h1{font-size:clamp(30px,5vw,44px);font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+header.top .role{font-size:17px;color:var(--ink-2);font-weight:600}
+header.top .meta{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;color:var(--muted)}
+header.top .note{margin-top:22px;padding:12px 16px;border-left:3px solid var(--blue);
+  background:var(--blue-soft);border-radius:0 8px 8px 0;font-size:14.5px;color:var(--ink-2)}
+
+h2.sec{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+  font-weight:800;margin:64px 0 20px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+h3{font-size:22px;font-weight:700;letter-spacing:-.01em;margin:0 0 4px}
+h4{font-size:15px;font-weight:700;margin:26px 0 10px;color:var(--ink)}
+p{margin:0 0 12px;overflow-wrap:break-word}
+ul{margin:0 0 12px;padding-left:20px}
+li{margin-bottom:6px}
+code{font-family:'Noto Sans Mono','DejaVu Sans Mono',ui-monospace,Menlo,Consolas,monospace;font-size:.88em;overflow-wrap:anywhere;
+  background:var(--code-bg);padding:2px 6px;border-radius:5px;color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:26px 28px;margin-bottom:18px;box-shadow:var(--shadow)}
+@media (max-width:560px){.card{padding:20px 18px}}
+.row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;justify-content:space-between}
+.when{font-size:13.5px;color:var(--muted);font-weight:600;white-space:nowrap}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 0}
+.tag{font-size:12px;font-weight:600;padding:3px 9px;border-radius:20px;
+  background:var(--blue-soft);color:var(--blue);white-space:nowrap}
+.sub{font-size:13.5px;color:var(--muted);margin-bottom:14px}
+
+/* ---------- Bảng kỹ năng ---------- */
+table.skills{width:100%;border-collapse:collapse;font-size:14.5px}
+table.skills th{text-align:left;vertical-align:top;padding:11px 16px 11px 0;
+  width:190px;font-weight:700;color:var(--ink);border-bottom:1px solid var(--line)}
+table.skills td{padding:11px 0;color:var(--ink-2);border-bottom:1px solid var(--line)}
+@media (max-width:560px){
+  table.skills th{display:block;width:auto;padding-bottom:2px;border:0}
+  table.skills td{display:block;padding-top:0}
+}
+
+/* ---------- Khối phỏng vấn ---------- */
+.pitch{background:var(--green-soft);border-radius:12px;padding:18px 20px;margin:14px 0 4px;
+  border:1px solid color-mix(in srgb,var(--green) 22%,transparent)}
+.pitch .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:800;color:var(--green);margin-bottom:6px}
+.pitch p{margin:0;font-size:15.5px;line-height:1.7}
+
+/* ---------- Khối STAR ---------- */
+.star{border:1px solid color-mix(in srgb,var(--green) 26%,transparent);border-radius:12px;
+  background:var(--green-soft);padding:6px 20px 16px;margin:14px 0 4px}
+.star > .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;
+  color:var(--green);margin:12px 0 4px}
+.star .st{padding:10px 0;border-top:1px solid color-mix(in srgb,var(--green) 20%,transparent)}
+.star .st:first-of-type{border-top:0}
+.star .st > b{display:block;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--green);margin-bottom:4px}
+.star .st p{margin:0;font-size:15px;line-height:1.7;color:var(--ink-2)}
+.star .st.fill{border-top-color:color-mix(in srgb,var(--orange) 34%,transparent)}
+.star .st.fill > b{color:var(--orange)}
+.star .st.fill p{color:var(--ink-2)}
+.star .st.fill .blank{display:block;margin-top:8px;padding:10px 12px;border-radius:8px;
+  border:1px dashed color-mix(in srgb,var(--orange) 50%,transparent);
+  background:var(--orange-soft);font-size:14px}
+
+/* ---------- Khối điểm nghẽn kỹ thuật ---------- */
+.chal{border:1px solid var(--line);border-left:3px solid var(--purple);border-radius:0 11px 11px 0;
+  padding:16px 18px;margin-bottom:12px;background:var(--paper)}
+.chal .head{font-weight:700;font-size:15.5px;margin-bottom:10px;color:var(--ink)}
+.chal p{margin:0 0 9px;font-size:14.5px;color:var(--ink-2)}
+.chal p:last-child{margin-bottom:0}
+.chal p > b{font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-right:6px}
+.chal .pb > b{color:var(--red)}
+.chal .opt > b{color:var(--muted)}
+.chal .pick > b{color:var(--blue)}
+.chal .res > b{color:var(--green)}
+
+.arch{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;
+  padding:16px;margin:12px 0;overflow-x:auto}
+.arch pre{margin:0;font-family:'Noto Sans Mono','DejaVu Sans Mono',ui-monospace,Menlo,Consolas,monospace;
+  font-size:12px;line-height:1.6;color:var(--ink-2);white-space:pre}
+
+.dec{border:1px solid var(--line);border-radius:11px;padding:16px 18px;margin-bottom:12px;background:var(--paper)}
+.dec .head{font-weight:700;font-size:15.5px;margin-bottom:2px}
+.dec .vs{font-size:13px;color:var(--muted);margin-bottom:10px}
+.dec .vs em{font-style:normal;color:var(--red);font-weight:600}
+.dec p{margin:0 0 8px;font-size:14.5px;color:var(--ink-2)}
+.dec p:last-child{margin-bottom:0}
+.dec .why::before{content:'Vì sao  ';font-weight:800;font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--green)}
+.dec .cost::before{content:'Đánh đổi  ';font-weight:800;font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--orange)}
+
+details.qa{border-bottom:1px solid var(--line);padding:2px 0}
+details.qa:last-of-type{border-bottom:0}
+details.qa summary{cursor:pointer;padding:13px 0 13px 26px;font-weight:600;font-size:15.5px;
+  list-style:none;position:relative;color:var(--ink)}
+details.qa summary::-webkit-details-marker{display:none}
+details.qa summary::before{content:'▸';position:absolute;left:4px;color:var(--blue);
+  transition:transform .15s ease;display:inline-block}
+details.qa[open] summary::before{transform:rotate(90deg)}
+details.qa summary:hover{color:var(--blue)}
+details.qa .ans{padding:0 0 16px 26px;font-size:15px;color:var(--ink-2)}
+details.qa .ans ul{padding-left:18px}
+details.qa .ans strong{color:var(--ink)}
+
+.trap{background:var(--red-soft);border-radius:12px;padding:16px 20px;margin-top:16px;
+  border:1px solid color-mix(in srgb,var(--red) 22%,transparent)}
+.trap .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:800;color:var(--red);margin-bottom:8px}
+.trap ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--ink-2)}
+
+.tip{background:var(--purple-soft);border-radius:12px;padding:16px 20px;margin-top:16px;
+  border:1px solid color-mix(in srgb,var(--purple) 22%,transparent)}
+.tip .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:800;color:var(--purple);margin-bottom:8px}
+.tip ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--ink-2)}
+.tip p{margin:0;font-size:14.5px;color:var(--ink-2)}
+
+footer{margin-top:72px;padding-top:24px;border-top:1px solid var(--line);
+  font-size:13.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="toc">
+  <b>Phần A · CV</b>
+  <a href="#muctieu">Mục tiêu nghề nghiệp</a>
+  <a href="#kinhnghiem">Kinh nghiệm làm việc</a>
+  <a href="#hocvan">Học vấn</a>
+  <a href="#kynang">Kỹ năng</a>
+  <b>Phần B · Mổ xẻ dự án</b>
+  <a href="#star">Cách dùng khung STAR</a>
+  <a href="#yteso">★ Nền tảng Y tế số (HIS · EMR)</a>
+  <a href="#p1">1. Trợ lý đấu thầu (RAG)</a>
+  <a href="#rustfs">↳ Đào sâu: RustFS / S3</a>
+  <a href="#p2">2. Quản lý BN tâm thần</a>
+  <a href="#p3">3. WAS App</a>
+  <a href="#p4">4. Enas</a>
+  <a href="#p5">5. Offerwall</a>
+  <a href="#p6">6. FactoryX</a>
+  <b>Phần C · Xuyên suốt</b>
+  <a href="#xuyensuot">Câu hỏi về hành trình</a>
+  <a href="#hanhvi">Câu hỏi tình huống</a>
+  <a href="#tranh">Những điều cần tránh</a>
+  <a href="#diemyeu">Điểm yếu CV & cách vá</a>
+  <a href="#hoilai">Câu nên hỏi ngược</a>
+</nav>
+
+<main>
+
+<header class="top">
+  <h1>Hà Tiến Hiệp</h1>
+  <div class="role">Lập trình viên Frontend</div>
+  <div class="meta">
+    <span>0968276932</span>
+    <span>hiep1997xz@gmail.com</span>
+    <span>Mễ Trì, Nam Từ Liêm, Hà Nội</span>
+  </div>
+  <div class="note">
+    Tài liệu gồm 2 phần: <b>(A)</b> bản dịch tiếng Việt của CV, giữ nguyên số liệu và tên công nghệ;
+    <b>(B)</b> mổ xẻ 7 dự án theo đúng cách hội đồng phỏng vấn đào — dự án giải quyết vấn đề gì,
+    tại sao kiến trúc như vậy, tại sao chọn công nghệ này mà không phải công nghệ kia, và bẫy thường gặp.
+  </div>
+</header>
+
+<h2 class="sec" id="muctieu">A · Mục tiêu nghề nghiệp</h2>
+<div class="card">
+  <p>Là một Frontend Developer với nền tảng vững về React.js và Next.js, tôi có nhiều năm kinh nghiệm
+  xây dựng hệ thống hiệu năng cao, responsive và tương thích đa thiết bị.</p>
+  <p>Tôi có kinh nghiệm dày làm việc theo Agile/Scrum, đảm bảo phối hợp trơn tru và bàn giao dự án hiệu quả.
+  Về chuyên môn, tôi thành thạo tích hợp API back-end qua RESTful, tuân thủ quy ước code và áp dụng các
+  thực hành tốt nhất của ngành để giữ chất lượng code ở mức cao.</p>
+  <p><b>Mục tiêu ngắn hạn:</b> học và nâng cao kỹ năng lập trình. Tôi muốn làm việc trong môi trường chuyên
+  nghiệp để phát huy tối đa và cải thiện năng lực cũng như hiệu suất làm việc.</p>
+  <p style="margin:0"><b>Mục tiêu dài hạn:</b> trở thành Full Stack Developer, tạo ra những sản phẩm hữu ích
+  và thành công trong sự nghiệp lập trình.</p>
+</div>
+
+<h2 class="sec" id="kinhnghiem">A · Kinh nghiệm làm việc</h2>
+
+<div class="card">
+  <div class="row"><h3>Công ty Cổ phần IniSoft</h3><span class="when">02/2025 – Hiện tại</span></div>
+  <div class="sub">Lập trình viên Frontend</div>
+  <ul>
+    <li>Vào với vai trò Middle Frontend Developer, chịu trách nhiệm trọn vẹn (end-to-end) cho các module sản phẩm — từ dựng UI đến khi release</li>
+    <li>Thiết kế UI trên Figma: dựng wireframe, mockup chi tiết và tài liệu bàn giao thiết kế cho các module trước khi code</li>
+    <li>Xây dựng và thiết lập pipeline CI/CD bằng Jenkins (build &amp; deploy dựa trên Docker), chuẩn hóa quy trình release của team</li>
+    <li>Làm cả full stack khi cần: đóng góp code backend Node.js/Express và FastAPI bên cạnh các tính năng frontend</li>
+    <li>Kèm cặp và phối hợp với thành viên trong team về chuẩn code và quy trình Git (nhánh feature → merge request)</li>
+  </ul>
+</div>
+
+<div class="card">
+  <div class="row"><h3>Công ty Cổ phần Công nghệ AMELA</h3><span class="when">07/2021 – 01/2025</span></div>
+  <div class="sub">Lập trình viên Frontend</div>
+  <ul>
+    <li>Khởi đầu là Junior Frontend Developer; công ty đầu tư đào tạo bài bản, xây nền tảng frontend cho tôi từ con số 0</li>
+    <li>Trưởng thành qua 5 dự án trong 3,5 năm, đi từ HTML/CSS/jQuery lên ReactJS/Next.js và React Native</li>
+    <li>Xây nền tảng vững: responsive design, kiến trúc component, quản lý state (Zustand, React Query) và hiện thực hóa thiết kế từ Figma</li>
+    <li>Tiến tới đảm nhận code review và trực tiếp build &amp; release ứng dụng lên App Store Connect và Google Play Console ở dự án cuối</li>
+  </ul>
+</div>
+
+<h2 class="sec" id="hocvan">A · Học vấn</h2>
+<div class="card">
+  <div class="row"><h3 style="font-size:18px">VTI Academy</h3><span class="when">09/2020 – 07/2021</span></div>
+  <div class="sub" style="margin-bottom:20px">Công nghệ thông tin (IT)</div>
+  <div class="row"><h3 style="font-size:18px">Đại học Văn hóa Hà Nội</h3><span class="when">2016 – 2019</span></div>
+</div>
+
+<h2 class="sec" id="kynang">A · Kỹ năng</h2>
+<div class="card">
+<table class="skills">
+  <tr><th>Framework &amp; Thư viện</th><td>ReactJS, NextJS, React-Native, Redux</td></tr>
+  <tr><th>Ngôn ngữ lập trình</th><td>HTML, CSS, SASS, Javascript, Typescript</td></tr>
+  <tr><th>Thiết kế &amp; UX</th><td>Material-UI, Ant Design, TailwindCSS, Styled-Component, Figma, Adobe XD, Photoshop, Illustrator</td></tr>
+  <tr><th>Công cụ quản lý dự án</th><td>Backlog, Github, Gitlab, Redmine</td></tr>
+  <tr><th>Lãnh đạo &amp; Phối hợp</th><td>Dẫn dắt nhóm (2–5 lập trình viên), thiết kế luồng nghiệp vụ, phân tích yêu cầu, họp khách hàng, daily standup, sprint planning, code review</td></tr>
+  <tr><th>Khác</th><td>NodeJs, PostgresSQL, VueJS, Tối ưu hiệu năng, CI/CD, Jenkins, Docker, Build App (Apple, Android)</td></tr>
+</table>
+</div>
+
+<h2 class="sec" id="star">B · Cách dùng tài liệu này — khung STAR</h2>
+
+<div class="card">
+  <p>Nhà tuyển dụng hỏi về dự án không phải để biết anh <em>đã làm gì</em>, mà để đo
+  <b>năng lực thật, tư duy xử lý vấn đề và mức độ đóng góp</b>. Mỗi dự án bên dưới vì thế được
+  xếp theo đúng thứ tự một buổi phỏng vấn diễn ra:</p>
+
+  <ul>
+    <li><b>① STAR — trả lời trong 2–3 phút.</b> Câu mở đầu. Không kể lể từ đầu đến cuối;
+    bốn ô Bối cảnh → Nhiệm vụ → Hành động → Kết quả, mỗi ô vài câu.</li>
+    <li><b>② Điểm nghẽn kỹ thuật.</b> Phần đào sâu sẽ rơi vào đây. Mỗi bài toán trình bày theo
+    <b>Vấn đề → Đã cân nhắc → Chọn gì và vì sao → Kết quả</b>. Chuẩn bị 1–2 bài toán khó nhất cho mỗi dự án.</li>
+    <li><b>③ Ownership — vì sao chọn stack này.</b> Chứng minh anh không phải người “ai bảo gì làm nấy”:
+    hiểu vì sao dự án chọn công nghệ đó, và biết đánh đổi là gì.</li>
+    <li><b>④ Đào sâu Q&amp;A.</b> Các câu hỏi kỹ thuật cụ thể đã kèm sẵn câu trả lời mẫu.</li>
+    <li><b>⑤ Bẫy.</b> Những chỗ dễ hớ, biết trước thì không trượt.</li>
+  </ul>
+
+  <div class="trap">
+    <div class="lbl">Ô “R — Kết quả” đang để trống, và cố ý</div>
+    <ul>
+      <li>Kết quả là phần duy nhất <b>không ai viết hộ anh được</b> — nó phải là số thật từ dự án của anh.
+      Mỗi dự án bên dưới có một ô gạch chân kèm gợi ý loại số nên lấy.</li>
+      <li><b>Không bịa số.</b> Người phỏng vấn senior chỉ cần hỏi “anh đo bằng cách nào” là lộ.
+      Không có số chính xác thì dùng mốc định tính kiểm chứng được: “release đúng hạn”,
+      “app đã lên App Store và Google Play”, “chuyển từ quy trình giấy sang phần mềm cho 6 nhóm vai trò”.</li>
+      <li>Ước lượng có cơ sở thì hợp lệ, miễn là <b>nói rõ đó là ước lượng</b>:
+      “build thủ công khoảng 15 phút, sau khi có pipeline còn khoảng 4 phút — tôi đo bằng thời gian job trên Jenkins”.</li>
+    </ul>
+  </div>
+
+  <div class="tip">
+    <div class="lbl">Ba câu tự kiểm trước khi vào phòng phỏng vấn</div>
+    <ul>
+      <li>Với mỗi dự án, tôi nói được <b>ranh giới phần việc của tôi</b> và phần của người khác không?</li>
+      <li>Tôi có <b>một bài toán khó</b> kể được trong 3 phút, kèm các phương án đã loại và lý do loại không?</li>
+      <li>Tôi có <b>một con số hoặc một mốc kiểm chứng được</b> cho mỗi dự án không?</li>
+    </ul>
+  </div>
+</div>
+
+<h2 class="sec" id="yteso">B · Dự án mới nhất — Nền tảng Y tế số (HIS · EMR)</h2>
+
+<div class="card">
+  <div class="row"><h3>Yteso — Nền tảng Y tế số HIS · EMR</h3><span class="when">07/2026 – Hiện tại</span></div>
+  <div class="sub">IniSoft · Team 4 dev · Fullstack Developer (thiên Frontend)</div>
+
+  <div class="tags">
+    <span class="tag">React 18</span><span class="tag">TypeScript</span><span class="tag">Vite</span>
+    <span class="tag">Ant Design 6</span><span class="tag">TanStack Query</span><span class="tag">React Router 7</span>
+    <span class="tag">Zod</span><span class="tag">Recharts</span><span class="tag">@react-pdf/renderer + pdf-lib</span>
+    <span class="tag">Socket.IO</span><span class="tag">NestJS 11</span><span class="tag">Drizzle ORM</span>
+    <span class="tag">PostgreSQL 16</span><span class="tag">Redis</span><span class="tag">RustFS (S3)</span>
+    <span class="tag">pnpm monorepo</span><span class="tag">Vitest + Playwright + Jest</span>
+    <span class="tag">GitLab CI + Harbor + Docker</span>
+  </div>
+
+  <div class="star">
+    <div class="lbl">① Trả lời trong 2–3 phút · khung STAR</div>
+    <div class="st"><b>S · Bối cảnh</b><p>Bệnh viện vận hành hồ sơ và quy trình trên giấy. IniSoft làm nền tảng y tế số triển khai <b>on-premise</b>, gồm hai phân hệ: HIS quản lý vận hành bệnh viện (tiếp đón, lịch hẹn, nội trú, dược, nhân sự, báo cáo) và EMR là bệnh án điện tử theo biểu mẫu Bộ Y tế, có y lệnh và ký số. Một codebase phục vụ nhiều bệnh viện, bật/tắt phân hệ bằng license flag.</p></div>
+    <div class="st"><b>T · Nhiệm vụ của tôi</b><p>Team 4 dev, tôi làm <b>fullstack thiên frontend</b>. Tôi sở hữu module bệnh án điện tử — form hồ sơ, khoảng 20 phiếu in PDF chuẩn BYT, ký số, luồng y lệnh cho điều dưỡng thực hiện — cùng các màn HIS gồm tiếp đón có màn hình gọi số realtime, dược/kho và báo cáo. Phần backend tôi viết API NestJS và schema Drizzle đi kèm cho chính các tính năng đó; kiến trúc kernel (auth, audit, ký số) do người khác thiết kế.</p></div>
+    <div class="st"><b>A · Hành động</b><p>Monorepo pnpm, TypeScript xuyên suốt, contract Zod dùng chung nên đổi field một chỗ là typecheck báo lỗi cả hai phía. API là <b>modular monolith</b> NestJS, tách riêng Bus cho tích hợp ngoài và Worker cho job nặng. Frontend React 18 + Ant Design 6 + TanStack Query. Phiếu in dựng bằng @react-pdf/renderer để bố cục cố định trên mọi máy in; hàng đợi gọi số dùng Socket.IO có fallback polling.</p></div>
+    <div class="st fill"><b>R · Kết quả — anh tự điền</b><p>Đây là phần chốt lại và cũng là phần nhà tuyển dụng nhớ nhất.
+      <span class="blank"><b>Gợi ý số nên lấy:</b> số phiếu in PDF đã hoàn thành (~20) · số module HIS/EMR anh bàn giao · số bệnh viện đã triển khai hoặc đang chạy thử · thời gian một lượt tiếp đón giảm so với quy trình giấy · số vai trò trong ma trận phân quyền. <b>Dự án mới vài tháng — nếu chưa go-live thì nói đúng trạng thái hiện tại.</b></span></p></div>
+  </div>
+
+  <h4>Phạm vi tôi phụ trách</h4>
+  <ul>
+    <li><b>EMR — bệnh án điện tử:</b> danh sách/chi tiết/form hồ sơ, chuyển khoa, thủ tục hành chính, file đính kèm,
+    ký số hồ sơ; ~20 mẫu in PDF (tờ điều trị, phiếu chăm sóc, truyền dịch, xét nghiệm, giấy ra viện, chuyển viện…).</li>
+    <li><b>EMR — y lệnh:</b> tách y lệnh thành nhiều cụm hoàn thành độc lập; điều dưỡng xác nhận thực hiện
+    và trừ vật tư y tế tiêu hao; khoá sửa đơn thuốc theo ngày đã xuất kho + trạng thái "Ngưng sử dụng".</li>
+    <li><b>HIS:</b> tiếp đón &amp; lịch hẹn, màn hình hàng đợi gọi số realtime (Socket.IO), buồng bệnh,
+    đơn thuốc / cấp phát / kho / tủ trực, nhân sự.</li>
+    <li><b>Báo cáo:</b> tồn kho, xuất – nhập – tồn, cảnh báo tồn kho, cảnh báo bệnh nhân; biểu đồ Recharts
+    nhấp để lọc bảng; xuất Excel (ExcelJS phía server).</li>
+    <li><b>Phân quyền (S2):</b> ma trận role–permission, ẩn/hiện thao tác theo vai trò (bác sĩ, điều dưỡng, KTV…),
+    guard kiểm tra quyền ở API.</li>
+    <li><b>Backend &amp; DevOps:</b> API NestJS trong module HIS/EMR, schema + migration Drizzle, contract Zod dùng chung
+    FE/BE; tinh chỉnh pipeline GitLab CI (retry job lỗi runner, retry login Harbor).</li>
+  </ul>
+
+  <h4>Kiến trúc &amp; luồng dữ liệu</h4>
+  <ul>
+    <li>Browser → Caddy (prod) → SPA + <code>/api</code> → API NestJS → PostgreSQL / Redis / RustFS.</li>
+    <li>Bus (<code>apps/bus</code>) cho tích hợp ngoài, Worker (<code>apps/worker</code>) cho job nặng: ký số PDF, sinh file.</li>
+    <li><code>packages/domain</code> (entity Zod), <code>packages/contracts</code> (DTO/API contract, event catalog),
+    <code>packages/db</code> (schema Drizzle theo schema PG <code>master/his/emr/audit</code>), <code>packages/config</code> (env + license).</li>
+    <li>CI: lint → typecheck → test → build → đẩy image lên Harbor → SSH <code>compose pull</code> → migrate DB → up.</li>
+  </ul>
+
+  <h4>② Điểm nghẽn kỹ thuật — chuẩn bị kể sâu</h4>
+  <div class="chal">
+    <div class="head">Trừ kho hai lần khi điều dưỡng hoàn thành y lệnh</div>
+    <p class="pb"><b>Vấn đề</b> Một y lệnh gồm nhiều việc thực hiện ở các thời điểm khác nhau (thuốc, thủ thuật, chăm sóc). Bản đầu gộp chung thành một lần hoàn thành, và khi hoàn thành thì trừ kho — nhưng thuốc đã được trừ ở bước cấp phát đơn. Hệ quả là <b>kho bị trừ hai lần</b>, số tồn sai lệch dần.</p>
+    <p class="opt"><b>Đã cân nhắc</b> (a) giữ nguyên cách gộp rồi thêm cờ đánh dấu đã trừ hay chưa; (b) bỏ trừ kho ở bước hoàn thành, dồn hết về cấp phát; (c) tách y lệnh thành nhiều cụm hoàn thành độc lập và định nghĩa lại chính xác cụm nào trừ loại vật tư nào.</p>
+    <p class="pick"><b>Chọn</b> Phương án (c). Lý do: (a) chỉ vá triệu chứng và vẫn sai thực tế lâm sàng vì điều dưỡng phải đợi xong hết mới xác nhận được; (b) làm mất khả năng theo dõi vật tư tiêu hao. Tách cụm vừa đúng nghiệp vụ vừa xử lý luôn gốc của lỗi: <b>khi hoàn thành chỉ trừ vật tư tiêu hao, thuốc đã trừ ở bước cấp phát</b>.</p>
+    <p class="res"><b>Kết quả</b> Số tồn kho khớp lại; điều dưỡng xác nhận được từng việc ngay khi làm xong thay vì chờ cả y lệnh. <i>Đây là bài toán tốt nhất để kể vì nó cho thấy anh sửa nghiệp vụ chứ không chỉ sửa code.</i></p>
+  </div>
+
+  <div class="chal">
+    <div class="head">20 phiếu in PDF chuẩn BYT phải giống hệt nhau trên mọi máy in</div>
+    <p class="pb"><b>Vấn đề</b> Biểu mẫu Bộ Y tế có bố cục cố định, sai lề hay tràn dòng là phiếu không dùng được. In bằng trình duyệt thì mỗi máy, mỗi bản Chrome lại ra một kiểu.</p>
+    <p class="opt"><b>Đã cân nhắc</b> (a) <code>window.print</code> với CSS print; (b) render PDF ở server bằng headless Chrome; (c) mô tả phiếu bằng component React rồi sinh PDF trực tiếp.</p>
+    <p class="pick"><b>Chọn</b> Phương án (c) với @react-pdf/renderer, kèm pdf-lib để ghép file và phục vụ ký số. Bố cục cố định tuyệt đối, và vì phiếu là component nên <b>header, bảng, ô chữ ký tái dùng được giữa 20 mẫu</b> thay vì chép đi chép lại.</p>
+    <p class="res"><b>Kết quả</b> Đánh đổi đã lường trước: không hỗ trợ đầy đủ CSS, font tiếng Việt phải nhúng thủ công, bundle nặng — nên module in được lazy-load. <b>Gợi ý điền:</b> số phiếu hoàn thành, thời gian dựng một mẫu mới sau khi có bộ component chung.</p>
+  </div>
+
+  <h4>③ Ownership — vì sao chọn stack này</h4>
+
+  <div class="dec">
+    <div class="head">Modular monolith (NestJS)</div>
+    <div class="vs">thay vì <em>microservices</em></div>
+    <p class="why">Deploy on-prem, mỗi bệnh viện một bản, đội nhỏ — microservices chỉ thêm chi phí vận hành.
+    Một process API nhưng <strong>ranh giới module Nest cứng</strong> (kernel / HIS / EMR), load theo license flag.
+    Riêng phần tích hợp và job nặng tách process (Bus, Worker) vì chúng có tải và vòng đời khác.</p>
+    <p class="cost">Phải giữ kỷ luật import giữa module, nếu không monolith sẽ thành "big ball of mud".</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">TypeScript toàn stack + Zod contract dùng chung</div>
+    <div class="vs">thay vì <em>BE Python + sinh type từ OpenAPI</em> (như dự án tâm thần trước)</div>
+    <p class="why">Cùng một schema Zod vừa validate request ở API vừa làm type cho frontend — đổi field một chỗ,
+    typecheck báo lỗi ở cả hai phía ngay trong cùng merge request.</p>
+    <p class="cost">Bó buộc backend vào hệ Node; phần AI/xử lý dữ liệu nặng nếu có sẽ phải là service riêng.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Drizzle ORM</div>
+    <div class="vs">thay vì <em>Prisma / TypeORM / Sequelize</em></div>
+    <p class="why">Viết gần SQL, type suy ra trực tiếp từ schema TS, không có runtime engine riêng;
+    migration là file SQL review được. Hợp với dữ liệu y tế cần truy vấn báo cáo phức tạp.</p>
+    <p class="cost">Ít "phép màu" hơn Prisma — quan hệ, transaction phải viết tường minh.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">@react-pdf/renderer (+ pdf-lib)</div>
+    <div class="vs">thay vì <em>in HTML bằng window.print</em> hoặc <em>render PDF ở server bằng headless Chrome</em></div>
+    <p class="why">Phiếu BYT cần bố cục cố định, giống hệt nhau trên mọi máy in. Mô tả layout bằng component React
+    nên tái dùng header/bảng/chữ ký giữa ~20 mẫu; pdf-lib dùng để ghép/xử lý file PDF có sẵn và phục vụ bước ký số.</p>
+    <p class="cost">Không phải CSS đầy đủ (flexbox con), font tiếng Việt phải nhúng thủ công, bundle nặng —
+    nên lazy-load module in.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Ant Design 6</div>
+    <div class="vs">thay vì <em>shadcn/ui + Tailwind</em> (dùng ở dự án Đấu thầu)</div>
+    <p class="why">Phần mềm nghiệp vụ dày form/bảng: Form, Table, DatePicker, Cascader có sẵn và ổn định.
+    Repo chủ động gỡ Tailwind/Radix để chỉ còn một hệ component + design token, tránh lệch UI giữa người làm.</p>
+  </div>
+
+  <h4>④ Đào sâu — câu hỏi &amp; trả lời mẫu</h4>
+
+  <details class="qa"><summary>Vì sao modular monolith mà không microservices?</summary>
+  <div class="ans">Bệnh viện deploy on-prem, hạ tầng khiêm tốn, IT bệnh viện không vận hành nổi hàng chục service.
+  Monolith một process dễ deploy/backup/rollback; ranh giới module vẫn rõ để sau này tách ra được nếu cần.
+  Chỉ những gì <strong>khác tải và khác vòng đời</strong> (tích hợp ngoài, ký số, sinh PDF) mới tách thành Bus/Worker.</div></details>
+
+  <details class="qa"><summary>Một codebase cho nhiều bệnh viện — làm sao không phải fork?</summary>
+  <div class="ans">License flag (<code>LICENSE_HIS</code>, <code>LICENSE_EMR</code>…) quyết định module nào được load ở composition root;
+  khác biệt theo bệnh viện đi qua config và adapter, không sửa code lõi. Deploy đơn-khách nên dữ liệu các bệnh viện tách vật lý.</div></details>
+
+  <details class="qa"><summary>Hoàn thành y lệnh theo từng cụm — vì sao phải tách?</summary>
+  <div class="ans">Một y lệnh thực tế gồm nhiều việc thực hiện ở các thời điểm khác nhau (thuốc, thủ thuật, chăm sóc).
+  Gộp chung thì điều dưỡng phải đợi xong hết mới xác nhận được, sai thực tế lâm sàng. Tách cụm cho phép hoàn thành độc lập;
+  khi hoàn thành chỉ trừ <strong>vật tư tiêu hao</strong>, còn thuốc đã trừ ở bước cấp phát đơn — tránh trừ kho hai lần
+  (đây chính là một bug tôi đã sửa).</div></details>
+
+  <details class="qa"><summary>Audit log trong hệ thống y tế đảm bảo toàn vẹn thế nào?</summary>
+  <div class="ans">Audit lưu ở schema riêng và <strong>nối chuỗi hash</strong>: mỗi bản ghi chứa hash của payload chuẩn hoá cộng hash bản ghi trước,
+  nên sửa/xoá lén một dòng là chuỗi verify gãy. Dữ liệu nghiệp vụ không xoá cứng, chỉ đánh dấu huỷ.</div></details>
+
+  <details class="qa"><summary>Màn hình gọi số hàng đợi realtime làm thế nào?</summary>
+  <div class="ans">Socket.IO namespace <code>/queue</code>; màn hình công khai subscribe, quầy tiếp đón phát sự kiện gọi số.
+  Có fallback polling khi mạng nội bộ chặn websocket, và khi reconnect thì fetch lại trạng thái đầy đủ thay vì tin vào event bị lỡ.</div></details>
+
+  <div class="trap">
+    <div class="lbl">⑤ Bẫy hay gặp</div>
+    <ul>
+      <li>"Anh ghi fullstack — backend anh viết đến đâu?" — nói rõ: API + schema Drizzle cho các tính năng mình làm ở HIS/EMR;
+      kiến trúc kernel (auth, audit, ký số) là của người khác thiết kế.</li>
+      <li>"Ký số anh làm phần nào?" — phần của tôi là UI ký/hiển thị chữ ký trên hồ sơ và PDF; signer thật do Worker/backend xử lý.</li>
+      <li>Dự án mới vài tháng — đừng nói "đã go-live nhiều bệnh viện" nếu chưa.</li>
+    </ul>
+  </div>
+</div>
+
+<h2 class="sec" id="p1">B · Dự án 1 — Trợ lý đấu thầu (Bidding Assistant)</h2>
+
+<div class="card">
+  <div class="row"><h3>Trợ lý đấu thầu — hệ thống RAG</h3><span class="when">03/2026 – Hiện tại</span></div>
+  <div class="sub">IniSoft · Team 5 người · Frontend Developer (phụ trách toàn bộ Admin CMS)</div>
+
+  <div class="tags">
+    <span class="tag">React 19</span><span class="tag">TypeScript</span><span class="tag">Vite</span>
+    <span class="tag">TanStack Query</span><span class="tag">react-hook-form + Zod</span>
+    <span class="tag">shadcn/ui + TailwindCSS</span><span class="tag">TipTap</span>
+    <span class="tag">ReactFlow</span><span class="tag">ApexCharts</span><span class="tag">i18next</span>
+    <span class="tag">Node.js/Express + Sequelize</span><span class="tag">PostgreSQL</span>
+    <span class="tag">Qdrant</span><span class="tag">Jenkins + Docker</span>
+  </div>
+
+  <div class="star">
+    <div class="lbl">① Trả lời trong 2–3 phút · khung STAR</div>
+    <div class="st"><b>S · Bối cảnh</b><p>Làm hồ sơ thầu phải đọc hàng trăm trang tài liệu để tìm đúng điều khoản — chậm và dễ sót. IniSoft xây trợ lý đấu thầu dùng <b>RAG</b>, cho phép hỏi đáp tài liệu bằng ngôn ngữ tự nhiên và trả lời kèm trích dẫn nguồn. Hệ thống gồm 3 phần: app Flutter, backend AI Python + Qdrant, và Admin CMS quản trị toàn bộ nội dung phục vụ app.</p></div>
+    <div class="st"><b>T · Nhiệm vụ của tôi</b><p>Team 5. Tôi <b>sở hữu trọn vẹn Admin CMS</b> — tự thiết kế Figma, code frontend, cho tới release. Phạm vi gồm quản lý tài liệu và loại tài liệu, trình soạn quy trình đấu thầu dạng sơ đồ, phân quyền theo tổ chức/phòng ban, dashboard, và các màn cấu hình đẩy xuống app. Ngoài ra tôi viết một phần REST API bằng Node.js/Express và dựng pipeline CI/CD Jenkins cho dự án.</p></div>
+    <div class="st"><b>A · Hành động</b><p>React 19 + TypeScript trên Vite — chọn SPA vì CMS nằm sau đăng nhập, không cần SEO. TanStack Query cho server state, react-hook-form + Zod cho form (một schema vừa validate vừa sinh type). shadcn/ui + Tailwind để kiểm soát thiết kế tới tận DOM. Các màn khó dùng TipTap cho rich text, ReactFlow cho sơ đồ quy trình, ApexCharts cho dashboard. File gốc lưu trên kho đối tượng chuẩn S3, chỉ dùng API S3 phổ thông để không khóa vào nhà cung cấp.</p></div>
+    <div class="st fill"><b>R · Kết quả — anh tự điền</b><p>Đây là phần chốt lại và cũng là phần nhà tuyển dụng nhớ nhất.
+      <span class="blank"><b>Gợi ý số nên lấy:</b> thời gian build/release trước và sau khi có Jenkins · số màn hình hoặc module CMS đã bàn giao · số tài liệu đã index · thời gian soạn một quy trình thầu giảm còn bao lâu · số ngôn ngữ hỗ trợ. Đây là dự án anh làm nhiều vai nhất — <b>một con số về CI/CD sẽ rất có sức nặng</b>.</span></p></div>
+  </div>
+
+  <h4>Kiến trúc &amp; luồng dữ liệu</h4>
+  <div class="arch"><pre>App Flutter ──hỏi──▶ Backend AI (Python)
+                       │ 1. embed câu hỏi
+                       │ 2. Qdrant: ANN + lọc payload (loại tài liệu, đơn vị)
+                       │ 3. top-k đoạn văn ──▶ LLM ──▶ trả lời + trích dẫn
+                       ▲
+                       │ index
+Admin CMS ──upload DOCX/PDF──▶ API ──▶ RustFS (S3) lưu file gốc
+    │                           └──▶ parse → chunk → embed → Qdrant
+    └── FAQ / Banner / Settings ──▶ PostgreSQL ──▶ app đọc xuống</pre></div>
+
+  <h4>② Điểm nghẽn kỹ thuật — chuẩn bị kể sâu</h4>
+  <div class="chal">
+    <div class="head">Upload và bóc tách file thầu vài trăm trang mà không treo trình duyệt, không timeout</div>
+    <p class="pb"><b>Vấn đề</b> File DOCX/PDF hồ sơ thầu rất nặng. Đẩy qua backend thì server phải giữ toàn bộ file trong bộ nhớ và dễ timeout; parse ở trình duyệt thì treo tab.</p>
+    <p class="opt"><b>Đã cân nhắc</b> (a) upload qua API backend rồi backend đẩy tiếp lên kho lưu trữ; (b) presigned URL cho trình duyệt đẩy thẳng lên kho; (c) parse ở client để đỡ tải cho server.</p>
+    <p class="pick"><b>Chọn</b> Kết hợp (b) cho upload và bỏ hẳn (c). Presigned URL + multipart upload: file chia phần, đẩy song song, phần nào lỗi thì thử lại riêng phần đó, tạm dừng và tiếp tục được. Parse đặt ở backend vì kết quả parse quyết định cách chunk và embed nên <b>phải nhất quán tuyệt đối</b>, và vì file người dùng upload là dữ liệu không tin cậy, cần sandbox.</p>
+    <p class="res"><b>Kết quả</b> Backend không còn là nút cổ chai băng thông; khóa truy cập kho lưu trữ không bao giờ xuất hiện ở frontend. <b>Gợi ý điền:</b> dung lượng file lớn nhất xử lý được, thời gian upload trước/sau.</p>
+  </div>
+
+  <div class="chal">
+    <div class="head">Trình soạn quy trình đấu thầu dạng sơ đồ</div>
+    <p class="pb"><b>Vấn đề</b> Người dùng cần vẽ quy trình thầu gồm nhiều giai đoạn và nhóm, nối với nhau, kéo thả sắp xếp — một trình soạn sơ đồ thực thụ chứ không phải danh sách.</p>
+    <p class="opt"><b>Đã cân nhắc</b> (a) tự vẽ bằng SVG và tự xử lý pan/zoom/định tuyến cạnh; (b) ReactFlow; (c) đơn giản hóa yêu cầu thành danh sách có thứ tự.</p>
+    <p class="pick"><b>Chọn</b> ReactFlow. Tự viết pan/zoom, kéo node, snap lưới và định tuyến cạnh là vài tháng công, trong khi <b>giá trị của sản phẩm không nằm ở đó</b> mà nằm ở chất lượng trả lời của RAG.</p>
+    <p class="res"><b>Kết quả</b> Màn phức tạp nhất của CMS hoàn thành trong thời gian chấp nhận được. <i>Khi kể, hãy nhấn vào việc anh đã cân nhắc tự viết và loại nó vì lý do ưu tiên, chứ không phải vì không làm được.</i></p>
+  </div>
+
+  <h4>③ Ownership — vì sao chọn stack này</h4>
+
+  <div class="dec">
+    <div class="head">RAG</div>
+    <div class="vs">thay vì <em>fine-tune model</em> hoặc <em>full-text search thuần</em></div>
+    <p class="why">Hồ sơ thầu thay đổi liên tục và mỗi gói thầu là một bộ tài liệu mới. Fine-tune nghĩa là
+    mỗi lần có tài liệu mới lại phải huấn luyện lại — chậm, đắt, và không thể truy vết câu trả lời đến từ đâu.
+    RAG chỉ cần index lại tài liệu là xong, và quan trọng nhất với lĩnh vực đấu thầu:
+    <strong>trả lời kèm trích dẫn đúng điều khoản</strong>, người dùng kiểm chứng được.
+    Còn full-text search thuần thì người dùng phải biết chính xác từ khóa; câu hỏi kiểu
+    "điều kiện năng lực tài chính của nhà thầu là gì" sẽ trượt vì tài liệu không viết y hệt.</p>
+    <p class="cost">Chất lượng câu trả lời phụ thuộc nặng vào khâu chunking và retrieval. Chunk sai thì
+    model không có ngữ cảnh để trả lời đúng — lỗi nằm ở pipeline dữ liệu chứ không phải ở model.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Qdrant</div>
+    <div class="vs">thay vì <em>pgvector</em>, <em>Pinecone</em>, <em>Elasticsearch</em></div>
+    <p class="why">Điểm quyết định là <strong>lọc theo payload ngay trong lúc tìm ANN</strong>: tài liệu đấu thầu
+    phải giới hạn theo tổ chức, phòng ban, loại tài liệu. Qdrant lọc trước/trong khi duyệt HNSW nên vẫn đủ top-k;
+    pgvector nếu lọc xong mới tìm gần đúng thì dễ rơi vào tình trạng thiếu kết quả. Thêm nữa Qdrant self-host được,
+    mà dữ liệu thầu là dữ liệu nhạy cảm — không đẩy lên SaaS như Pinecone được, cả vì chi phí lẫn vì nơi lưu dữ liệu.</p>
+    <p class="cost">Thêm một service phải vận hành, backup, giám sát. Nếu dữ liệu chỉ vài chục nghìn vector
+    và đã nằm sẵn trong PostgreSQL thì pgvector đơn giản hơn hẳn — đó là lựa chọn đúng cho quy mô nhỏ.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Vite SPA</div>
+    <div class="vs">thay vì <em>Next.js</em></div>
+    <p class="why">Admin CMS nằm sau màn đăng nhập: không có nhu cầu SEO, không có trang public, và
+    <strong>mọi dữ liệu đều theo người dùng nên SSR không cache được gì</strong> — lợi ích lớn nhất của Next.js
+    không áp dụng ở đây. Đổi lại phải nuôi thêm một Node server, ảnh Docker nặng hơn, deploy phức tạp hơn.
+    Vite build ra file tĩnh, nginx serve, ảnh Docker vài chục MB, HMR nhanh khi dev.</p>
+    <p class="cost">Bundle đầu tiên to hơn, first paint chậm hơn — nhưng là app nội bộ dùng hằng ngày,
+    người dùng đã cache, đánh đổi này chấp nhận được.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">TanStack Query</div>
+    <div class="vs">thay vì <em>Redux / Redux Toolkit</em></div>
+    <p class="why">Admin CMS khoảng 90% là <strong>server state</strong> — danh sách, chi tiết, CRUD.
+    Dùng Redux nghĩa là tự tay viết loading, error, cache, invalidate, chống gọi trùng cho từng endpoint.
+    TanStack Query cho sẵn cache theo key, dedupe request, stale-while-revalidate, optimistic update,
+    và <code>invalidateQueries</code> sau mutation — lượng code giảm rõ rệt và ít bug state hơn.</p>
+    <p class="cost">Vẫn cần một chỗ cho client state (modal, bộ lọc, wizard). Ở dự án này lượng đó nhỏ
+    nên <code>useState</code> + Context là đủ, không cần thêm store.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">shadcn/ui + TailwindCSS</div>
+    <div class="vs">thay vì <em>Ant Design</em> (thứ tôi dùng ở các dự án trước)</div>
+    <p class="why">shadcn không phải thư viện mà là <strong>code copy thẳng vào repo</strong> — sửa được đến tận
+    DOM, không phải vật lộn với <code>!important</code> hay override class nội bộ. Dự án có identity thiết kế riêng
+    và tôi tự làm Figma nên cần quyền kiểm soát đó. Nền dưới là Radix nên a11y (focus trap, ARIA, phím tắt) có sẵn.</p>
+    <p class="cost">Không có sẵn Table/DatePicker/Form mạnh như AntD — phải tự ghép TanStack Table, react-day-picker.
+    Tốn thêm thời gian giai đoạn đầu. Nếu là admin thuần CRUD cần ra nhanh, AntD vẫn là lựa chọn hợp lý hơn.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">react-hook-form + Zod</div>
+    <div class="vs">thay vì <em>Formik</em>, <em>AntD Form</em>, <em>Yup</em></div>
+    <p class="why">RHF dùng uncontrolled input nên <strong>gõ vào một field không re-render cả form</strong> —
+    khác biệt rất rõ ở form 30–50 field. Zod thì cho <code>z.infer</code>: viết một schema, vừa validate runtime
+    vừa sinh ra type TypeScript. Không còn cảnh type và validator lệch nhau sau vài lần sửa,
+    và schema đó dùng lại được ở phía Node.js.</p>
+    <p class="cost">Debug khó hơn Formik một chút vì giá trị không nằm trong React state; với field phức tạp
+    (select tự viết, editor) phải bọc qua <code>Controller</code>.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">TipTap (rich-text) &amp; ReactFlow (sơ đồ quy trình)</div>
+    <div class="vs">thay vì <em>Quill / CKEditor</em> và <em>tự vẽ bằng SVG</em></div>
+    <p class="why">TipTap là lớp headless trên ProseMirror: tôi định nghĩa được schema node riêng
+    và render node bằng chính React component — thứ Quill làm rất chật vật. Giấy phép MIT, không như CKEditor.
+    ReactFlow cho sẵn pan/zoom, kéo node, tự định tuyến cạnh, snap lưới — tự viết những thứ đó bằng SVG
+    là vài tháng công, mà giá trị của dự án không nằm ở đó.</p>
+    <p class="cost">TipTap/ProseMirror có đường học dốc, lưu dữ liệu dạng JSON chứ không phải HTML
+    nên cần quy ước rõ về versioning nội dung.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">RustFS (S3-compatible)</div>
+    <div class="vs">thay vì <em>lưu blob trong PostgreSQL</em> hoặc <em>ổ đĩa local của server</em></div>
+    <p class="why">File DOCX/PDF thầu nặng; nhét vào DB làm backup phình to và mọi query chậm theo.
+    Lưu vào ổ local thì container restart là mất, và không scale ngang được.
+    Dùng chuẩn S3 nghĩa là <strong>đổi sang MinIO hay AWS S3 chỉ cần đổi endpoint</strong>, code không sửa.
+    RustFS là bản self-host — phù hợp yêu cầu dữ liệu phải nằm trong hạ tầng của khách.</p>
+  </div>
+
+  <h4>④ Đào sâu — câu hỏi &amp; trả lời mẫu</h4>
+
+  <details class="qa"><summary>Chunking tài liệu thầu như thế nào? Vì sao?</summary>
+  <div class="ans">Không cắt theo số ký tự cố định vì như thế sẽ cắt ngang một điều khoản.
+  Cắt <strong>theo cấu trúc tài liệu trước</strong> (chương → điều → khoản, dựa vào heading khi parse DOCX),
+  rồi mới giới hạn kích thước, và cho các chunk <strong>chồng lấn (overlap)</strong> khoảng 10–15% để câu
+  nằm ở ranh giới không bị mất ngữ cảnh. Mỗi chunk gắn metadata: tên tài liệu, số điều, trang —
+  đây chính là thứ dùng để hiện trích dẫn cho người dùng.</div></details>
+
+  <details class="qa"><summary>Làm sao giảm hallucination?</summary>
+  <div class="ans">Bốn lớp: <strong>(1)</strong> prompt bắt buộc chỉ trả lời dựa trên ngữ cảnh được cung cấp,
+  không biết thì nói không tìm thấy; <strong>(2)</strong> đặt ngưỡng điểm tương đồng — dưới ngưỡng thì
+  không đưa vào prompt và trả về "không có dữ liệu" thay vì để model tự bịa;
+  <strong>(3)</strong> luôn trả kèm trích dẫn để người dùng bấm vào xem đoạn gốc;
+  <strong>(4)</strong> Admin CMS có FAQ do người soạn, dùng cho các câu hỏi quan trọng hay lặp lại —
+  không để AI đoán những thứ có thể trả lời chắc chắn.</div></details>
+
+  <details class="qa"><summary>Vì sao parse file ở backend mà không parse ở trình duyệt?</summary>
+  <div class="ans">Ba lý do. <strong>Nhất quán:</strong> kết quả parse phải giống hệt nhau vì nó quyết định
+  cách chunk và embed — không thể phụ thuộc vào trình duyệt và máy của từng người.
+  <strong>Bảo mật:</strong> file người dùng upload là dữ liệu không tin cậy, parse ở server có sandbox
+  và giới hạn tài nguyên. <strong>Tài nguyên:</strong> PDF vài trăm trang parse trên main thread
+  là treo tab. Frontend chỉ làm phần upload: validate loại file, giới hạn dung lượng,
+  chia phần (chunked upload) cho file lớn và hiện tiến trình.</div></details>
+
+  <details class="qa"><summary>Admin CMS phân quyền theo vai trò — anh làm ở frontend thế nào?</summary>
+  <div class="ans">Sau khi đăng nhập, lấy về danh sách permission, giữ trong một context, rồi
+  <strong>gác ở ba tầng</strong>: route (không đủ quyền thì không vào được trang), menu (ẩn mục không dùng được),
+  và từng hành động (nút Xóa disable hoặc ẩn). Điều luôn phải nói thêm:
+  <strong>đây chỉ là trải nghiệm người dùng, không phải bảo mật</strong> — backend vẫn phải kiểm tra quyền
+  trên mọi endpoint, vì ai cũng có thể gọi thẳng API.</div></details>
+
+  <details class="qa"><summary>Vì sao Sequelize mà không phải Prisma / TypeORM / Drizzle?</summary>
+  <div class="ans">Trả lời thật: backend Node đã dùng Sequelize từ trước tôi tham gia, và team quen nó.
+  Đổi ORM giữa chừng không mang lại giá trị cho sản phẩm mà tạo rủi ro migration.
+  Nếu làm mới từ đầu tôi sẽ cân nhắc Prisma vì type sinh tự động từ schema khớp tốt với TypeScript,
+  hoặc Drizzle nếu muốn giữ sát SQL. <em>Cách trả lời này ghi điểm hơn là bịa ra một lý do kỹ thuật —
+  người phỏng vấn đánh giá cao ứng viên phân biệt được "quyết định kỹ thuật" và "ràng buộc bối cảnh".</em></div></details>
+
+  <details class="qa"><summary>Device whitelist login cho mobile là gì và vì sao cần?</summary>
+  <div class="ans">Mỗi tài khoản chỉ đăng nhập được từ thiết bị đã được admin duyệt — app gửi lên device id,
+  server đối chiếu whitelist. Vì tài liệu thầu là dữ liệu nhạy cảm: chỉ có mật khẩu thì một tài khoản
+  bị lộ là rò rỉ toàn bộ. Whitelist khiến kẻ tấn công phải có thêm đúng thiết bị.
+  Admin CMS là nơi quản lý danh sách đó và có Audit Log ghi lại mọi thao tác.</div></details>
+
+  <div class="trap">
+    <div class="lbl">⑤ Bẫy hay gặp</div>
+    <ul>
+      <li>"RAG khác gì search thường?" — đừng trả lời "dùng AI". Điểm khác là tìm theo <b>ngữ nghĩa</b> qua vector
+      chứ không khớp từ khóa, và kết quả được model tổng hợp thành câu trả lời kèm nguồn.</li>
+      <li>Hỏi sâu về <b>hybrid search</b>: chỉ vector sẽ trượt các truy vấn chứa mã số, tên riêng, số hiệu văn bản.
+      Câu trả lời tốt là kết hợp keyword (BM25) với vector rồi gộp điểm.</li>
+      <li>Nói "React 19" thì phải biết nó mới ở chỗ nào: Actions, <code>useOptimistic</code>, <code>use()</code>,
+      ref là prop thường, và Compiler bỏ được phần lớn <code>useMemo</code> thủ công.</li>
+      <li>Dự án của anh dùng <b>vừa Python vừa Node</b> — sẽ bị hỏi tại sao tách. Lý do: AI/embedding thuộc hệ Python;
+      CRUD nghiệp vụ thì Node chung ngôn ngữ với frontend, chia sẻ được type và schema Zod.</li>
+    </ul>
+  </div>
+
+  <div class="tip">
+    <div class="lbl">Nói thêm để ghi điểm</div>
+    <p>Đây là dự án duy nhất trong CV mà anh <b>vừa thiết kế Figma, vừa code frontend, vừa viết API, vừa dựng CI/CD</b>.
+    Hãy kể theo trục đó — nó chứng minh mục tiêu "trở thành Full Stack" ghi trong CV không phải nguyện vọng suông
+    mà đã bắt đầu làm. Kèm một con số cụ thể nếu có: thời gian build giảm bao nhiêu sau khi có Jenkins,
+    hoặc số bước thủ công đã cắt bỏ khỏi quy trình release.</p>
+  </div>
+</div>
+
+<h2 class="sec" id="rustfs">B · Đào sâu — RustFS &amp; lưu trữ đối tượng chuẩn S3</h2>
+
+<div class="card">
+  <p class="sub" style="margin-bottom:6px">Phần bổ sung cho dự án Trợ lý đấu thầu. Đây là lựa chọn hạ tầng
+  dễ bị đào nhất trong CV, vì RustFS là phần mềm rất mới.</p>
+
+  <div class="pitch">
+    <div class="lbl">Nói trong 30 giây</div>
+    <p>RustFS là hệ thống lưu trữ đối tượng phân tán viết bằng Rust, nói chuẩn S3 API, giấy phép Apache 2.0.
+    Chúng tôi dùng nó để giữ file gốc DOCX/PDF của hồ sơ thầu, tự vận hành trên hạ tầng của khách.
+    Lý do chọn nó thay vì MinIO là giấy phép và công cụ vận hành; lý do dùng chuẩn S3 nói chung là để
+    <b>không khóa mình vào một nhà cung cấp</b> — đổi sang MinIO hay AWS S3 chỉ là đổi endpoint.</p>
+  </div>
+
+  <h4>RustFS là gì — các con số cần nhớ</h4>
+  <ul>
+    <li><b>Bản chất:</b> object storage phân tán, tương thích S3 API. Cổng <code>9000</code> cho S3 API,
+    cổng <code>9001</code> cho web console.</li>
+    <li><b>Giấy phép Apache 2.0</b> — đây là điểm bán hàng chính của dự án, đặt đối lập với AGPL của MinIO.</li>
+    <li><b>Tính năng đã ổn định:</b> erasure coding, versioning, object lock (WORM), bucket &amp; site replication,
+    bitrot protection, lifecycle, IAM policy, OIDC/SSO, STS, KMS, audit log, multipart upload.</li>
+    <li><b>Còn ở mức preview:</b> S3 Tables (Iceberg REST Catalog) và khả năng tương thích on-disk với MinIO.</li>
+    <li><b>Mốc phát triển:</b> khởi động 02/2024 → mở mã nguồn 07/2025 → beta 04/2026 → RC 08/2026 →
+    <b>GA 1.0 ngày 16/09/2026</b>.</li>
+  </ul>
+
+  <div class="trap" style="margin-top:18px">
+    <div class="lbl">Mốc thời gian — đọc kỹ chỗ này</div>
+    <ul style="list-style:none;padding-left:0">
+      <li>Dự án Trợ lý đấu thầu bắt đầu <b>03/2026</b>. RustFS vào beta <b>04/2026</b> và chỉ mới GA
+      <b>16/09/2026</b>.</li>
+      <li style="margin-top:8px">Nghĩa là khi dự án khởi động, RustFS <b>còn chưa tới bản beta</b>, và bản ổn định
+      đầu tiên mới ra cách đây vài tuần. Một người phỏng vấn có tra cứu sẽ hỏi thẳng:
+      <b>“Anh đưa một object storage bản alpha vào hệ thống lưu hồ sơ thầu?”</b></li>
+      <li style="margin-top:8px">Đây không phải câu hỏi để né. Nó là câu hỏi để chứng minh anh hiểu rủi ro
+      mình đang mang — xem phần trả lời bên dưới.</li>
+    </ul>
+  </div>
+
+  <h4>Những quyết định — và lý do</h4>
+
+  <div class="dec">
+    <div class="head">RustFS</div>
+    <div class="vs">thay vì <em>MinIO</em> — lựa chọn mặc định của ngành trong nhiều năm</div>
+    <p class="why">Hai lý do đều thuộc về giấy phép và vận hành, không phải hiệu năng.
+    <strong>Thứ nhất, MinIO đã chuyển từ Apache 2.0 sang AGPLv3</strong> (hoàn tất 2021).
+    AGPL ràng buộc cả trường hợp cung cấp phần mềm qua mạng — với một sản phẩm thương mại đóng bán cho khách,
+    đó là rủi ro pháp lý phải hỏi luật sư, hoặc phải mua giấy phép thương mại.
+    Apache 2.0 của RustFS không đặt ra câu hỏi đó.
+    <strong>Thứ hai, giữa 2025 MinIO gỡ Console quản trị khỏi bản Community</strong>, chỉ để lại một trình duyệt
+    file để xem và tải; quản lý policy, lifecycle, site replication chuyển hẳn sang bản trả tiền.
+    Nghĩa là team vận hành mất công cụ đồ họa, phải làm mọi thứ qua dòng lệnh. RustFS giữ console đầy đủ.</p>
+    <p class="cost">Đánh đổi thì rất thật: MinIO có nhiều năm chạy thật ngoài production, có sẵn runbook,
+    có tích hợp backup của bên thứ ba, và có nhiều người biết vận hành. RustFS mới GA nên
+    <strong>hệ sinh thái vận hành còn mỏng</strong> — gặp sự cố lạ thì phải tự xử lý nhiều hơn.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Tự vận hành (self-host)</div>
+    <div class="vs">thay vì <em>AWS S3</em>, <em>Google Cloud Storage</em>, <em>Cloudflare R2</em></div>
+    <p class="why">Hồ sơ thầu là dữ liệu nhạy cảm và khách hàng yêu cầu dữ liệu nằm trong hạ tầng của họ —
+    đây là ràng buộc nghiệp vụ, không phải sở thích kỹ thuật. Khi yêu cầu đã là “không ra khỏi hạ tầng nội bộ”
+    thì mọi dịch vụ đám mây đều bị loại từ đầu, và câu hỏi còn lại chỉ là chọn phần mềm nào để tự chạy.
+    Thêm một điểm phụ: hệ thống RAG đọc lại tài liệu nhiều lần khi index, dùng cloud thì phí truyền dữ liệu ra
+    (egress) là khoản không nhỏ.</p>
+    <p class="cost">Tự vận hành nghĩa là tự chịu trách nhiệm sao lưu, giám sát, vá lỗi, và tự đảm bảo
+    độ bền dữ liệu — những thứ mà nhà cung cấp đám mây làm sẵn và cam kết bằng hợp đồng.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Giao tiếp qua S3 API chuẩn</div>
+    <div class="vs">thay vì <em>API riêng của RustFS</em></div>
+    <p class="why">Đây là quyết định quan trọng nhất và cũng là <strong>câu trả lời cho mọi câu hỏi về rủi ro</strong>.
+    Code chỉ gọi những thao tác S3 phổ thông — <code>PutObject</code>, <code>GetObject</code>,
+    <code>ListObjects</code>, <code>DeleteObject</code>, multipart upload, presigned URL — nên
+    <strong>đổi sang MinIO, Ceph hay AWS S3 chỉ là đổi endpoint và khóa truy cập</strong>, không phải viết lại.
+    Chi phí để giữ được đường lùi này gần như bằng không; giá trị của nó thì rất lớn khi hạ tầng còn mới.</p>
+  </div>
+
+  <h4>Phần một frontend developer thực sự chạm vào</h4>
+  <p>Frontend gần như không nói chuyện trực tiếp với RustFS. Nhưng cách upload được thiết kế lại là
+  câu hỏi phỏng vấn kinh điển, và anh phải trả lời được vì đó là màn upload tài liệu anh làm.</p>
+
+  <div class="arch"><pre>Cách A — đi qua backend (proxy)
+  Trình duyệt ──file──▶ API backend ──▶ RustFS
+  đơn giản, dễ kiểm soát · nhưng file đi qua server, tốn băng thông + dễ timeout
+
+Cách B — presigned URL (thường là cách đúng cho file lớn)
+  1. Trình duyệt ──xin URL──▶ API backend  (backend kiểm tra quyền, ký URL có hạn)
+  2. Trình duyệt ──PUT file──▶ RustFS      (không qua backend)
+  3. Trình duyệt ──báo xong──▶ API backend (backend xác minh rồi mới ghi nhận)</pre></div>
+
+  <details class="qa"><summary>Presigned URL là gì và vì sao dùng?</summary>
+  <div class="ans">Backend dùng khóa bí mật của nó ký trước một URL cho phép thực hiện đúng một thao tác
+  (ví dụ <code>PUT</code> vào đúng một đường dẫn), có <strong>thời hạn ngắn</strong>. Trình duyệt cầm URL đó
+  đẩy file thẳng lên kho lưu trữ. Lợi ích: file không đi qua backend nên
+  <strong>không tốn băng thông và RAM của server, không bị timeout với file hàng trăm MB</strong>,
+  và quan trọng nhất là <strong>khóa truy cập không bao giờ xuất hiện ở frontend</strong>.
+  Điểm phải nhớ: bước 3 bắt buộc phải có — backend xác minh file đã lên thật rồi mới ghi vào database,
+  vì không được tin tín hiệu từ client.</div></details>
+
+  <details class="qa"><summary>Upload file PDF 500MB — frontend làm gì?</summary>
+  <div class="ans">Dùng <strong>multipart upload</strong>: chia file thành nhiều phần, upload song song vài phần một lúc,
+  phần nào lỗi thì thử lại riêng phần đó thay vì làm lại từ đầu, xong thì gọi lệnh hoàn tất để ghép.
+  Nhờ vậy có thể <strong>tạm dừng và tiếp tục</strong>, và hiện được tiến trình thật theo số byte đã gửi
+  chứ không phải thanh loading giả. Kèm theo: kiểm tra loại file và dung lượng ngay ở client để phản hồi tức thì
+  (nhưng backend vẫn phải kiểm lại), và cảnh báo khi người dùng rời trang giữa chừng.</div></details>
+
+  <details class="qa"><summary>Upload thẳng lên storage thì vướng CORS thế nào?</summary>
+  <div class="ans">Vì trình duyệt gửi request sang một origin khác (kho lưu trữ), nên
+  <strong>phải cấu hình CORS trên bucket</strong>: cho phép origin của web, cho phép method
+  <code>PUT</code>/<code>POST</code>, và — chỗ hay quên nhất — <strong>expose header <code>ETag</code></strong>,
+  vì multipart upload cần đọc ETag của từng phần để ghép lại. Thiếu dòng này thì upload phần nhỏ chạy ngon
+  mà file lớn thì hỏng, và lỗi rất khó đoán.</div></details>
+
+  <details class="qa"><summary>Cho người dùng xem lại tài liệu thầu — làm sao cho an toàn?</summary>
+  <div class="ans"><strong>Không để bucket ở chế độ công khai.</strong> Tài liệu thầu là dữ liệu nhạy cảm;
+  bucket public nghĩa là ai có link đều xem được, và link thì bị chia sẻ, bị log, bị index.
+  Cách đúng là backend kiểm tra quyền rồi cấp <strong>presigned GET có thời hạn ngắn</strong> cho từng lần xem.
+  Với tài liệu rất nhạy cảm thì thêm watermark hoặc bắt buộc xem qua trình đọc trong ứng dụng thay vì tải về.</div></details>
+
+  <details class="qa"><summary>Vì sao dám dùng một phần mềm mới ra GA cho hệ thống thật?</summary>
+  <div class="ans">Đây là câu quan trọng nhất của cả phần này. Cấu trúc câu trả lời tốt gồm ba ý:
+  <ul>
+    <li><strong>Thừa nhận rủi ro trước khi bị chỉ ra.</strong> Nói thẳng rằng thời điểm bắt đầu dự án,
+    RustFS còn rất mới — điều này cho thấy anh biết mình đang mang rủi ro gì.</li>
+    <li><strong>Nêu cách giới hạn thiệt hại.</strong> Chỉ dùng S3 API chuẩn nên đổi sang MinIO hay AWS S3
+    là chuyện đổi cấu hình; <strong>nguồn sự thật là PostgreSQL</strong>, kho đối tượng chỉ giữ file nhị phân,
+    nên mất kho không đồng nghĩa mất dữ liệu nghiệp vụ; và file gốc có bản sao lưu độc lập.</li>
+    <li><strong>Nêu điều kiện để đổi ý.</strong> Nếu gặp lỗi mất dữ liệu hoặc hiệu năng đọc không đạt thì
+    phương án thay thế đã sẵn sàng.</li>
+  </ul>
+  <em>Nếu thực tế team chưa làm đủ các biện pháp trên, đừng bịa. Nói đúng những gì đã làm, và nói rằng
+  nhìn lại thì đây là chỗ anh sẽ làm chặt hơn — câu trả lời đó vẫn ghi điểm, bịa thì không.</em></div></details>
+
+  <details class="qa"><summary>RustFS nhanh hơn MinIO không?</summary>
+  <div class="ans">Đừng trả lời “nhanh hơn” trống không. Số liệu công khai cho thấy bức tranh
+  <strong>hai chiều</strong>: trong một đánh giá độc lập, RustFS ghi nhanh hơn đáng kể (throughput ghi cao hơn
+  khoảng 57%) và tiết kiệm dung lượng hơn hẳn (7,8GB so với 18GB cho cùng tập dữ liệu),
+  nhưng <strong>độ trễ đọc lại kém hơn nhiều</strong> (7,96ms so với 1,85ms, có lúc vọt lên 17ms).
+  Cần nói thêm hai điều để câu trả lời chính xác: đánh giá đó chạy trên <strong>bản alpha, không phải 1.0</strong>,
+  và chính nhóm phát triển cũng thừa nhận nhóm tải đọc-nhiều vẫn đang được cải thiện.
+  Với hệ thống của chúng tôi thì đặc tính là <strong>ghi một lần, đọc nhiều lần</strong> — nên độ trễ đọc là
+  thứ đáng theo dõi, và đó là lý do phải đo trên chính workload của mình chứ không tin benchmark của người khác.</div></details>
+
+  <div class="tip">
+    <div class="lbl">Nói thêm để ghi điểm</div>
+    <p>Nếu người phỏng vấn tỏ ra hoài nghi về RustFS, hãy chuyển câu chuyện sang thứ có giá trị hơn:
+    <b>quyết định thật sự không phải “chọn RustFS” mà là “chỉ phụ thuộc vào S3 API”</b>.
+    Cái đầu là lựa chọn có thể đảo ngược trong một buổi chiều; cái sau là quyết định kiến trúc giữ cho
+    lựa chọn đó luôn đảo ngược được. Nói được sự khác biệt giữa hai loại quyết định này là dấu hiệu
+    của người nghĩ ở tầm kiến trúc, không chỉ tầm thư viện.</p>
+  </div>
+
+  <div style="margin-top:22px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)">
+    <b style="color:var(--ink)">Nguồn kiểm chứng</b> (tra cứu 28/09/2026):
+    kho mã và tài liệu RustFS trên GitHub · thông báo RustFS 1.0 GA (16/09/2026) trên Linuxiac ·
+    bài phân tích “what's actually production-ready” trên DEV · đánh giá RustFS làm backend cho Milvus
+    (số liệu benchmark) · các bài đưa tin việc MinIO gỡ Console khỏi bản Community (Blocks &amp; Files, Cloudian).
+  </div>
+</div>
+
+<h2 class="sec" id="p2">B · Dự án 2 — Phần mềm quản lý bệnh nhân tâm thần HN 1</h2>
+
+<div class="card">
+  <div class="row"><h3>PSY Healthcare Management System</h3><span class="when">02/2025 – 03/2026</span></div>
+  <div class="sub">IniSoft · Team 10 người · Frontend Developer</div>
+
+  <div class="tags">
+    <span class="tag">React 18</span><span class="tag">TypeScript</span><span class="tag">Vite</span>
+    <span class="tag">Ant Design 5</span><span class="tag">TanStack Query</span><span class="tag">Zustand</span>
+    <span class="tag">React Router 7</span><span class="tag">FastAPI (Python)</span>
+    <span class="tag">pnpm monorepo</span><span class="tag">Vitest + RTL</span>
+    <span class="tag">Jenkins + Docker</span>
+  </div>
+
+  <div class="star">
+    <div class="lbl">① Trả lời trong 2–3 phút · khung STAR</div>
+    <div class="st"><b>S · Bối cảnh</b><p>Bệnh viện tâm thần Hà Nội 1 quản lý hồ sơ bệnh nhân trên giấy. Mục tiêu là số hóa trọn vòng đời hồ sơ — tiếp nhận, điều trị, chăm sóc điều dưỡng, dược — và xuất được báo cáo theo chuẩn Bộ Y tế. Dự án dựng dưới dạng monorepo pnpm với frontend React và backend FastAPI.</p></div>
+    <div class="st"><b>T · Nhiệm vụ của tôi</b><p>Team 10, tôi làm frontend. Phần của tôi là các module nghiệp vụ nặng nhất: <b>bệnh án điện tử theo biểu mẫu chuẩn BYT</b> (phiếu chăm sóc điều dưỡng, theo dõi sinh hiệu, sử dụng thuốc, truyền dịch), <b>kê đơn có luồng duyệt nhiều bước</b>, <b>kho dược</b> theo lô và nồng độ, và giao diện phân quyền cho 6 vai trò.</p></div>
+    <div class="st"><b>A · Hành động</b><p>React 18 + TypeScript + Vite + Ant Design 5 — chọn AntD vì phần mềm nghiệp vụ dày form và bảng, và vì 10 người làm song song cần một bộ component thống nhất. Tách state làm hai: TanStack Query cho dữ liệu server, Zustand cho state giao diện. Biểu mẫu BYT được mô tả bằng cấu hình thay vì viết tay từng JSX, vì nhiều phiếu có cấu trúc tương tự. Viết unit test bằng Vitest + React Testing Library cho phần logic validate và tính toán.</p></div>
+    <div class="st fill"><b>R · Kết quả — anh tự điền</b><p>Đây là phần chốt lại và cũng là phần nhà tuyển dụng nhớ nhất.
+      <span class="blank"><b>Gợi ý số nên lấy:</b> số biểu mẫu BYT đã dựng · số vai trò trong ma trận phân quyền (6) · số đơn vị hành chính và mã ICD-10 hệ thống phục vụ (3.321 đơn vị) · độ phủ test ở phần logic nghiệp vụ · thời gian hoàn thành một phiếu chăm sóc so với làm tay. Dự án kéo dài 13 tháng nên <b>một mốc go-live sẽ mạnh hơn mọi mô tả</b>.</span></p></div>
+  </div>
+
+  <h4>Vì sao bài toán này khó hơn một CRUD admin thông thường</h4>
+  <ul>
+    <li><b>Biểu mẫu không do mình định nghĩa.</b> Phiếu chăm sóc điều dưỡng, phiếu theo dõi truyền dịch,
+    phiếu phân loại bệnh nhân đều có mẫu cố định của Bộ Y tế — không được tự ý đơn giản hóa,
+    kể cả khi form có hàng chục ô và nhiều ràng buộc chéo.</li>
+    <li><b>Dữ liệu y tế không được xóa.</b> Sửa hồ sơ phải giữ vết: ai sửa, lúc nào, giá trị cũ là gì.
+    Nghĩa là soft delete và lịch sử phiên bản, không phải <code>DELETE</code>.</li>
+    <li><b>Sai một liều thuốc là sự cố y khoa.</b> Validate không chỉ là "bắt buộc nhập" mà là ràng buộc
+    theo nghiệp vụ: liều theo cân nặng, tương tác thuốc, tồn kho theo lô và nồng độ.</li>
+    <li><b>Danh mục khổng lồ:</b> ICD-10, danh mục thuốc, 3.321 đơn vị hành chính — không thể đổ hết vào một select.</li>
+  </ul>
+
+  <h4>② Điểm nghẽn kỹ thuật — chuẩn bị kể sâu</h4>
+  <div class="chal">
+    <div class="head">Phiếu bệnh án chuẩn BYT hàng chục field, gõ phím nào cũng giật</div>
+    <p class="pb"><b>Vấn đề</b> Phiếu chăm sóc điều dưỡng và phiếu truyền dịch có 30–50 ô cùng ràng buộc chéo (chọn “có truyền dịch” thì nhóm ô tốc độ/thể tích thành bắt buộc). Dùng form controlled thì mỗi lần gõ một ký tự là <b>cả phiếu re-render</b>.</p>
+    <p class="opt"><b>Đã cân nhắc</b> (a) giữ AntD Form controlled và bọc memo từng field; (b) chuyển sang form uncontrolled; (c) mô tả phiếu bằng cấu hình dữ liệu rồi sinh ra JSX.</p>
+    <p class="pick"><b>Chọn</b> (b) + (c). Uncontrolled để một lần gõ không chạm vào state chung; và vì nhiều phiếu BYT có cấu trúc na ná nhau nên mô tả bằng cấu hình rẻ hơn hẳn viết tay từng phiếu. Ràng buộc chéo gom về <b>một chỗ theo schema</b> thay vì rải <code>if</code> khắp component.</p>
+    <p class="res"><b>Kết quả</b> Nhập liệu mượt trở lại; thêm một phiếu BYT mới chủ yếu là thêm cấu hình. <b>Gợi ý điền:</b> số phiếu đã dựng, thời gian dựng phiếu mới trước/sau khi cấu hình hóa.</p>
+  </div>
+
+  <div class="chal">
+    <div class="head">Danh mục 3.321 đơn vị hành chính và toàn bộ ICD-10 làm select đơ</div>
+    <p class="pb"><b>Vấn đề</b> Đổ hết danh mục vào một select là hàng nghìn node DOM, mở dropdown mất vài giây, và mỗi lần mở form lại tải lại.</p>
+    <p class="opt"><b>Đã cân nhắc</b> (a) tải hết rồi lọc ở client; (b) ảo hóa danh sách; (c) tải theo cấp và tìm kiếm phía server.</p>
+    <p class="pick"><b>Chọn</b> (c) là chính, (b) dự phòng cho chỗ buộc phải hiện danh sách dài. Đơn vị hành chính dùng cascader tải theo cấp — chọn tỉnh mới gọi lấy huyện. ICD-10 dùng select tìm kiếm phía server có debounce, mỗi lần chỉ trả vài chục kết quả. Danh mục ít đổi thì cache dài hạn bằng <code>staleTime</code> lớn.</p>
+    <p class="res"><b>Kết quả</b> Form mở tức thì thay vì chờ tải danh mục. <b>Gợi ý điền:</b> thời gian mở form trước/sau, số request tiết kiệm được nhờ cache.</p>
+  </div>
+
+  <h4>③ Ownership — vì sao chọn stack này</h4>
+
+  <div class="dec">
+    <div class="head">Ant Design 5</div>
+    <div class="vs">thay vì <em>tự dựng design system</em> hoặc <em>shadcn/ui</em></div>
+    <p class="why">Đây là phần mềm nghiệp vụ nội bộ: giá trị nằm ở đúng nghiệp vụ, không nằm ở thẩm mỹ khác biệt.
+    AntD cho sẵn <code>Form</code> với validate lồng nhau, <code>Table</code> có sort/filter/phân trang/cột cố định,
+    DatePicker chuẩn locale — đúng những thứ chiếm phần lớn khối lượng của một HMS.
+    Team 10 người làm song song thì một bộ component thống nhất còn giúp <strong>giảm lệch giao diện giữa các module</strong>.</p>
+    <p class="cost">Bundle lớn, tùy biến sâu thì vướng; CSS-in-JS runtime của v5 tốn thêm chi phí render.
+    Ở dự án Bidding Assistant sau này, khi cần identity thiết kế riêng, tôi đã chọn ngược lại — shadcn/ui.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Zustand + TanStack Query</div>
+    <div class="vs">thay vì <em>Redux Toolkit</em> gánh cả hai</div>
+    <p class="why">Tách bạch hai loại state. <strong>Server state</strong> (bệnh nhân, đơn thuốc, danh mục)
+    giao cho TanStack Query vì nó có cache, invalidate, refetch — Redux không giải quyết được chuyện
+    "dữ liệu trên server đã cũ". <strong>Client state</strong> (bước hiện tại của wizard kê đơn, bộ lọc,
+    ca trực đang chọn) giao cho Zustand: một hàm <code>create</code>, không provider, không action/reducer/boilerplate.
+    Đặt cạnh Redux Toolkit cho cùng tập tính năng thì lượng code ít hơn đáng kể.</p>
+    <p class="cost">Zustand không có time-travel debugging như Redux DevTools mặc định, và vì quá dễ tạo store
+    nên phải có quy ước rõ ràng kẻo store mọc lung tung.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">FastAPI (Python)</div>
+    <div class="vs">thay vì <em>Node.js/Express</em></div>
+    <p class="why">Lý do có lợi trực tiếp cho frontend: FastAPI <strong>tự sinh OpenAPI schema từ model Pydantic</strong>,
+    nên frontend sinh được type TypeScript từ đó — hợp đồng API không bị trôi khi backend sửa.
+    Thêm nữa team backend mạnh Python và hệ sinh thái xử lý dữ liệu y tế/báo cáo bên Python phong phú hơn.</p>
+    <p class="cost">Không dùng chung ngôn ngữ với frontend nên không share code validate;
+    phải dựa vào bước sinh type từ OpenAPI làm cầu nối.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">pnpm monorepo</div>
+    <div class="vs">thay vì <em>nhiều repo riêng</em> hoặc <em>npm/yarn workspace</em></div>
+    <p class="why">Một repo giúp đổi API và đổi frontend đi chung một commit, một lần review —
+    quan trọng khi 10 người làm song song. Chọn pnpm vì <strong>node_modules chặt chẽ</strong>:
+    package chỉ import được thứ nó khai báo, chặn lỗi "chạy máy tôi thì được" do phantom dependency.
+    Store dùng chung bằng hard link nên cài nhanh và nhẹ đĩa hơn hẳn npm.</p>
+    <p class="cost">CI phải cấu hình cẩn thận để chỉ build/test phần bị ảnh hưởng, nếu không mỗi commit
+    lại build cả repo.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Vitest + React Testing Library</div>
+    <div class="vs">thay vì <em>Jest</em></div>
+    <p class="why">Dự án đã dùng Vite. Vitest <strong>dùng lại đúng config, alias và plugin của Vite</strong> —
+    không phải nuôi song song một cấu hình transform riêng cho Jest, vốn là nguồn lỗi kinh điển với ESM và TS path alias.
+    API gần như giống Jest nên không tốn chi phí học.</p>
+  </div>
+
+  <h4>④ Đào sâu — câu hỏi &amp; trả lời mẫu</h4>
+
+  <details class="qa"><summary>Form bệnh án hàng chục field, validate chéo — anh xử lý ra sao?</summary>
+  <div class="ans">Tách thành ba lớp. <strong>Lớp cấu hình:</strong> mô tả field bằng dữ liệu (tên, kiểu, ràng buộc)
+  thay vì viết tay từng JSX — biểu mẫu BYT có nhiều phiếu na ná nhau, cấu hình hóa thì thêm phiếu mới rẻ hơn nhiều.
+  <strong>Lớp validate:</strong> ràng buộc chéo (ví dụ chọn "có truyền dịch" thì nhóm field tốc độ/thể tích thành bắt buộc)
+  viết ở một chỗ theo schema, không rải <code>if</code> trong component.
+  <strong>Lớp hiệu năng:</strong> chỉ re-render nhóm field liên quan, không để một lần gõ phím làm cả phiếu vẽ lại.</div></details>
+
+  <details class="qa"><summary>Luồng duyệt đơn thuốc nhiều bước — mô hình hóa thế nào?</summary>
+  <div class="ans">Coi đơn thuốc là một <strong>máy trạng thái</strong>: nháp → chờ duyệt → đã duyệt → đã cấp phát → hủy.
+  Mỗi trạng thái quy định rõ vai trò nào được chuyển sang trạng thái nào. Frontend đọc trạng thái hiện tại
+  để quyết định hiện nút gì — không viết <code>if</code> rải rác kiểu "nếu là bác sĩ và đơn chưa duyệt thì...".
+  Backend là nơi chốt chuyển trạng thái, vì đây là ràng buộc nghiệp vụ chứ không phải ràng buộc giao diện.
+  Phần thông báo trong ứng dụng gắn vào chính các mốc chuyển trạng thái đó.</div></details>
+
+  <details class="qa"><summary>3.321 đơn vị hành chính và danh mục ICD-10 — hiển thị kiểu gì cho không lag?</summary>
+  <div class="ans">Không đổ hết vào DOM. Với đơn vị hành chính dùng <strong>cascader tải theo cấp</strong>:
+  chọn tỉnh mới gọi lấy huyện. Với ICD-10 dùng <strong>select tìm kiếm phía server có debounce</strong>,
+  mỗi lần chỉ trả vài chục kết quả. Nếu buộc phải hiện danh sách dài thì <strong>ảo hóa</strong> (chỉ render
+  phần đang nhìn thấy). Những danh mục ít đổi thì cache dài hạn bằng TanStack Query với
+  <code>staleTime</code> lớn — không gọi lại mỗi lần mở form.</div></details>
+
+  <details class="qa"><summary>Phân quyền 6 vai trò ở frontend — có phải là bảo mật không?</summary>
+  <div class="ans">Không. Frontend ẩn/hiện chỉ để người dùng không thấy thứ họ không dùng được —
+  đó là trải nghiệm. <strong>Bảo mật nằm ở backend</strong>, kiểm tra quyền trên từng endpoint,
+  vì bất kỳ ai cũng gọi được API trực tiếp. Điểm cần chú ý thêm ở frontend là
+  <strong>không tải về dữ liệu vượt quyền rồi mới ẩn đi</strong> — dữ liệu đã nằm trong response
+  thì mở DevTools là thấy. Danh sách phải được lọc từ server.</div></details>
+
+  <details class="qa"><summary>Dữ liệu y tế — có gì phải lưu ý ở frontend?</summary>
+  <div class="ans">Không log dữ liệu bệnh nhân ra console kể cả khi debug; không lưu vào
+  <code>localStorage</code>; cẩn thận với công cụ theo dõi lỗi (Sentry) vì nó gửi cả nội dung form đi
+  — phải cấu hình che các field nhạy cảm. Thao tác sửa phải giữ vết để phục vụ Audit Log.
+  Và mọi thao tác xóa đều là đánh dấu đã hủy, không xóa thật.</div></details>
+
+  <div class="trap">
+    <div class="lbl">⑤ Bẫy hay gặp</div>
+    <ul>
+      <li>"Team 10 người, cụ thể anh làm gì?" — chuẩn bị ranh giới rõ ràng: module nào của anh, phần nào là của người khác.
+      Nói mơ hồ kiểu "làm frontend nói chung" dễ bị đánh giá là thổi phồng.</li>
+      <li>"Anh nói có viết test — coverage bao nhiêu, test cái gì?" — trả lời thật và có trọng tâm:
+      test logic validate và các hàm tính toán liều/tồn kho trước, không đuổi theo con số phần trăm.</li>
+      <li>"Vì sao dự án này AntD mà dự án sau lại shadcn?" — đây là câu hỏi tốt, không phải câu bắt lỗi.
+      Trả lời bằng tiêu chí: nghiệp vụ nặng + cần ra nhanh + nhiều người làm song song → AntD;
+      cần identity thiết kế riêng và kiểm soát DOM → shadcn.</li>
+      <li>Dự án kéo dài 13 tháng — sẽ bị hỏi <b>phần khó nhất</b> và <b>thứ anh sẽ làm khác đi</b>. Chuẩn bị sẵn một câu chuyện thật.</li>
+    </ul>
+  </div>
+</div>
+
+<h2 class="sec" id="p3">B · Dự án 3 — WAS App</h2>
+
+<div class="card">
+  <div class="row"><h3>WAS — Hệ thống đặt lịch phòng khám nha khoa (thị trường Nhật)</h3><span class="when">08/2024 – 01/2025</span></div>
+  <div class="sub">AMELA · Team 10+ · Frontend Developer</div>
+
+  <div class="tags">
+    <span class="tag">React 18</span><span class="tag">TypeScript</span><span class="tag">Ant Design 4</span>
+    <span class="tag">Redux Toolkit</span><span class="tag">React Query</span>
+    <span class="tag">GitLab CI</span><span class="tag">App Store / Google Play</span>
+  </div>
+
+  <div class="star">
+    <div class="lbl">① Trả lời trong 2–3 phút · khung STAR</div>
+    <div class="st"><b>S · Bối cảnh</b><p>Phòng khám nha khoa ở Nhật cần hệ thống cho bệnh nhân đặt lịch online, còn nhân viên quản lý lịch đặt, ca làm, thông báo SMS và dữ liệu bệnh nhân. Yêu cầu đặc thù của thị trường Nhật: sản phẩm <b>phải có mặt trên App Store và Google Play</b> thì phòng khám mới tin dùng.</p></div>
+    <div class="st"><b>T · Nhiệm vụ của tôi</b><p>Team 10+, tôi làm frontend. Hai việc chính: <b>đưa module Operator sang giao diện responsive hoàn chỉnh</b> để dùng được trên điện thoại — gồm lịch đặt kéo-thả, lịch làm việc và điều hướng; và <b>đóng gói chính codebase web đó thành ứng dụng iOS/Android rồi trực tiếp release lên hai store</b>. Ngoài ra tôi fix bug và đẩy release qua GitLab CI.</p></div>
+    <div class="st"><b>A · Hành động</b><p>React 18 + TypeScript + Ant Design 4 + Redux Toolkit + React Query — dự án đã chạy trước khi tôi vào nên tôi giữ nguyên quy ước của team thay vì đổi sang thứ tôi quen hơn. Phần responsive không chỉ là media query: bảng lịch 7 cột trên desktop được đổi hẳn cách trình bày sang xem theo ngày trên mobile. Phần kéo-thả phải chuyển từ HTML5 drag-and-drop sang pointer event vì màn cảm ứng không hỗ trợ.</p></div>
+    <div class="st fill"><b>R · Kết quả — anh tự điền</b><p>Đây là phần chốt lại và cũng là phần nhà tuyển dụng nhớ nhất.
+      <span class="blank"><b>Gợi ý số nên lấy:</b> số lần release lên store · thời gian từ merge đến khi app lên store · số phòng khám đang dùng · số màn đã chuyển sang responsive. <b>Việc app đã có trên cả App Store và Google Play tự nó là một kết quả kiểm chứng được</b> — hãy nói rõ chính anh là người build và submit.</span></p></div>
+  </div>
+
+  <h4>② Điểm nghẽn kỹ thuật — chuẩn bị kể sâu</h4>
+  <div class="chal">
+    <div class="head">Lịch đặt kéo-thả không dùng được trên điện thoại</div>
+    <p class="pb"><b>Vấn đề</b> Module Operator phải chạy trong app mobile, nhưng <b>HTML5 drag-and-drop không hoạt động trên màn cảm ứng</b>. Nặng hơn: khi ngón tay đặt xuống và di chuyển, không phân biệt được người dùng muốn kéo khối lịch hay muốn cuộn trang.</p>
+    <p class="opt"><b>Đã cân nhắc</b> (a) giữ HTML5 DnD và chỉ cho kéo trên desktop, mobile dùng form chọn giờ; (b) tự xử lý bằng pointer event; (c) dùng thư viện hỗ trợ cả chuột lẫn cảm ứng.</p>
+    <p class="pick"><b>Chọn</b> Kéo bằng pointer event với <b>long-press để vào chế độ kéo</b>, và chặn cuộn trong lúc kéo — đây là cách phân biệt ý định của người dùng. Đồng thời giãn vùng chạm: khung giờ cao 20px trên desktop thì không bấm trúng trên mobile, nên mobile đổi hẳn sang xem theo ngày thay vì thu nhỏ bảng tuần.</p>
+    <p class="res"><b>Kết quả</b> Thao tác xếp lịch dùng được thật trên app chứ không chỉ “hiển thị được”. <b>Gợi ý điền:</b> số màn đã chuyển responsive, phản hồi của phòng khám sau khi có bản mobile.</p>
+  </div>
+
+  <div class="chal">
+    <div class="head">Đưa web lên App Store mà không bị từ chối vì “chỉ là website bọc lại”</div>
+    <p class="pb"><b>Vấn đề</b> Thị trường Nhật đòi app trên store, nhưng Apple có quy định 4.2 về chức năng tối thiểu — app chỉ bọc website rất dễ bị từ chối.</p>
+    <p class="opt"><b>Đã cân nhắc</b> (a) viết lại bằng React Native; (b) viết native; (c) đóng gói web và bổ sung giá trị chỉ app mới có.</p>
+    <p class="pick"><b>Chọn</b> (c). Tính năng sản phẩm là lịch, biểu mẫu, danh sách — <b>không có gì cần API native nặng</b>, nên viết lại bằng React Native nghĩa là nuôi hai codebase cho cùng một nghiệp vụ. Thay vào đó bổ sung push notification, lưu phiên đăng nhập, xử lý vùng an toàn màn hình và deep link.</p>
+    <p class="res"><b>Kết quả</b> App lên được cả App Store và Google Play, giữ một codebase. <b>Đây là kết quả kiểm chứng được — nói rõ chính anh là người build và submit.</b></p>
+  </div>
+
+  <h4>③ Ownership — vì sao chọn stack này</h4>
+
+  <div class="dec">
+    <div class="head">Đóng gói web thành app</div>
+    <div class="vs">thay vì <em>viết lại bằng React Native</em> hoặc <em>native</em></div>
+    <p class="why">Tính năng của sản phẩm là lịch, biểu mẫu, danh sách — <strong>không có gì cần API native nặng</strong>
+    (không AR, không xử lý ảnh/video, không bản đồ offline). Trong khi đó thị trường Nhật gần như bắt buộc
+    phải có mặt trên store thì phòng khám mới tin dùng. Viết lại bằng React Native nghĩa là nuôi hai codebase,
+    hai luồng release, hai chỗ phát sinh bug cho cùng một nghiệp vụ. Giữ một codebase web là đường ngắn nhất ra thị trường.</p>
+    <p class="cost">Cảm giác không "mượt" bằng native ở animation và cuộn dài; không dùng được đầy đủ API thiết bị;
+    và rủi ro thật sự là <strong>Apple từ chối theo quy định 4.2 (minimum functionality)</strong> nếu app chỉ là website bọc lại.
+    Cách hóa giải: bổ sung giá trị chỉ app mới có — push notification, lưu phiên đăng nhập,
+    và xử lý tử tế vùng an toàn màn hình, offline, deep link.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Redux Toolkit</div>
+    <div class="vs">thay vì <em>Zustand</em> (thứ tôi dùng ở dự án khác)</div>
+    <p class="why">Dự án đã chạy trước khi tôi vào và team đã thống nhất RTK. Với một sản phẩm đang vận hành,
+    <strong>nhất quán quan trọng hơn tối ưu</strong>: trộn hai thư viện state trong cùng codebase gây rối cho
+    người đọc sau. RTK cũng có lý của nó ở đây — nhiều module chia sẻ state, DevTools có time-travel
+    giúp truy vết bug lịch đặt, middleware để xử lý side effect.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">GitLab CI</div>
+    <div class="vs">thay vì <em>Jenkins</em></div>
+    <p class="why">Repo đã ở GitLab; CI khai báo bằng <code>.gitlab-ci.yml</code> nằm ngay trong repo nên
+    pipeline được review như code và đi theo branch. Không phải dựng và bảo trì máy chủ riêng như Jenkins.
+    <em>Ở IniSoft thì ngược lại — hạ tầng self-host, cần chạy job build Docker nặng và tích hợp hệ thống nội bộ,
+    nên Jenkins hợp hơn. Biết cả hai và nói được khi nào chọn cái nào là điểm cộng.</em></p>
+  </div>
+
+  <h4>④ Đào sâu — câu hỏi &amp; trả lời mẫu</h4>
+
+  <details class="qa"><summary>Lịch đặt kéo-thả trên mobile — khó ở đâu?</summary>
+  <div class="ans">Khó nhất là <strong>HTML5 drag-and-drop không hoạt động trên màn cảm ứng</strong>,
+  phải chuyển sang pointer/touch event hoặc dùng thư viện hỗ trợ cả hai.
+  Vấn đề thứ hai là phân biệt <strong>kéo và cuộn</strong>: ngón tay đặt xuống rồi di chuyển —
+  là người dùng muốn kéo khối lịch hay muốn cuộn trang? Giải pháp là yêu cầu giữ một khoảng
+  (long-press) mới vào chế độ kéo, và chặn cuộn trong lúc kéo.
+  Thứ ba là vùng chạm: khung giờ trên desktop cao 20px thì trên mobile không bấm trúng, phải giãn ra
+  và đổi cách hiển thị chứ không chỉ thu nhỏ giao diện desktop.</div></details>
+
+  <details class="qa"><summary>Responsive ở đây là gì — chỉ thêm media query?</summary>
+  <div class="ans">Không. Bảng lịch tuần 7 cột trên desktop mà nhét vào màn 375px thì không đọc được dù có
+  media query. Phải <strong>đổi cách trình bày</strong>: mobile chuyển sang xem theo ngày, vuốt để đổi ngày;
+  bảng dữ liệu chuyển thành danh sách thẻ; thao tác phụ dồn vào bottom sheet.
+  Thêm nữa app chạy trong webview nên phải xử lý vùng an toàn (tai thỏ, thanh home) và
+  chiều cao viewport thay đổi khi bàn phím bật lên.</div></details>
+
+  <details class="qa"><summary>Quy trình release lên App Store và Google Play?</summary>
+  <div class="ans">Phía Apple: chứng chỉ và provisioning profile, tăng version/build number, archive,
+  upload qua App Store Connect, điền phiếu khai quyền riêng tư, gửi review — và chuẩn bị tinh thần bị hỏi
+  vì sao app không chỉ là website. Phía Google: ký bằng keystore (mất key là mất khả năng cập nhật app,
+  nên dùng Play App Signing), upload AAB, phát hành theo bậc phần trăm để nếu lỗi thì chặn sớm.
+  Điểm cần nói thêm: web sửa là đẩy được ngay, còn app phải chờ review — nên
+  <strong>những gì có thể cấu hình từ server thì đừng hard-code vào app</strong>.</div></details>
+
+  <details class="qa"><summary>Vì sao thông báo SMS do backend gửi?</summary>
+  <div class="ans">Vì gửi SMS cần khóa bí mật của nhà cung cấp — để lộ ở frontend là ai cũng gửi được và
+  hóa đơn về tay công ty. Thêm nữa SMS phải gửi đúng cả khi người dùng đã đóng trình duyệt
+  (nhắc lịch hẹn ngày mai), nên nó phải là job có hàng đợi ở server, có retry khi lỗi, có chống gửi trùng.
+  Frontend chỉ tạo lịch hẹn; việc "đến giờ thì nhắc" không thuộc về frontend.</div></details>
+
+  <div class="trap">
+    <div class="lbl">⑤ Bẫy hay gặp</div>
+    <ul>
+      <li>"Anh ghi <b>React-Native</b> trong mục kỹ năng nhưng dự án này là web bọc lại" — phải phân biệt rành mạch,
+      đừng để người phỏng vấn tự phát hiện. Nói rõ anh có chạm React Native ở mức nào và kinh nghiệm build/release là thật.</li>
+      <li>Hỏi sâu về <b>múi giờ</b>: sản phẩm cho thị trường Nhật, lịch hẹn phải lưu UTC và hiển thị theo giờ địa phương.
+      Lưu chuỗi giờ địa phương là bug chờ ngày nổ.</li>
+      <li>Hỏi về <b>đặt trùng lịch</b>: hai người cùng bấm một khung giờ. Frontend disable ô chỉ là giảm xác suất;
+      chống trùng thật phải ở database (ràng buộc unique hoặc khóa).</li>
+    </ul>
+  </div>
+</div>
+
+<h2 class="sec" id="p4">B · Dự án 4 — Enas</h2>
+
+<div class="card">
+  <div class="row"><h3>ENAS — SaaS tiếp thị biểu mẫu &amp; tương tác khách hàng (thị trường Nhật)</h3><span class="when">01/2024 – 08/2024</span></div>
+  <div class="sub">AMELA · Team 20+ · Frontend Developer</div>
+
+  <div class="tags">
+    <span class="tag">Next.js 14 (App Router)</span><span class="tag">React 18</span><span class="tag">TypeScript</span>
+    <span class="tag">Ant Design 5</span><span class="tag">Redux Toolkit</span><span class="tag">React Query</span>
+    <span class="tag">Stripe</span><span class="tag">i18n JP/EN</span>
+  </div>
+
+  <div class="star">
+    <div class="lbl">① Trả lời trong 2–3 phút · khung STAR</div>
+    <div class="st"><b>S · Bối cảnh</b><p>ENAS là nền tảng SaaS cho thị trường Nhật, giúp doanh nghiệp thu khách hàng tiềm năng qua biểu mẫu web được tối ưu tỉ lệ điền (EFO), kèm khảo sát, A/B testing và các kênh liên lạc. Khác với các dự án admin nội bộ, sản phẩm này có <b>trang public</b> — chính là biểu mẫu khách hàng cuối điền vào, nên tốc độ hiển thị ảnh hưởng trực tiếp đến doanh thu của người dùng.</p></div>
+    <div class="st"><b>T · Nhiệm vụ của tôi</b><p>Team 20+, tôi làm frontend các module chính: <b>form builder</b>, A/B testing, quản lý khách hàng, cài đặt dự án, luồng thanh toán Stripe và song ngữ Nhật/Anh. Phần tôi chịu trách nhiệm thiết kế kỹ thuật là <b>engine sinh biểu mẫu từ schema</b> — thứ toàn bộ sản phẩm dựa lên.</p></div>
+    <div class="st"><b>A · Hành động</b><p>Next.js 14 App Router — chọn SSR vì trang form là trang public cần hiển thị nhanh và chia sẻ được. Form engine tách 4 lớp <code>schema → converter → layout → ui</code> để thêm một loại field mới chỉ phải sửa một lớp. A/B testing chia nhánh ở middleware phía server kèm cookie giữ biến thể cố định, tránh nháy giao diện và tránh làm sai số liệu. Thanh toán dùng Stripe Elements nên thông tin thẻ không bao giờ đi qua server của chúng tôi.</p></div>
+    <div class="st fill"><b>R · Kết quả — anh tự điền</b><p>Đây là phần chốt lại và cũng là phần nhà tuyển dụng nhớ nhất.
+      <span class="blank"><b>Gợi ý số nên lấy:</b> số loại field form engine hỗ trợ · thời gian thêm một loại field mới trước/sau khi tách lớp · số form hoặc số khách hàng dùng thật · cải thiện tỉ lệ hoàn thành form sau tối ưu EFO · điểm Lighthouse của trang form public. <b>Tỉ lệ chuyển đổi là số thuyết phục nhất ở dự án này nếu anh lấy được.</b></span></p></div>
+  </div>
+
+  <h4>② Điểm nghẽn kỹ thuật — chuẩn bị kể sâu</h4>
+  <div class="chal">
+    <div class="head">Thêm một loại field mới phải sửa file mà cả team đang cùng chạm</div>
+    <p class="pb"><b>Vấn đề</b> Form builder ban đầu render bằng một <code>switch-case</code> theo loại field. Mỗi lần thêm loại field là sửa đúng file đó — team 20+ người nên <b>xung đột merge liên tục</b>, và logic bố cục lẫn với logic vẽ field.</p>
+    <p class="opt"><b>Đã cân nhắc</b> (a) giữ switch-case nhưng tách thành nhiều file nhỏ; (b) dùng thư viện sẵn như react-jsonschema-form hoặc Formily; (c) tự tách engine thành các lớp có trách nhiệm riêng.</p>
+    <p class="pick"><b>Chọn</b> (c): <code>schema → converter → layout → ui</code>. Thư viện sẵn bị loại vì sản phẩm cần ba thứ chúng không cho: đặc thù EFO Nhật (mã bưu điện tự điền địa chỉ, kiểm tra kana), mỗi biến thể A/B là một phiên bản form render song song, và kiểm soát hoàn toàn giao diện vì đây là mặt tiền của khách hàng. Lớp converter còn là chỗ xử lý tương thích ngược <b>để form cũ của khách vẫn chạy khi schema đổi phiên bản</b>.</p>
+    <p class="res"><b>Kết quả</b> Thêm loại field mới chỉ chạm lớp ui, hết xung đột merge. <b>Gợi ý điền:</b> số loại field hỗ trợ, thời gian thêm một loại field trước/sau.</p>
+  </div>
+
+  <div class="chal">
+    <div class="head">A/B testing bị nháy giao diện và làm sai số liệu</div>
+    <p class="pb"><b>Vấn đề</b> Chia nhánh ở phía client khiến người dùng thấy bản A rồi mới nhảy sang bản B — vừa xấu vừa khiến số liệu thống kê không tin được. Thêm nữa người dùng quay lại lần sau có thể rơi vào biến thể khác.</p>
+    <p class="opt"><b>Đã cân nhắc</b> (a) chia nhánh ở client sau khi tải; (b) chia nhánh ở server qua middleware; (c) render sẵn cả hai rồi ẩn một.</p>
+    <p class="pick"><b>Chọn</b> (b): middleware của Next.js chọn biến thể dựa trên cookie và trả về HTML của đúng biến thể ngay từ đầu. Cookie đảm bảo <b>một người luôn thấy cùng một biến thể</b> ở các lần sau. Kèm theo phải tắt cache trang đó hoặc cache riêng theo biến thể, kẻo CDN trả nhầm.</p>
+    <p class="res"><b>Kết quả</b> Không còn nháy, và số liệu A/B dùng được để ra quyết định. <b>Gợi ý điền:</b> số thí nghiệm A/B đã chạy, mức cải thiện tỉ lệ hoàn thành form.</p>
+  </div>
+
+  <h4>③ Ownership — vì sao chọn stack này</h4>
+
+  <div class="dec">
+    <div class="head">Next.js 14 App Router</div>
+    <div class="vs">thay vì <em>SPA thuần</em> như các dự án admin khác</div>
+    <p class="why">Khác biệt căn bản: sản phẩm này có <strong>trang public</strong> — chính là biểu mẫu mà
+    khách hàng cuối điền vào. Đó là trang kiếm tiền cho người dùng của chúng tôi, nên
+    <strong>tốc độ hiển thị ảnh hưởng trực tiếp đến tỉ lệ chuyển đổi</strong>, và form cần được index/chia sẻ được
+    (thẻ OGP khi gửi qua mạng xã hội). SSR giải quyết cả hai. App Router thêm React Server Component:
+    phần render form từ schema chạy ở server, trình duyệt tải ít JavaScript hơn — đúng chỗ cần nhất.</p>
+    <p class="cost">Thời điểm 2024, App Router còn mới: <strong>bốn tầng cache của Next.js</strong>
+    (request memo, data cache, full route cache, router cache) rất dễ gây hiện tượng "sửa dữ liệu rồi mà màn hình
+    vẫn cũ", phải nắm rõ <code>revalidate</code> và <code>revalidateTag</code>.
+    Ngoài ra Ant Design là thư viện client, ghép với RSC phải cấu hình registry để tránh nháy giao diện khi hydrate.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Form engine chia 4 lớp: schema → converter → layout → ui</div>
+    <div class="vs">thay vì <em>một component lớn với switch-case theo loại field</em></div>
+    <p class="why">Đây là quyết định kiến trúc đáng nói nhất của dự án.
+    <strong>schema</strong> là hợp đồng dữ liệu người dùng lưu trong DB;
+    <strong>converter</strong> chuẩn hóa schema đó thành mô hình nội bộ (và là nơi xử lý tương thích ngược
+    khi schema đổi phiên bản — form cũ của khách vẫn phải chạy);
+    <strong>layout</strong> lo vị trí, chia cột, nhóm field;
+    <strong>ui</strong> chỉ lo vẽ một field.
+    Lợi ích cụ thể: thêm một loại field mới chỉ cần đăng ký thêm ở lớp ui,
+    <strong>không đụng vào ba lớp còn lại</strong>. Nếu nhét hết vào một switch-case khổng lồ thì
+    mỗi lần thêm field là một lần sửa file mà cả team đang cùng chạm.</p>
+    <p class="cost">Nhiều lớp trừu tượng hơn nên người mới vào mất thời gian hiểu; debug phải đi qua nhiều tầng.
+    Chỉ đáng làm khi số loại field và số form đủ lớn — ở đây thì đúng là đủ lớn.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Tự viết form engine</div>
+    <div class="vs">thay vì <em>react-jsonschema-form</em> hoặc <em>Formily</em></div>
+    <p class="why">Thư viện sẵn có cho được form từ JSON Schema, nhưng sản phẩm cần ba thứ chúng không cho:
+    <strong>(1)</strong> đặc thù EFO Nhật — nhập mã bưu điện tự điền địa chỉ, kiểm tra kana, tách họ/tên theo kiểu Nhật,
+    báo lỗi ngay khi rời field để giảm bỏ dở; <strong>(2)</strong> mỗi biến thể A/B là một phiên bản form
+    phải render được song song; <strong>(3)</strong> kiểm soát hoàn toàn giao diện vì đây là mặt tiền của khách hàng.
+    Uốn thư viện để làm được cả ba còn tốn hơn tự viết lớp render.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Stripe</div>
+    <div class="vs">thay vì <em>tự nhận thanh toán qua cổng nội địa</em></div>
+    <p class="why">Điểm mấu chốt là <strong>số thẻ không bao giờ đi qua server của chúng tôi</strong>:
+    Stripe Elements là iframe thuộc miền của Stripe, thông tin thẻ đi thẳng từ trình duyệt đến Stripe,
+    ta chỉ nhận về token. Nhờ vậy phạm vi tuân thủ PCI-DSS giảm xuống mức nhẹ nhất (SAQ-A).
+    Tự nhận thẻ đồng nghĩa với kiểm toán bảo mật, lưu trữ mã hóa và trách nhiệm pháp lý — không tương xứng
+    với giá trị mang lại.</p>
+    <p class="cost">Phí theo giao dịch, và ở thị trường Nhật thiếu một số phương thức nội địa như Konbini hay
+    chuyển khoản ngân hàng truyền thống — phải bổ sung riêng nếu khách yêu cầu.</p>
+  </div>
+
+  <h4>④ Đào sâu — câu hỏi &amp; trả lời mẫu</h4>
+
+  <details class="qa"><summary>A/B testing triển khai thế nào cho không bị nháy giao diện?</summary>
+  <div class="ans">Nếu chia nhánh ở phía client thì người dùng thấy bản A xong mới nhảy sang bản B —
+  vừa xấu vừa làm sai số liệu. Cách đúng là <strong>quyết định biến thể ở server</strong> (middleware của Next.js),
+  chọn nhánh dựa trên cookie rồi trả về HTML của đúng biến thể ngay từ đầu.
+  Cookie đó cũng bảo đảm <strong>một người luôn thấy cùng một biến thể</strong> ở các lần truy cập sau,
+  nếu không thì dữ liệu thống kê vô nghĩa. Cần nhớ thêm: chia nhánh ở server thì phải tắt cache trang đó
+  hoặc cache riêng theo biến thể, kẻo CDN trả nhầm.</div></details>
+
+  <details class="qa"><summary>Webhook — frontend có vai trò gì?</summary>
+  <div class="ans">Webhook đi thẳng từ Stripe/Salesforce đến backend, frontend không nhận webhook.
+  Việc của frontend là hiển thị kết quả — và đây là chỗ hay sai: sau khi thanh toán,
+  <strong>không được tin trang redirect để kết luận là đã thu tiền</strong>, vì người dùng có thể đóng tab
+  trước khi quay về. Nguồn sự thật là webhook đã ghi vào DB. Frontend hiển thị trạng thái "đang xử lý"
+  rồi hỏi lại server cho đến khi có kết quả.</div></details>
+
+  <details class="qa"><summary>Song ngữ Nhật/Anh có gì ngoài việc dịch chuỗi?</summary>
+  <div class="ans">Chiều dài chữ khác nhau nên nút và nhãn phải co giãn được, không đặt độ rộng cố định.
+  Ngày tháng và số theo định dạng địa phương (<code>Intl</code>), không tự ghép chuỗi.
+  Quan trọng với dự án này: <strong>thông báo lỗi validate và dữ liệu do người dùng tạo cũng phải song ngữ</strong> —
+  tên form, nhãn field khách tự đặt, nên schema phải lưu được chuỗi theo từng ngôn ngữ chứ không chỉ một chuỗi.
+  Và đừng ghép câu từ mảnh — trật tự từ tiếng Nhật khác tiếng Anh, phải đặt biến vào trong câu hoàn chỉnh.</div></details>
+
+  <details class="qa"><summary>Vì sao dùng cả Redux Toolkit lẫn React Query?</summary>
+  <div class="ans">Vì hai thứ giải quyết hai bài toán khác nhau. React Query lo dữ liệu từ server: cache, đồng bộ, refetch.
+  Redux Toolkit lo state phía client phức tạp — ở đây là <strong>trạng thái đang soạn của form builder</strong>:
+  cây field, chọn/di chuyển/nhân bản block, undo–redo. Đó là state có nhiều hành động rời rạc tác động lên
+  cùng một cấu trúc, đúng kiểu Redux mạnh. Trả lời sai là gộp cả hai vào một chỗ rồi tự viết cache trong Redux.</div></details>
+
+  <div class="trap">
+    <div class="lbl">⑤ Bẫy hay gặp</div>
+    <ul>
+      <li>"App Router có 4 tầng cache, kể tên và nói khi nào cần <code>revalidateTag</code>" — hỏi rất nhiều.</li>
+      <li>"Server Component khác Client Component chỗ nào?" — nhớ: không có state/effect/event handler,
+      không chạy ở trình duyệt, nhưng đổi lại truy cập được dữ liệu trực tiếp và không tốn bundle.
+      Đánh dấu <code>'use server'</code>/<code>'use client'</code> sai chỗ là lỗi kinh điển.</li>
+      <li>"EFO là gì?" — Entry Form Optimization, tối ưu để người dùng không bỏ dở giữa chừng.
+      Không giải thích được thì mất điểm vì nó là lõi nghiệp vụ của sản phẩm.</li>
+      <li>Team 20+ người — hãy nói rõ anh sở hữu module nào và phối hợp qua quy trình gì.</li>
+    </ul>
+  </div>
+</div>
+
+<h2 class="sec" id="p5">B · Dự án 5 — Offerwall</h2>
+
+<div class="card">
+  <div class="row"><h3>Offer Wall — nền tảng quảng cáo thưởng điểm (thị trường Nhật)</h3><span class="when">01/2023 – 12/2024</span></div>
+  <div class="sub">AMELA · Team 15+ · Front-End Developer</div>
+
+  <div class="tags">
+    <span class="tag">Next.js 13</span><span class="tag">React 18</span><span class="tag">TypeScript</span>
+    <span class="tag">Ant Design 4</span><span class="tag">React Query</span><span class="tag">Zustand</span>
+    <span class="tag">styled-components</span><span class="tag">react-beautiful-dnd</span>
+    <span class="tag">Static export → S3/CloudFront</span>
+  </div>
+
+  <div class="star">
+    <div class="lbl">① Trả lời trong 2–3 phút · khung STAR</div>
+    <div class="st"><b>S · Bối cảnh</b><p>Nền tảng offer wall cho thị trường quảng cáo di động Nhật: người dùng cuối tải và tương tác với ứng dụng được quảng cáo để nhận điểm thưởng. Sản phẩm gồm một offer wall public tùy biến được — nhúng trong webview của app đối tác — và một Admin CMS quản lý wall, template, popup và gợi ý quảng cáo.</p></div>
+    <div class="st"><b>T · Nhiệm vụ của tôi</b><p>Team 15+, tôi làm frontend. Phần cốt lõi tôi xây là <b>trình dựng template kéo-thả với 9 loại block nội dung</b> có xem trước trong khung điện thoại, và cơ chế <b>render offer wall hoàn toàn theo cấu hình từ API</b> — admin đổi bố cục, màu sắc, block thì wall thật đổi theo mà không cần deploy lại. Ngoài ra tôi làm màn cài đặt wall theo từng vùng và tích hợp toàn bộ REST API.</p></div>
+    <div class="st"><b>A · Hành động</b><p>Next.js 13 xuất tĩnh lên S3 + CloudFront — bỏ SSR vì wall nhúng trong webview nên không cần SEO, mà traffic thì bùng theo chiến dịch quảng cáo, file tĩnh trên CDN thì không có server nào để sập. Mỗi loại block là một component tự khai báo schema và đăng ký vào một map <code>type → component</code>; <b>cả wall thật lẫn khung xem trước dùng chung đúng map đó</b> nên cái admin thấy đúng bằng cái người dùng nhìn. Theme động từ database nên dùng styled-components.</p></div>
+    <div class="st fill"><b>R · Kết quả — anh tự điền</b><p>Đây là phần chốt lại và cũng là phần nhà tuyển dụng nhớ nhất.
+      <span class="blank"><b>Gợi ý số nên lấy:</b> số loại block (9) và số tab báo cáo (7) · thời gian tạo một wall mới trước/sau khi có template builder · số wall hoặc số chiến dịch đang chạy · lượng truy cập wall lúc cao điểm · chi phí hạ tầng so với phương án chạy server. <b>Dự án kéo dài 2 năm — thời gian tạo wall giảm là con số kể được câu chuyện rõ nhất.</b></span></p></div>
+  </div>
+
+  <h4>② Điểm nghẽn kỹ thuật — chuẩn bị kể sâu</h4>
+  <div class="chal">
+    <div class="head">Wall phải đổi bố cục và màu theo cấu hình admin mà không deploy lại</div>
+    <p class="pb"><b>Vấn đề</b> Mỗi chiến dịch quảng cáo cần một wall khác nhau. Nếu mỗi lần đổi bố cục lại phải sửa code và deploy thì đội vận hành bị chặn bởi đội dev, và tốc độ ra chiến dịch phụ thuộc lịch release.</p>
+    <p class="opt"><b>Đã cân nhắc</b> (a) mỗi wall một template code riêng; (b) một component lớn với <code>switch</code> theo loại block; (c) sổ đăng ký renderer — mỗi block tự khai báo schema và đăng ký vào map <code>type → component</code>.</p>
+    <p class="pick"><b>Chọn</b> (c). Thêm loại block thứ 10 chỉ là viết một file và đăng ký, không sửa file nào khác. Quan trọng hơn: <b>wall thật và khung xem trước trong template builder dùng chung đúng map đó</b>, nên cái admin thấy lúc sửa đúng bằng cái người dùng cuối nhìn thấy — không có hai nhánh code để lệch nhau.</p>
+    <p class="res"><b>Kết quả</b> Đội vận hành tự tạo wall mới không cần dev. <b>Gợi ý điền:</b> thời gian tạo một wall trước/sau, số wall đã tạo, số chiến dịch chạy song song.</p>
+  </div>
+
+  <div class="chal">
+    <div class="head">Infinite scroll bị trùng item, mất item và ngày càng giật</div>
+    <p class="pb"><b>Vấn đề</b> Danh sách offer phân trang theo offset. Khi có offer mới chèn vào giữa lúc người dùng đang cuộn, các trang sau bị <b>trùng hoặc sót item</b>. Cuộn lâu thì DOM phình dần đến mức giật, và bấm vào một offer rồi quay lại thì mất vị trí cuộn.</p>
+    <p class="opt"><b>Đã cân nhắc</b> (a) giữ offset và chấp nhận sai lệch; (b) chuyển sang cursor; (c) thêm ảo hóa danh sách; (d) lắng nghe sự kiện scroll để tải thêm.</p>
+    <p class="pick"><b>Chọn</b> (b) + (c), và bỏ (d). Phân trang bằng cursor để chèn item mới không làm lệch trang. Tải thêm bằng <code>IntersectionObserver</code> đặt mốc ở cuối danh sách thay vì nghe sự kiện scroll vốn bắn liên tục và phải tự throttle. Dùng <code>useInfiniteQuery</code> để có sẵn nối trang, chống gọi trùng và giữ cache khi quay lại.</p>
+    <p class="res"><b>Kết quả</b> Hết trùng/sót, cuộn dài vẫn mượt, quay lại giữ nguyên vị trí. <b>Gợi ý điền:</b> số item cuộn được trước khi giật, thời gian phản hồi lúc cao điểm chiến dịch.</p>
+  </div>
+
+  <h4>③ Ownership — vì sao chọn stack này</h4>
+
+  <div class="dec">
+    <div class="head">Static export SPA lên S3 + CloudFront</div>
+    <div class="vs">thay vì <em>SSR chạy Node server</em></div>
+    <p class="why">Offer wall nhúng trong webview của app đối tác nên <strong>không cần SEO</strong> —
+    lợi ích lớn nhất của SSR bị loại. Đổi lại traffic rất bấp bênh: một chiến dịch quảng cáo chạy là
+    lượng truy cập nhảy vọt trong vài giờ. File tĩnh trên CDN thì <strong>không có server nào để sập hay để scale</strong>,
+    chi phí gần như bằng không lúc vắng, và người dùng Nhật lấy file từ edge gần họ nên độ trễ thấp.
+    Vận hành cũng đơn giản: deploy là đồng bộ file lên S3 rồi xóa cache CloudFront.</p>
+    <p class="cost">Không cá nhân hóa được ở phía server — mọi thứ theo người dùng phải gọi API sau khi tải trang,
+    nên phải làm skeleton tử tế. Và phải xử lý routing phía client trên S3
+    (mọi đường dẫn không tồn tại trả về <code>index.html</code>).</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Vẫn dùng Next.js dù chỉ xuất tĩnh</div>
+    <div class="vs">thay vì <em>Vite/CRA</em></div>
+    <p class="why">Trả lời thật: lợi ích còn lại là routing theo file, tối ưu ảnh, chia bundle theo route
+    có sẵn, và team đã quen Next.js — đồng thời <strong>giữ đường lùi</strong>, nếu sau này cần SSR cho
+    một phần landing page thì không phải viết lại. <em>Nếu người phỏng vấn nói "vậy thì Vite gọn hơn",
+    hãy đồng ý thay vì cãi — đó là nhận xét đúng, và thừa nhận được cho thấy anh đánh giá công nghệ
+    bằng tiêu chí chứ không bằng thói quen.</em></p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Sổ đăng ký renderer cho 9 loại block</div>
+    <div class="vs">thay vì <em>switch-case theo <code>block.type</code></em></div>
+    <p class="why">Mỗi block (list, carousel, slider, tab, card, video…) là một component tự khai báo
+    schema cấu hình của nó, đăng ký vào một map <code>type → component</code>. Cả trang wall và
+    khung xem trước trong template builder <strong>dùng chung đúng một map đó</strong> —
+    nên cái admin thấy lúc sửa đúng bằng cái người dùng cuối nhìn thấy, không có hai nhánh code dễ lệch nhau.
+    Thêm loại block thứ 10 là viết một file và đăng ký, không sửa file nào khác.</p>
+    <p class="cost">Phải quản lý phiên bản schema của block: wall đã lưu cấu hình cũ, khi block đổi
+    thì cần lớp tương thích ngược, nếu không wall của khách hàng cũ sẽ vỡ.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">styled-components</div>
+    <div class="vs">thay vì <em>Tailwind</em>/CSS Modules</div>
+    <p class="why">Đặc thù của sản phẩm: <strong>màu sắc, kích thước banner, icon do admin cấu hình và
+    lưu trong database</strong> — giá trị chỉ biết lúc chạy. CSS-in-JS nhận thẳng giá trị đó qua props
+    một cách tự nhiên. Tailwind gặp trở ngại vì class được sinh lúc build, không thể ghép chuỗi class động
+    từ dữ liệu API.</p>
+    <p class="cost">Có chi phí runtime tạo style. <em>Nếu làm lại hôm nay tôi sẽ dùng
+    <strong>CSS custom properties</strong>: đổ giá trị từ API vào biến CSS trên phần tử gốc rồi dùng
+    Tailwind/CSS thường đọc biến đó — vẫn động mà không tốn runtime.</em> Đây là câu trả lời ghi điểm
+    vì cho thấy anh có nhìn lại quyết định cũ.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">react-beautiful-dnd + react-grid-dnd</div>
+    <div class="vs">thay vì <em>một thư viện duy nhất</em></div>
+    <p class="why">Hai bài toán kéo-thả khác nhau: sắp xếp block theo chiều dọc trong template
+    (react-beautiful-dnd làm tốt, lại hỗ trợ bàn phím và screen reader), và sắp xếp dạng lưới 2 chiều
+    (react-grid-dnd).</p>
+    <p class="cost">Hai thư viện là hai bộ API và bundle lớn hơn.
+    <strong>Quan trọng: react-beautiful-dnd nay đã ngừng phát triển và không hợp React 18 StrictMode</strong> —
+    nếu bị hỏi, hãy chủ động nói rõ điều này và nêu hướng thay thế là <code>dnd-kit</code>.
+    Biết thư viện mình dùng đã hết vòng đời là dấu hiệu của người theo dõi hệ sinh thái.</p>
+  </div>
+
+  <h4>④ Đào sâu — câu hỏi &amp; trả lời mẫu</h4>
+
+  <details class="qa"><summary>Infinite scroll — làm sao cho không giật và không rò bộ nhớ?</summary>
+  <div class="ans">Dùng <code>IntersectionObserver</code> đặt một phần tử mốc ở cuối danh sách thay vì lắng nghe
+  sự kiện scroll (scroll bắn liên tục, tốn CPU và phải tự throttle). Gọi dữ liệu bằng
+  <code>useInfiniteQuery</code> để có sẵn cơ chế nối trang, chống gọi trùng và giữ cache khi quay lại.
+  Phân trang nên dùng <strong>cursor thay vì offset</strong>: có offer mới chèn vào thì offset gây trùng
+  hoặc mất item. Danh sách rất dài thì phải <strong>ảo hóa</strong>, nếu không DOM phình dần đến mức
+  cuộn bị giật. Và nhớ giữ vị trí cuộn khi người dùng bấm vào một offer rồi quay lại.</div></details>
+
+  <details class="qa"><summary>Xem trước trong khung điện thoại — làm bằng iframe hay render trực tiếp?</summary>
+  <div class="ans">Tôi render trực tiếp trong một khung có kích thước cố định, dùng chung component render thật.
+  Ưu điểm: nhanh, truyền state tức thì, không phải đồng bộ qua <code>postMessage</code>.
+  Nhược điểm thật sự là <strong>CSS của trang admin có thể rò vào phần xem trước</strong> và media query
+  của wall sẽ ăn theo kích thước cửa sổ trình duyệt chứ không theo khung giả lập —
+  nên chỗ nào phụ thuộc bề rộng phải dựa vào container chứ không dựa vào viewport.
+  Nếu cần cách ly tuyệt đối thì iframe đúng hơn, đổi lại phức tạp hơn khi truyền dữ liệu.</div></details>
+
+  <details class="qa"><summary>Xuất CSV báo cáo — làm ở frontend hay backend?</summary>
+  <div class="ans">Backend. Ở frontend chỉ ổn với vài trăm dòng: gom hết dữ liệu vào bộ nhớ rồi tạo blob,
+  với báo cáo quảng cáo hàng chục nghìn dòng là treo tab. Backend thì stream thẳng ra file,
+  làm nền rồi gửi link tải khi xong. Ngoài ra còn hai chuyện thực tế:
+  <strong>Excel ở Nhật cần BOM UTF-8</strong> nếu không mở ra là chữ lỗi; và
+  <strong>phải chống CSV injection</strong> — ô bắt đầu bằng <code>=</code> hay <code>+</code> sẽ bị Excel
+  coi là công thức.</div></details>
+
+  <details class="qa"><summary>Dự án kéo dài 2 năm — anh xử lý nợ kỹ thuật thế nào?</summary>
+  <div class="ans">Trả lời trung thực và cụ thể hơn là nói chung chung. Ví dụ đúng bối cảnh dự án này:
+  9 loại block sinh ra nhiều cấu hình chồng chéo nên phải thống nhất lại schema và viết lớp chuyển đổi
+  cho dữ liệu cũ; thư viện kéo-thả ngừng hỗ trợ nên phải lên kế hoạch thay thế;
+  và việc Admin CMS với wall public dùng chung component render chính là quyết định giúp tránh được
+  một khối nợ lớn ngay từ đầu.</div></details>
+
+  <div class="trap">
+    <div class="lbl">⑤ Bẫy hay gặp</div>
+    <ul>
+      <li>"Static export thì dùng Next.js làm gì?" — đã có câu trả lời ở trên, đừng cố bảo vệ bằng lý do gượng ép.</li>
+      <li>"react-beautiful-dnd còn được duy trì không?" — câu hỏi kiểm tra xem anh có cập nhật hệ sinh thái.</li>
+      <li>Hỏi về <b>chống gian lận</b>: người dùng nhận điểm mà không thật sự cài app.
+      Phải nói được rằng việc xác nhận hoàn thành offer bắt buộc do server đối chiếu với postback của đối tác,
+      không bao giờ tin tín hiệu từ client.</li>
+      <li>CV ghi dự án này 01/2023–12/2024 chồng lấn với Enas (01–08/2024) và WAS (08/2024–01/2025) —
+      <b>chắc chắn sẽ bị hỏi</b>. Chuẩn bị giải thích: làm song song hay bàn giao dần, và lúc đó phân bổ thời gian ra sao.</li>
+    </ul>
+  </div>
+</div>
+
+<h2 class="sec" id="p6">B · Dự án 6 — FactoryX</h2>
+
+<div class="card">
+  <div class="row"><h3>Nền tảng kết nối nhân lực &amp; công việc ngành kỹ thuật (thị trường Nhật)</h3><span class="when">07/2021 – 12/2022</span></div>
+  <div class="sub">AMELA · Team 15+ · Front-End Developer · <b>dự án đầu tiên</b></div>
+
+  <div class="tags">
+    <span class="tag">Next.js 11 (SSR)</span><span class="tag">React 17</span><span class="tag">TypeScript</span>
+    <span class="tag">Ant Design 4</span><span class="tag">Zustand</span><span class="tag">React Query</span>
+    <span class="tag">Jitsi</span><span class="tag">next-i18next</span>
+  </div>
+
+  <div class="star">
+    <div class="lbl">① Trả lời trong 2–3 phút · khung STAR</div>
+    <div class="st"><b>S · Bối cảnh</b><p>Nền tảng tiếng Nhật kết nối doanh nghiệp với kỹ sư và kỹ thuật viên ngành kỹ thuật: vừa tuyển dụng toàn thời gian, vừa khớp dự án thuê ngoài giữa bên đặt hàng và bên nhận, kèm chat trong ứng dụng và họp video để phỏng vấn online. Tin tuyển dụng cần được Google index nên SEO là kênh có được người dùng.</p></div>
+    <div class="st"><b>T · Nhiệm vụ của tôi</b><p>Team 15+. Đây là <b>dự án đầu tiên của tôi</b> — vào với vai trò junior và được công ty đào tạo từ nền. Tôi làm các module chính: khớp nhân sự, luồng thuê ngoài giữa bên đặt hàng và bên nhận, luồng ủy quyền – phê duyệt, cùng đăng tin việc làm, tìm kiếm nâng cao và biểu mẫu động. Về cuối dự án tôi bắt đầu nhận review code của thành viên khác.</p></div>
+    <div class="st"><b>A · Hành động</b><p>Next.js 11 với SSR vì cần SEO và thẻ OGP theo từng tin tuyển dụng. React Query cho dữ liệu server, Zustand cho state giao diện — chọn Zustand từ 2021, khi Redux còn là mặc định, vì phần lớn dữ liệu đã do React Query quản. Họp video dùng Jitsi self-host thay vì tự viết WebRTC hay mua Twilio, vì chi phí cố định theo hạ tầng và dữ liệu cuộc gọi nằm trong hạ tầng của khách. Trạng thái bộ lọc tìm kiếm đẩy lên URL để chia sẻ và back được.</p></div>
+    <div class="st fill"><b>R · Kết quả — anh tự điền</b><p>Đây là phần chốt lại và cũng là phần nhà tuyển dụng nhớ nhất.
+      <span class="blank"><b>Gợi ý số nên lấy:</b> số module đã bàn giao · thời gian dự án (1,5 năm) và số lần release · số tin tuyển dụng hoặc người dùng trên nền tảng · cải thiện thứ hạng/lưu lượng tìm kiếm nhờ SSR. <b>Đây là dự án đầu — kết quả đáng giá nhất lại là sự trưởng thành</b>: từ làm theo yêu cầu đến nhận review code cho người khác.</span></p></div>
+  </div>
+
+  <h4>② Điểm nghẽn kỹ thuật — chuẩn bị kể sâu</h4>
+  <div class="chal">
+    <div class="head">Chat mất tin nhắn khi người dùng đổi mạng</div>
+    <p class="pb"><b>Vấn đề</b> Người dùng trên điện thoại chuyển liên tục giữa 4G và Wi-Fi, WebSocket rớt rồi nối lại. Tin nhắn gửi đến trong lúc mất kết nối <b>không bao giờ tới</b>, vì client chỉ nghe sự kiện realtime.</p>
+    <p class="opt"><b>Đã cân nhắc</b> (a) polling cho chắc; (b) WebSocket kèm tự động nối lại; (c) WebSocket nối lại rồi đồng bộ bù phần bị lỡ.</p>
+    <p class="pick"><b>Chọn</b> (c). Chỉ nối lại thôi là chưa đủ — đó là chỗ nhiều người dừng lại và để lọt bug. Sau khi nối lại phải <b>hỏi server các tin sau id tin cuối cùng client có</b> rồi ghép vào. Thêm: nối lại có giãn thời gian chờ để không dội server, gửi tin hiển thị lạc quan ngay kèm trạng thái đang gửi/đã gửi/lỗi, và id do client sinh để chống hiển thị trùng khi server trả về lại.</p>
+    <p class="res"><b>Kết quả</b> Hết mất tin khi đổi mạng — lỗi khó tái hiện nhất của module chat. <b>Gợi ý điền:</b> số hội thoại/tin nhắn mỗi ngày, số báo lỗi mất tin trước và sau.</p>
+  </div>
+
+  <div class="chal">
+    <div class="head">Người dùng không chia sẻ được kết quả tìm kiếm đã lọc</div>
+    <p class="pb"><b>Vấn đề</b> Màn tìm kiếm việc làm có nhiều bộ lọc, nhưng state để trong component. Hệ quả: không gửi link kết quả cho người khác được, bấm back là mất hết lựa chọn, F5 là về mặc định.</p>
+    <p class="opt"><b>Đã cân nhắc</b> (a) lưu bộ lọc vào localStorage; (b) lưu lên server theo người dùng; (c) đẩy state lên URL.</p>
+    <p class="pick"><b>Chọn</b> (c). URL là nguồn sự thật: chia sẻ được, bookmark được, back/forward chạy đúng tự nhiên. Thêm một lợi ích không định trước: <b>React Query lấy chính chuỗi query làm key</b> nên chuyển qua lại giữa các bộ lọc là có cache ngay. Ô nhập chữ thì debounce trước khi đẩy lên URL để không tạo một mục lịch sử cho mỗi phím gõ.</p>
+    <p class="res"><b>Kết quả</b> Kết quả tìm kiếm chia sẻ được — với nền tảng tuyển dụng thì đây cũng là một kênh lan truyền. <b>Gợi ý điền:</b> lưu lượng đến từ link tìm kiếm được chia sẻ.</p>
+  </div>
+
+  <h4>③ Ownership — vì sao chọn stack này</h4>
+
+  <div class="dec">
+    <div class="head">Next.js 11 với SSR</div>
+    <div class="vs">thay vì <em>SPA</em></div>
+    <p class="why">Ngược hẳn với Offerwall, ở đây <strong>SEO là kênh có được người dùng</strong>:
+    người Nhật tìm việc bằng Google, tin tuyển dụng phải được index. Thêm nữa tin việc được chia sẻ
+    qua mạng xã hội nên cần thẻ OGP sinh theo từng tin — thứ SPA không làm được.
+    Và ứng viên vào từ điện thoại, mạng di động: HTML có sẵn nội dung hiển thị nhanh hơn hẳn việc
+    tải JavaScript rồi mới gọi API.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Jitsi (self-host)</div>
+    <div class="vs">thay vì <em>tự viết WebRTC</em>, <em>Twilio</em>, <em>Agora</em>, <em>Zoom SDK</em></div>
+    <p class="why">Tự viết WebRTC nghe đơn giản khi hai người gọi nhau, nhưng thực tế phải có
+    signaling server, STUN/TURN để xuyên NAT, và SFU khi từ ba người trở lên — đó là cả một sản phẩm riêng,
+    không phải một tính năng. Twilio/Agora tính tiền theo phút nên phỏng vấn dài là chi phí tăng tuyến tính.
+    Jitsi mã nguồn mở, self-host được, <strong>chi phí cố định theo hạ tầng chứ không theo lượng dùng</strong>,
+    và dữ liệu cuộc gọi nằm trong hạ tầng của mình — điều khách Nhật quan tâm.
+    Nhúng vào React thì dùng iframe API, đủ cho nhu cầu phỏng vấn.</p>
+    <p class="cost">Phải tự vận hành server, tự lo TURN và băng thông, chất lượng phụ thuộc hạ tầng mình dựng.
+    Tùy biến giao diện cuộc gọi bị giới hạn nếu dùng iframe.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Zustand</div>
+    <div class="vs">thay vì <em>Redux</em> (2021–2022, lúc Redux còn là mặc định)</div>
+    <p class="why">Khi đó Redux vẫn phổ biến nhưng đi kèm action/reducer/middleware cho cả những state
+    rất nhỏ. Phần lớn dữ liệu của dự án đã do React Query quản, phần còn lại chỉ là state giao diện —
+    Zustand vừa đủ, không provider, không boilerplate. <em>Nói được mình chọn Zustand từ 2021,
+    trước khi nó thành xu hướng, là một điểm nhấn về khả năng đánh giá công cụ.</em></p>
+  </div>
+
+  <h4>④ Đào sâu — câu hỏi &amp; trả lời mẫu</h4>
+
+  <details class="qa"><summary>Chat trong ứng dụng — WebSocket, SSE hay polling?</summary>
+  <div class="ans">Chat cần hai chiều nên <strong>WebSocket</strong> là đúng: SSE chỉ một chiều từ server xuống,
+  polling thì hoặc trễ hoặc tốn request. Phần khó ở frontend không phải mở kết nối mà là
+  <strong>kết nối lại khi rớt mạng</strong> (mobile chuyển 4G/Wi-Fi liên tục): phải tự động reconnect có
+  giãn thời gian chờ, và sau khi nối lại phải <strong>đồng bộ tin nhắn bị lỡ</strong> dựa trên id tin cuối cùng.
+  Thêm nữa gửi tin nên hiển thị lạc quan ngay để cảm giác tức thì, kèm trạng thái đang gửi/đã gửi/lỗi,
+  và cần id do client sinh để chống hiển thị trùng khi server trả về lại.</div></details>
+
+  <details class="qa"><summary>Luồng ủy quyền – phê duyệt, mô hình hóa ra sao?</summary>
+  <div class="ans">Cũng là máy trạng thái như luồng kê đơn ở dự án bệnh viện, nhưng thêm chiều phức tạp:
+  <strong>người duyệt phụ thuộc dữ liệu</strong> — ai duyệt được đơn này tùy vào phòng ban, cấp bậc,
+  và trường hợp ủy quyền khi người duyệt vắng mặt. Vì thế frontend không tự suy luận quyền duyệt;
+  server trả về danh sách hành động hợp lệ cho người dùng hiện tại trên từng bản ghi,
+  frontend chỉ hiển thị đúng những hành động đó. Cách này khiến thêm một quy tắc nghiệp vụ mới
+  không cần sửa frontend.</div></details>
+
+  <details class="qa"><summary>Tìm kiếm nâng cao nhiều bộ lọc — giữ state ở đâu?</summary>
+  <div class="ans">Trên <strong>URL</strong>, không phải trong state component. Lý do rất thực tế:
+  người dùng cần chia sẻ được link kết quả tìm kiếm, cần bookmark, cần bấm nút back về bộ lọc trước,
+  và cần F5 mà không mất lựa chọn. URL là nguồn sự thật, React Query lấy chính chuỗi query đó làm key
+  nên chuyển qua lại giữa các bộ lọc là có cache ngay. Ô nhập chữ thì debounce trước khi đẩy lên URL
+  để không tạo một mục lịch sử cho mỗi phím gõ.</div></details>
+
+  <details class="qa"><summary>Đây là dự án đầu tiên của anh — anh học được gì lớn nhất?</summary>
+  <div class="ans">Câu này gần như chắc chắn được hỏi. Trả lời tốt nên gắn với một thay đổi hành vi cụ thể,
+  ví dụ: lần đầu làm sản phẩm cho thị trường Nhật nên hiểu ra rằng yêu cầu phải được xác nhận lại bằng
+  màn hình và số liệu cụ thể chứ không phải bằng "tôi hiểu rồi"; hoặc việc đọc code người khác và
+  bị review kỹ đã dạy anh viết component tách biệt hơn. Tránh câu trả lời sáo rỗng kiểu "học được teamwork".</div></details>
+
+  <div class="trap">
+    <div class="lbl">⑤ Bẫy hay gặp</div>
+    <ul>
+      <li>Next.js 11 đã cũ — có thể bị hỏi "từ 11 lên 14 đổi gì". Cần nói được:
+      <code>getServerSideProps</code>/<code>getStaticProps</code> ở Pages Router so với App Router + Server Component,
+      và cơ chế cache khác hẳn.</li>
+      <li>"Anh có tự dựng Jitsi không hay chỉ nhúng?" — trả lời đúng phạm vi mình làm, đừng nhận phần của DevOps.</li>
+      <li>Dự án 1,5 năm và là dự án đầu — sẽ bị hỏi <b>sự trưởng thành</b>: so với bây giờ anh sẽ làm khác chỗ nào.</li>
+    </ul>
+  </div>
+</div>
+
+<h2 class="sec" id="xuyensuot">C · Câu hỏi về hành trình nghề nghiệp</h2>
+
+<div class="card">
+  <p class="sub" style="margin-bottom:18px">Nhóm câu hỏi không gắn với dự án cụ thể, nhưng gần như buổi phỏng vấn nào cũng có.</p>
+
+  <details class="qa"><summary>Kể về hành trình của anh trong 2 phút</summary>
+  <div class="ans">Có sẵn một mạch kể rõ ràng: học Đại học Văn hóa, chuyển hướng sang IT qua VTI Academy,
+  vào AMELA làm Junior và được đào tạo bài bản, đi qua 5 dự án trong 3,5 năm với mức độ trách nhiệm tăng dần —
+  từ làm theo yêu cầu, đến làm module chính, rồi code review và tự tay release app lên store.
+  Sang IniSoft ở vị trí Middle với trách nhiệm trọn vẹn một module: tự thiết kế Figma, code frontend,
+  viết một phần backend và dựng CI/CD. <strong>Điểm cần nhấn: mỗi bước đều mở rộng phạm vi trách nhiệm,
+  không phải lặp lại cùng một công việc ở chỗ khác.</strong></div></details>
+
+  <details class="qa"><summary>Tại sao học Văn hóa lại chuyển sang lập trình?</summary>
+  <div class="ans">Đừng né và cũng đừng xin lỗi. Trả lời thẳng lý do chuyển, và biến nó thành bằng chứng:
+  việc tự học và chuyển ngành thành công cho thấy khả năng tự đào tạo — điều quan trọng với nghề này
+  khi công nghệ đổi liên tục. Minh chứng nằm ngay trong CV: từ HTML/CSS/jQuery lên React, Next.js,
+  rồi tự học sang backend và CI/CD. <em>Một người phỏng vấn giỏi quan tâm bốn năm gần đây anh làm được gì,
+  không phải bằng cấp bảy năm trước.</em></div></details>
+
+  <details class="qa"><summary>Tại sao rời AMELA sau 3,5 năm?</summary>
+  <div class="ans">Trả lời theo hướng tiến lên, không theo hướng chê nơi cũ:
+  muốn phạm vi trách nhiệm rộng hơn — ở IniSoft anh làm từ thiết kế đến release thay vì chỉ code frontend theo spec.
+  <strong>Tuyệt đối không nói xấu công ty cũ</strong>; người phỏng vấn sẽ tự suy ra rằng công ty tiếp theo
+  cũng sẽ bị nói như vậy. Và hãy nói được một điều biết ơn cụ thể: AMELA đào tạo anh từ con số 0.</div></details>
+
+  <details class="qa"><summary>Anh dùng Zustand, Redux, TanStack Query ở các dự án khác nhau — vì sao không nhất quán?</summary>
+  <div class="ans">Đây là cơ hội chứ không phải điểm yếu. Trả lời bằng <strong>tiêu chí chọn</strong>:
+  dữ liệu đến từ server thì luôn là TanStack/React Query, không bao giờ nhét vào store thủ công;
+  state client đơn giản thì Zustand; state client phức tạp có nhiều hành động trên cùng cấu trúc,
+  cần undo–redo và devtools thì Redux Toolkit; và khi vào dự án đang chạy thì theo quy ước sẵn có
+  vì nhất quán quan trọng hơn sở thích cá nhân. Nói được như vậy chứng minh anh chọn theo bài toán,
+  không chọn theo trào lưu.</div></details>
+
+  <details class="qa"><summary>Anh tối ưu hiệu năng frontend thế nào? (CV có ghi "Performance Optimization")</summary>
+  <div class="ans">Trả lời theo thứ tự: <strong>đo trước, sửa sau</strong> — Lighthouse và React Profiler
+  chỉ ra chỗ thật sự chậm, không đoán. Nhóm giải pháp về tải: chia bundle theo route, lazy-load
+  màn ít dùng và thư viện nặng (editor, biểu đồ), tối ưu ảnh, đặt kích thước sẵn để tránh layout nhảy.
+  Nhóm về render: ảo hóa danh sách dài, tách state để một lần gõ không vẽ lại cả trang,
+  dùng memo có chọn lọc. Nhóm về dữ liệu: cache và dedupe bằng React Query, debounce ô tìm kiếm,
+  phân trang bằng cursor. <strong>Luôn kèm một ví dụ thật từ dự án</strong> thay vì liệt kê lý thuyết.</div></details>
+
+  <details class="qa"><summary>Anh dựng CI/CD Jenkins như thế nào?</summary>
+  <div class="ans">Mô tả pipeline thật: checkout → cài dependency có cache → lint và typecheck → test →
+  build Docker <strong>nhiều tầng</strong> (tầng build chạy Node để tạo file tĩnh, tầng chạy chỉ còn nginx
+  và thư mục <code>dist</code>, nên ảnh cuối nhẹ) → đẩy image có gắn tag theo commit → deploy bằng docker-compose.
+  Những chi tiết nên nói thêm vì cho thấy làm thật: tag image bằng commit SHA để rollback được,
+  <code>.dockerignore</code> để không copy <code>node_modules</code> vào context,
+  và biến môi trường lấy lúc chạy chứ không nướng vào image.</div></details>
+
+  <details class="qa"><summary>Anh nói dẫn dắt 2–5 người — cụ thể là làm gì?</summary>
+  <div class="ans">Cụ thể hóa bằng hoạt động chứ không bằng chức danh: chia task và ước lượng,
+  review code (và review theo nguyên tắc gì), thống nhất quy ước, gỡ vướng cho thành viên,
+  họp với khách để chốt yêu cầu. Chuẩn bị sẵn <strong>một tình huống khó</strong> —
+  ví dụ một thành viên làm chậm tiến độ hoặc một bất đồng kỹ thuật trong team — và anh đã xử lý ra sao.
+  Câu hỏi này gần như luôn đi kèm một tình huống cụ thể.</div></details>
+</div>
+
+<h2 class="sec" id="hanhvi">C · Câu hỏi tình huống — kỹ năng mềm</h2>
+
+<div class="card">
+  <p class="sub" style="margin-bottom:18px">Nhóm câu này đánh giá cách anh tương tác với người khác trong dự án.
+  Trả lời cũng dùng STAR, nhưng <b>R ở đây là kết quả của cách hành xử</b>, không phải số liệu kỹ thuật.
+  Mỗi câu dưới đây kèm gợi ý tình huống lấy thẳng từ chính CV của anh — <b>chỉ dùng nếu nó đúng sự thật</b>.</p>
+
+  <details class="qa"><summary>Khi anh và Tech Lead bất đồng về giải pháp, anh xử lý thế nào?</summary>
+  <div class="ans">Cấu trúc trả lời: <strong>tách quan điểm khỏi cái tôi</strong> → đưa tiêu chí chung để so sánh →
+  nếu vẫn khác nhau thì người chịu trách nhiệm quyết, và mình <b>thực hiện hết mình theo quyết định đó</b>.
+  Điều nhà tuyển dụng muốn nghe là anh tranh luận bằng dữ liệu chứ không bằng cảm tính, và không
+  giận dỗi khi bị bác.
+  <p style="margin:10px 0 0"><b>Tình huống có sẵn trong CV anh:</b> ở dự án WAS App, team đã dùng Redux Toolkit
+  trước khi anh vào trong khi anh quen Zustand. Anh chọn giữ quy ước của team vì
+  <b>nhất quán trong một codebase đang vận hành quan trọng hơn sở thích cá nhân</b> — và trộn hai thư viện
+  state gây rối cho người đọc sau. Đây là câu trả lời rất mạnh vì nó cho thấy anh biết đặt lợi ích
+  codebase lên trên việc chứng minh mình đúng.</p></div></details>
+
+  <details class="qa"><summary>Kể một lần dự án gặp sự cố nghiêm trọng hoặc sát deadline.</summary>
+  <div class="ans">Khung kể: <strong>chặn thiệt hại trước, tìm nguyên nhân sau</strong> → cô lập phạm vi →
+  sửa → và quan trọng nhất là <b>làm gì để nó không lặp lại</b>. Phần cuối mới là thứ phân biệt
+  người có tư duy hệ thống với người chỉ biết chữa cháy.
+  <p style="margin:10px 0 0"><b>Tình huống có sẵn:</b> lỗi trừ kho hai lần ở dự án Y tế số — số tồn sai lệch dần
+  là sự cố nghiêm trọng trong bệnh viện. Kể theo mạch: phát hiện tồn kho không khớp → truy ra thuốc bị trừ
+  cả ở bước cấp phát lẫn bước hoàn thành y lệnh → sửa tận gốc bằng cách định nghĩa lại cụm nào trừ loại vật tư nào,
+  chứ không vá bằng một cờ đánh dấu.</p>
+  <p style="margin:10px 0 0"><b>Một tình huống khác:</b> release app lên store phải chờ Apple duyệt, không đẩy
+  bản vá ngay được như web. Bài học rút ra và nói được: <b>thứ gì có thể cấu hình từ server thì đừng
+  hard-code vào app</b>.</p>
+  <p style="margin:10px 0 0"><em>Nếu chưa từng gặp sự cố production lớn thì nói thật, và kể một bug khó
+  đã truy ra được. Bịa một sự cố là rủi ro cao vì người phỏng vấn sẽ hỏi rất sâu vào chi tiết vận hành.</em></p></div></details>
+
+  <details class="qa"><summary>Anh phối hợp với Designer, BA, Tester, PM như thế nào?</summary>
+  <div class="ans">Đây là câu anh có lợi thế rõ ràng và nhiều ứng viên không có:
+  <b>ở IniSoft anh vừa là người thiết kế Figma vừa là người code</b>. Nói được điều này đổi hẳn chất câu trả lời —
+  anh không chỉ “nhận design rồi làm theo” mà hiểu cả hai phía.
+  <p style="margin:10px 0 0">Các ý nên nêu: chốt yêu cầu bằng <b>màn hình và số liệu cụ thể</b> chứ không bằng
+  “tôi hiểu rồi”; phát hiện sớm những chỗ thiết kế đẹp nhưng dựng lên sẽ vỡ ở mobile hoặc khi dữ liệu dài;
+  thống nhất API contract với backend <b>trước khi code</b> để hai bên làm song song — ở dự án Y tế số
+  chính là contract Zod dùng chung, đổi field một chỗ thì typecheck báo lỗi cả hai phía.
+  Với tester thì cung cấp môi trường và dữ liệu mẫu, và đọc bug report theo hướng tìm nguyên nhân
+  thay vì phản biện.</p></div></details>
+
+  <details class="qa"><summary>Anh đã cải thiện quy trình làm việc của team ra sao?</summary>
+  <div class="ans">Nhà tuyển dụng dùng câu này để phân biệt coder thuần túy với người có ownership.
+  Những thứ anh làm thật và nên kể:
+  <ul>
+    <li><b>Dựng CI/CD Jenkins</b> ở IniSoft, chuẩn hóa quy trình release của cả team — trước đó build và
+    deploy thủ công.</li>
+    <li><b>Chuẩn hóa quy trình Git</b> (nhánh feature → merge request) và kèm cặp thành viên về chuẩn code.</li>
+    <li><b>Contract dùng chung giữa FE và BE</b> để hai bên không lệch nhau giữa chừng.</li>
+    <li><b>Thiết kế Figma trước khi code</b> — giảm số vòng sửa đi sửa lại sau khi đã dựng xong UI.</li>
+    <li>Ở dự án Offerwall: cho wall thật và khung xem trước <b>dùng chung một bộ component render</b>,
+    nhờ vậy đội vận hành tự tạo wall mới không cần chờ dev.</li>
+  </ul></div></details>
+
+  <details class="qa"><summary>Anh làm gì khi nhận một codebase cũ lộn xộn?</summary>
+  <div class="ans">Cách nói an toàn và chuyên nghiệp: gọi đúng tên là <b>technical debt</b>, không gọi là “code tệ”.
+  Khung trả lời: hiểu vì sao nó thành ra như vậy (thường là do áp lực thời gian, không phải do người trước kém)
+  → không refactor toàn bộ mà <b>refactor theo vùng mình đang chạm</b> → có test hoặc có cách kiểm chứng trước khi sửa.
+  <p style="margin:10px 0 0"><b>Ví dụ có sẵn:</b> ở Offerwall, 9 loại block sinh ra nhiều cấu hình chồng chéo,
+  anh thống nhất lại schema và viết lớp chuyển đổi cho dữ liệu cũ <b>để wall của khách hàng cũ vẫn chạy</b> —
+  đó là refactor có trách nhiệm, không phải đập đi xây lại.</p></div></details>
+</div>
+
+<h2 class="sec" id="tranh">C · Những điều cần tránh</h2>
+
+<div class="card">
+  <div class="dec">
+    <div class="head">Đừng nói “team em làm” cho phần việc của chính mình</div>
+    <p style="margin-top:8px">Khiêm tốn quá mức khiến nhà tuyển dụng không đo được đóng góp của anh, và
+    trong một team 20 người thì “team em làm” gần như không mang thông tin gì.</p>
+    <p class="why">Quy tắc: <b>phần việc chuyên biệt của anh thì nói “em làm”</b> — “em xây form engine”,
+    “em build và submit app lên hai store”. <b>Phần của tập thể thì nói “team em”</b> —
+    “team em ra mắt sản phẩm đúng hạn”. Nói đúng ranh giới vừa trung thực vừa làm nổi bật anh.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Đừng nhận vơ công nghệ — đây là rủi ro lớn nhất trong CV của anh</div>
+    <p style="margin-top:8px">Mục kỹ năng đang liệt kê <b>VueJS, React-Native, Material-UI, Adobe XD,
+    Photoshop, Illustrator</b> nhưng không dự án nào trong CV dùng đến. Người phỏng vấn thường
+    chọn đúng mục lạc lõng nhất để hỏi.</p>
+    <p class="why">Hai lựa chọn: bỏ khỏi CV, hoặc giữ và <b>phân tầng rõ</b> (“thành thạo” / “đã dùng ở mức cơ bản”).
+    Nếu bị hỏi về VueJS mà thực tế chỉ làm một bài tập nhỏ thì nói đúng như vậy.</p>
+    <p class="cost">Chỉ cần hỏi sâu 2–3 câu là lộ, và khi đã lộ thì <b>mọi phần còn lại của CV đều bị nghi ngờ</b> —
+    kể cả những phần rất thật. Cái giá của một dòng kỹ năng không tương xứng với rủi ro đó.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Đừng nhận phần kiến trúc do người khác thiết kế</div>
+    <p style="margin-top:8px">Ranh giới dễ bị hỏi nhất trong các dự án của anh:</p>
+    <ul style="font-size:14.5px;color:var(--ink-2);margin:6px 0 10px">
+      <li>Y tế số: kernel auth/audit/ký số <b>không phải</b> anh thiết kế — anh làm module HIS/EMR và UI ký số.</li>
+      <li>Trợ lý đấu thầu: backend AI và vector search là của người khác — anh làm Admin CMS và một phần API Node.</li>
+      <li>WAS App: anh đóng gói và release app, <b>không phải</b> viết bằng React Native.</li>
+    </ul>
+    <p class="why">Chủ động vạch ranh giới trước khi bị hỏi. Câu “phần đó do anh X thiết kế, em làm phần Y
+    và tích hợp vào” <b>làm tăng độ tin cậy</b> cho mọi thứ anh nhận là của mình.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Đừng nói xấu công ty hoặc dự án cũ</div>
+    <p style="margin-top:8px">Dù codebase cũ có rối hay quy trình có yếu, nói xấu chỉ khiến nhà tuyển dụng
+    nghĩ công ty tiếp theo cũng sẽ bị anh nói như vậy.</p>
+    <p class="why">Diễn đạt lại theo hướng kỹ thuật và tích cực: <b>“codebase có một số technical debt,
+    em cùng team refactor lại module X bằng cách…”</b>. Với AMELA, anh còn có một điều biết ơn cụ thể
+    để nói: công ty đào tạo anh từ con số 0 và cho anh đi qua 5 dự án trong 3,5 năm.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Đừng kể lể tuần tự từ đầu đến cuối dự án</div>
+    <p style="margin-top:8px">Kể theo dòng thời gian làm người nghe mất dấu, và tiêu hết thời gian vào phần
+    bối cảnh thay vì phần đóng góp của anh.</p>
+    <p class="why">Dùng STAR và <b>giữ trong 2–3 phút</b>. Bối cảnh chỉ cần đủ để hiểu bài toán;
+    dành phần lớn thời lượng cho A và R. Nếu nhà tuyển dụng muốn biết thêm, họ sẽ hỏi —
+    và lúc đó anh đã có sẵn phần “điểm nghẽn kỹ thuật” để đi sâu.</p>
+  </div>
+</div>
+
+<h2 class="sec" id="diemyeu">C · Điểm yếu trong CV &amp; cách vá</h2>
+
+<div class="card">
+  <p class="sub" style="margin-bottom:18px">Những chỗ người phỏng vấn kỹ tính sẽ nhắm vào. Biết trước thì chuẩn bị được.</p>
+
+  <div class="dec">
+    <div class="head">Mốc thời gian dự án chồng lấn</div>
+    <p style="margin-top:8px">Offerwall ghi 01/2023–12/2024, nhưng Enas là 01–08/2024 và WAS App là 08/2024–01/2025.
+    Ba dự án đè lên nhau trong năm 2024. <strong>Đây là thứ dễ bị soi nhất trong cả CV.</strong></p>
+    <p class="why">Chuẩn bị câu trả lời thật: nếu làm song song thì nói rõ tỉ lệ thời gian cho mỗi dự án;
+    nếu là giai đoạn bàn giao/bảo trì thì ghi rõ "bảo trì" chứ đừng để trông như phát triển toàn thời gian.
+    Cách tốt nhất là <strong>sửa CV trước khi nộp</strong>, ghi chú vai trò theo giai đoạn.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Không có một con số kết quả nào</div>
+    <p style="margin-top:8px">CV mô tả rất kỹ <em>đã làm gì</em> nhưng không có chỗ nào nói <em>kết quả ra sao</em>.
+    Người đọc không phân biệt được giữa một module chạy được và một module tạo ra giá trị.</p>
+    <p class="why">Thêm vào 3–5 con số, kể cả ước lượng có cơ sở: thời gian build giảm từ bao nhiêu xuống bao nhiêu
+    sau khi có Jenkins; điểm Lighthouse trước/sau; số form mà form engine phục vụ;
+    số người dùng hoặc số phòng khám đang chạy thật; thời gian tạo một wall mới giảm còn bao lâu nhờ template builder.
+    <strong>Một con số cụ thể có sức nặng hơn ba dòng mô tả.</strong></p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Mục kỹ năng liệt kê thứ không xuất hiện ở dự án nào</div>
+    <p style="margin-top:8px">VueJS, React-Native, Redux, Material-UI, Adobe XD, Photoshop, Illustrator
+    nằm trong mục kỹ năng nhưng không thấy trong phần dự án. Người phỏng vấn thường
+    <strong>chọn đúng mục lạc lõng nhất để hỏi</strong>.</p>
+    <p class="why">Hai lựa chọn: bỏ khỏi CV, hoặc giữ và phân tầng rõ ("thành thạo" / "đã dùng ở mức cơ bản").
+    Nếu bị hỏi về VueJS mà thực tế chỉ làm một bài tập nhỏ thì hãy nói đúng như vậy —
+    <strong>bị bắt gặp nói quá là mất toàn bộ niềm tin cho những phần còn lại</strong>, kể cả những phần rất thật.</p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Mục tiêu nghề nghiệp viết chung chung</div>
+    <p style="margin-top:8px">"Muốn học hỏi, muốn môi trường chuyên nghiệp" là câu ai cũng viết, không nói gì về anh.</p>
+    <p class="why">Thay bằng định vị cụ thể dựa trên chính những gì anh đã làm, ví dụ:
+    frontend nhiều năm React/Next.js cho sản phẩm nghiệp vụ nặng ở thị trường Nhật và y tế,
+    đang mở rộng sang backend Node/Python và CI/CD, hướng tới vai trò làm chủ sản phẩm từ thiết kế đến release.
+    <strong>Nói rõ mình là ai thì nhà tuyển dụng mới biết đặt anh vào đâu.</strong></p>
+  </div>
+
+  <div class="dec">
+    <div class="head">Không có link GitHub, portfolio hay sản phẩm demo</div>
+    <p style="margin-top:8px">Toàn bộ dự án trong CV là sản phẩm nội bộ của khách hàng — không ai kiểm chứng được.</p>
+    <p class="why">Nếu NDA không cho chia sẻ code (điều bình thường), hãy bù bằng thứ khác:
+    một GitHub có vài dự án nhỏ nhưng viết tử tế, hoặc vài ảnh chụp màn hình đã che dữ liệu nhạy cảm,
+    hoặc một bài viết kỹ thuật về form engine / template builder — đó là hai thứ đủ đặc sắc để viết.
+    <strong>Với ứng viên không có bằng IT chính quy, bằng chứng nhìn thấy được có giá trị bù đắp lớn.</strong></p>
+  </div>
+</div>
+
+<h2 class="sec" id="hoilai">C · Câu nên hỏi ngược nhà tuyển dụng</h2>
+<div class="card">
+  <p class="sub" style="margin-bottom:16px">Hỏi ngược là phần được chấm điểm, không phải phần lịch sự cuối buổi.
+  Chọn 3–4 câu hợp với vị trí đang ứng tuyển.</p>
+  <ul>
+    <li>Team frontend hiện tại bao nhiêu người, và công việc được chia theo tính năng hay theo tầng?</li>
+    <li>Quy trình review code của team như thế nào — có bắt buộc, và tiêu chí gì thì chặn merge?</li>
+    <li>Tỉ lệ thời gian dành cho tính năng mới so với xử lý nợ kỹ thuật, tính theo quý gần nhất?</li>
+    <li>Ai là người quyết định chọn công nghệ — người dẫn dắt kỹ thuật hay cả team cùng bàn?</li>
+    <li>Có test tự động và CI/CD chưa? Từ lúc merge đến lúc lên production mất bao lâu?</li>
+    <li>Ba tháng đầu, anh/chị kỳ vọng người vào vị trí này làm được gì thì coi là thành công?</li>
+    <li>Vị trí này có cơ hội chạm vào backend không? <em>(hỏi nếu mục tiêu Full Stack là thật)</em></li>
+  </ul>
+  <div class="tip" style="margin-top:20px">
+    <div class="lbl">Lưu ý</div>
+    <p>Đừng hỏi lương ở câu đầu tiên và đừng hỏi những thứ tra một phút là ra trên website công ty.
+    Câu hỏi tốt cho thấy anh đang đánh giá xem <b>công ty có phù hợp với mình không</b> —
+    đó là tư thế của người có lựa chọn, và nhà tuyển dụng cảm nhận được điều đó.</p>
+  </div>
+</div>
+
+<footer>
+  Bản dịch và phân tích dựa trên <code>Cv-Ha-Tien-Hiep-FE.pdf</code> (4 trang, 6 dự án).
+  Phần A giữ nguyên nội dung gốc; phần B và C là phân tích bổ sung, không có trong CV.
+</footer>
+
+</main>
+</div>
+</body>
+</html>
