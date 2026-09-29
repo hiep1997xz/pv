@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>08. Vòng Senior — kiến trúc — Bộ phỏng vấn FE</title>
+<meta name="description" content="Dành cho vị trí Senior/Lead: monorepo, design system, migration, observability, tech debt. Họ không hỏi bạn code gì — họ hỏi bạn quyết định gì và chịu trách nhiệm ra sao.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-set="bo-08">
+<div class="progress"><div class="progress__bar" id="progressBar"></div></div>
+<header class="topbar">
+  <a class="btn" href="index.html">← Trang chủ</a>
+  <div class="topbar__brand">
+    <span class="topbar__title">08. Vòng Senior — kiến trúc</span>
+    <span class="topbar__sub">Dành cho vị trí Senior/Lead: monorepo, design system, migration, observability, tech debt. Họ không hỏi bạn code gì — họ hỏi bạn quyết định gì và chịu trách nhiệm ra sao.</span>
+  </div>
+  <div class="search">
+    <input type="search" id="searchInput" placeholder="Tìm câu hỏi…" aria-label="Tìm câu hỏi theo từ khoá">
+  </div>
+  <button class="btn" id="toggleAll" type="button" aria-label="Mở hoặc đóng tất cả câu trả lời">
+    <span aria-hidden="true">⇕</span><span class="btn__label">Mở tất cả</span>
+  </button>
+  <button class="btn btn--icon" id="themeBtn" type="button" aria-label="Đổi chế độ sáng/tối" title="Đổi chế độ sáng/tối">
+    <span aria-hidden="true" id="themeIcon">◐</span>
+  </button>
+</header>
+
+<div class="layout">
+  <nav class="toc" aria-label="Mục lục">
+    <p class="toc__label">Nội dung</p>
+    <ul class="toc__list">
+      <li><a href="#s0"><span class="toc__num">00</span> Kiến trúc & codebase</a></li>
+      <li><a href="#s1"><span class="toc__num">01</span> Nợ kỹ thuật, migration & vận hành</a></li>
+    </ul>
+    <p class="toc__label" style="margin-top:20px">Tiến độ bộ này</p>
+    <p style="margin:0 0 0 10px;font-size:.82rem;color:var(--text-muted)">
+      Đã thuộc <strong id="knownCount" style="color:var(--ok)">0</strong> / <span id="totalCount">0</span> câu
+    </p>
+    <button class="btn" id="resetBtn" type="button" style="margin:12px 0 0 10px">Xoá tiến độ</button>
+  </nav>
+
+  <main class="content">
+    <p class="crumb"><a href="index.html">Bộ phỏng vấn</a> <span aria-hidden="true">›</span> 08. Vòng Senior — kiến trúc</p>
+
+    <div class="hero">
+      <h1>🏛️ Vòng Senior — kiến trúc FE quy mô lớn</h1>
+      <p>Khác biệt giữa Middle và Senior ở vòng này: Middle trả lời <em>"cách làm là X"</em>; Senior trả lời <em>"em chọn X vì bối cảnh A, đổi lại mất B, và em sẽ đổi sang Y nếu C xảy ra"</em>. Luôn nói <strong>bối cảnh → quyết định → đánh đổi → điều kiện đổi ý</strong>. Nếu bạn đang nhắm Middle thì bộ này là để đọc trước, chưa cần thuộc.</p>
+      <div class="hero__meta"><span class="tag tag--senior">Senior</span><span class="pill">60 phút</span><span class="pill">Kiến trúc & quyết định</span><span class="pill pill--accent">8 câu</span><span class="pill">Monorepo</span><span class="pill">Design System</span><span class="pill">Migration</span><span class="pill">DX</span><span class="pill">Observability</span></div>
+    </div>
+
+    <section class="section" id="s0">
+      <div class="section__head">
+        <span class="section__num">00</span>
+        <h2 class="section__title">Kiến trúc & codebase</h2>
+        <span class="section__count">4 câu</span>
+      </div>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q1</span>
+          <span class="qa__text">Khi nào nên dùng monorepo? Khi nào là over-engineering?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p><strong>Nên dùng khi có ít nhất 2 trong 3 điều kiện:</strong></p>
+<ol>
+<li><strong>Nhiều app dùng chung code có ý nghĩa</strong> — không phải chung vài util, mà chung <em>type nghiệp vụ</em>, component, hoặc API client. Ở PSY HMS là web chính + phần báo cáo dùng chung type bệnh nhân/đơn thuốc.</li>
+<li><strong>Thay đổi thường xuyên cắt ngang nhiều package</strong> — sửa một type là phải sửa cả 2 app. Ở repo riêng thì đó là 2 PR ở 2 repo, version lệch, và luôn có giai đoạn không tương thích.</li>
+<li><strong>Cùng một nhóm người sở hữu</strong> tất cả — monorepo giữa các team không nói chuyện với nhau là địa ngục về ownership.</li>
+</ol>
+<p><strong>Over-engineering khi:</strong> chỉ có một app; hoặc các app thật sự độc lập và release theo nhịp khác nhau; hoặc team chưa có ai từng vận hành monorepo (chi phí học và chi phí CI sẽ nuốt hết lợi ích).</p>
+<p><strong>Cái giá thật của monorepo</strong> — phần mà người chưa làm hay bỏ qua:</p>
+<ul>
+<li><strong>CI phức tạp</strong>: phải xác định được "đổi package X thì build/test app nào". Không có affected-detection (Nx/Turborepo) thì mỗi PR build lại tất cả, CI 25 phút và ai cũng ghét.</li>
+<li><strong>Cám dỗ coupling</strong>: vì import dễ nên người ta import lung tung, và ranh giới package tan rã sau 6 tháng. Phải có lint rule chặn import sai chiều (<code>ui</code> không được import <code>features</code>).</li>
+<li><strong>Versioning nội bộ</strong>: dùng <code>workspace:*</code> thì mọi thứ luôn cùng version — đơn giản nhưng nghĩa là không thể để một app dùng bản cũ của package.</li>
+</ul>
+<p><strong>Câu chốt:</strong> "Em sẽ không bắt đầu bằng monorepo. Em bắt đầu bằng một repo với thư mục rõ ràng, và <em>tách ra package khi đau</em> — khi đã có app thứ hai thật sự cần. Tách sớm là trả chi phí cho lợi ích chưa tồn tại."</p></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q2</span>
+          <span class="qa__text">Micro-frontend — bạn nghĩ sao? Khi nào bạn đề xuất dùng?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p>Câu trả lời ngắn: <strong>micro-frontend giải bài toán tổ chức, không giải bài toán kỹ thuật.</strong> Nếu bạn không có vấn đề tổ chức thì nó chỉ là chi phí.</p>
+<p><strong>Nó giải đúng một việc:</strong> cho phép nhiều team <strong>deploy độc lập</strong> mà không phải đồng bộ với nhau. Nếu 5 team phải chờ nhau để release, và hàng đợi release là nút cổ chai thật, thì micro-frontend đáng cân nhắc.</p>
+<p><strong>Cái giá — thường bị đánh giá thấp:</strong></p>
+<ul>
+<li><strong>Bundle trùng lặp.</strong> Mỗi MFE mang React của riêng nó, trừ khi chia sẻ dependency — mà chia sẻ thì lại tạo coupling về version, đúng thứ ta muốn tránh.</li>
+<li><strong>UI không nhất quán.</strong> Team A nâng design system, team B chưa → hai nửa trang trông khác nhau. Phải có design system versioning nghiêm ngặt, và đó là một dự án riêng.</li>
+<li><strong>State chung khó.</strong> Auth, theme, notification phải chia sẻ qua một shell — và hợp đồng giữa shell và MFE là thứ rất dễ vỡ.</li>
+<li><strong>Debug xuyên MFE là ác mộng</strong>: lỗi ở MFE A do dữ liệu MFE B truyền sang, source map rời rạc, không ai sở hữu vấn đề.</li>
+<li><strong>Performance</strong>: nhiều bundle, nhiều request, khó tối ưu tổng thể.</li>
+</ul>
+<p><strong>Em sẽ thử các bước rẻ hơn trước:</strong> (1) monorepo + module boundary rõ ràng + CODEOWNERS theo thư mục — được 80% lợi ích với 10% chi phí; (2) feature flag để team deploy code chưa bật; (3) trunk-based development để giảm hàng đợi merge.</p>
+<p><strong>Trung thực:</strong> "Em <em>chưa</em> vận hành micro-frontend ở production. Em đã đọc và đã cân nhắc nó cho một dự án nhưng kết luận là không cần. Nên em nói được trade-off nhưng không nói được kinh nghiệm vận hành thật — đó là giới hạn của em."</p></blockquote>
+          <div class="note"><span class="note__icon" aria-hidden="true">⭐</span><div><p><strong>Điểm ăn tiền:</strong> Nói "em chưa làm cái này ở production" đúng lúc làm tăng độ tin cậy của MỌI câu trả lời khác. Interviewer sẽ tin những gì bạn nhận là đã làm.</p></div></div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q3</span>
+          <span class="qa__text">Team 3 người thành 12 người trong 6 tháng. Bạn chuẩn bị codebase thế nào?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p>Vấn đề khi scale team không phải công nghệ mà là <strong>ai đụng vào cái gì, và làm sao người mới không phá</strong>. Bốn việc theo thứ tự ưu tiên:</p>
+<ol>
+<li><strong>Ranh giới module và ownership.</strong> Chia theo <em>feature/domain</em>, không theo <em>loại file</em>. <code>features/patients/*</code> chứ không phải <code>components/</code> + <code>hooks/</code> + <code>services/</code> khổng lồ. Vì chia theo domain thì 2 người làm 2 feature gần như không chạm nhau; chia theo loại file thì ai cũng sửa <code>components/</code> và conflict liên tục. Kèm <code>CODEOWNERS</code> để PR tự gán reviewer đúng người.</li>
+<li><strong>Tự động hoá thay vì quy ước miệng.</strong> Người mới không đọc wiki. Phải là: ESLint + Prettier chạy trong pre-commit; <code>tsc --noEmit</code> trong CI; lint rule chặn import sai chiều giữa layer; rule cấm gọi <code>axios</code> trực tiếp trong component. Quy ước không có công cụ ép là quy ước sẽ chết.</li>
+<li><strong>Đường mòn rõ ràng (paved path).</strong> Có <em>một</em> cách chuẩn để làm mỗi việc phổ biến, kèm ví dụ trong repo: thêm màn hình mới, gọi API, làm form, xử lý lỗi, viết test. Tốt hơn nữa là generator (<code>plop</code>) sinh khung sẵn. Nếu có 4 cách làm form thì 12 người sẽ tạo ra 4 kiểu codebase.</li>
+<li><strong>ADR (Architecture Decision Record).</strong> Mỗi quyết định lớn một file markdown ngắn: bối cảnh, lựa chọn, lý do, hệ quả. Giải quyết vấn đề "tại sao code lại thế này" mà người mới hỏi hàng tuần, và ngăn việc quyết định bị lật lại bởi người không biết bối cảnh.</li>
+</ol>
+<p><strong>Về quy trình (không phải code):</strong> onboarding phải có checklist và một task thật nhỏ trong tuần đầu (sửa được và deploy được → tạo niềm tin); pair 2–3 buổi đầu; và giới hạn kích thước PR (~400 dòng) vì PR 2.000 dòng thì review chỉ là bấm approve.</p>
+<p><strong>Cái em sẽ KHÔNG làm:</strong> không rewrite kiến trúc để "chuẩn bị cho team lớn". Cải thiện dần theo từng feature mới, vì rewrite giữa lúc tuyển người là cách nhanh nhất để mất cả hai.</p></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q4</span>
+          <span class="qa__text">Design system nội bộ — bạn xây và duy trì thế nào? Version ra sao?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p><strong>Quyết định đầu tiên: build từ đầu hay wrap thư viện có sẵn?</strong></p>
+<p>Em gần như luôn chọn <strong>wrap</strong> (Ant Design, MUI, Radix + Tailwind). Tự build từ đầu nghĩa là tự làm accessibility, keyboard nav, focus management, i18n cho <em>mọi</em> component — đó là công việc của một team chuyên trách, không phải việc phụ. Chỉ build từ đầu khi yêu cầu thiết kế quá đặc thù hoặc công ty đủ lớn để nuôi team design system.</p>
+<p><strong>Ba tầng:</strong></p>
+<pre class="code"><code>tokens/     màu, spacing, typography, radius, shadow, z-index
+            -&gt; CSS variable, là nguồn sự thật, đồng bộ với Figma
+primitives/ wrap thư viện: Button, Input, Select, Modal
+            -&gt; API của MÌNH, không lộ API của AntD ra ngoài
+patterns/   ghép sẵn: DataTable, FormField, PageHeader, ConfirmDialog
+            -&gt; đây là chỗ tiết kiệm thời gian thật</code></pre>
+<p><strong>Vì sao phải wrap chứ không dùng thẳng AntD:</strong> khi cần đổi từ AntD 4 lên 5 (hoặc bỏ AntD), nếu 200 file import thẳng <code>antd</code> thì đó là dự án 3 tháng. Nếu tất cả import <code>@app/ui</code> thì đổi ở một chỗ. Đây là lý do duy nhất nhưng nó rất đáng.</p>
+<p><strong>Versioning và thay đổi phá vỡ:</strong></p>
+<ul>
+<li><strong>Trong monorepo</strong>: <code>workspace:*</code>, tất cả cùng version. Đổi breaking thì phải sửa hết call site trong cùng PR — nghe nặng nhưng thực ra là ưu điểm: không có nợ trôi nổi.</li>
+<li><strong>Nếu publish package riêng</strong>: semver nghiêm túc, và <strong>deprecate trước khi xoá</strong> — thêm API mới, đánh dấu cũ <code>@deprecated</code> với hướng dẫn thay thế, xoá sau 2 minor version.</li>
+<li><strong>Codemod cho breaking change lớn</strong>: viết script jscodeshift thay vì bắt 12 người sửa tay.</li>
+</ul>
+<p><strong>Duy trì — phần khó hơn xây:</strong></p>
+<ul>
+<li><strong>Storybook</strong> là tài liệu sống. Không có nó thì người ta không biết component tồn tại và sẽ tự viết cái mới.</li>
+<li><strong>Visual regression test</strong> (Chromatic/Playwright screenshot) — thay đổi token màu mà vỡ 5 component thì phải biết trước khi merge.</li>
+<li><strong>Quy trình nhận đóng góp</strong>: ai cũng được thêm component, nhưng phải qua review của người sở hữu DS và phải có story + test. Nếu chỉ một người được sửa thì DS thành nút cổ chai và mọi người sẽ đi vòng.</li>
+<li><strong>Đo mức độ dùng</strong>: script đếm import <code>antd</code> trực tiếp còn sót — đó là nợ cần dọn.</li>
+</ul></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <section class="section" id="s1">
+      <div class="section__head">
+        <span class="section__num">01</span>
+        <h2 class="section__title">Nợ kỹ thuật, migration & vận hành</h2>
+        <span class="section__count">4 câu</span>
+      </div>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q5</span>
+          <span class="qa__text">Bạn phải migrate Ant Design 4 lên 5 (hoặc Next Pages Router lên App Router) trên codebase 100+ màn hình đang chạy production. Kế hoạch?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p><strong>Nguyên tắc số 1: không big-bang.</strong> Migration một lần trên 100 màn hình nghĩa là một PR khổng lồ, không ai review được, không rollback được, và block mọi feature trong 2 tháng. Em chưa thấy dự án nào làm thế mà thành công.</p>
+<ol class="steps">
+<li><strong>Đo trước đã.</strong> Script đếm: bao nhiêu file import AntD, component nào dùng nhiều nhất, API nào đã breaking. Không có số thì không estimate được và không thuyết phục được PO cho thời gian.</li>
+<li><strong>Đọc migration guide và viết một tài liệu ánh xạ.</strong> Cái gì đổi tên, cái gì đổi hành vi, cái gì bị bỏ. Chia thành 3 nhóm: <em>codemod tự động được</em> / <em>sửa tay đơn giản</em> / <em>phải thiết kế lại</em>.</li>
+<li><strong>Làm thí điểm một module nhỏ nhưng thật.</strong> Không phải trang demo — một module có thật, có form, có bảng, có modal. Mục đích là <em>phát hiện cái chưa biết</em> và hiệu chỉnh estimate. Thường sau bước này estimate ban đầu tăng gấp đôi, và đó là thông tin quý.</li>
+<li><strong>Chạy song song nếu có thể.</strong> AntD 4 và 5 có thể cùng tồn tại (khác prefix class) — nặng bundle hơn tạm thời nhưng cho phép migrate dần. Next thì App Router và Pages Router chạy song song được theo route. Đây là thứ làm cho việc "làm dần" khả thi.</li>
+<li><strong>Codemod + migrate theo từng module</strong>, mỗi module một PR nhỏ, có người review và QA test. Ưu tiên module ít rủi ro trước để build confidence, module quan trọng nhất làm sau cùng khi đã quen.</li>
+<li><strong>Chặn hồi quy</strong>: lint rule cấm import từ package cũ trong code mới, để không vừa migrate vừa sinh thêm nợ.</li>
+<li><strong>Dọn sạch</strong>: gỡ bỏ package cũ, xoá code tương thích. Migration không có bước này thì codebase mãi mãi ở trạng thái nửa vời — đây là thứ hay bị bỏ khi dự án chuyển hướng.</li>
+</ol>
+<p><strong>Thuyết phục PO cho thời gian</strong> — phần quan trọng không kém kỹ thuật. Không nói "code cũ xấu", mà nói bằng ngôn ngữ của họ: "AntD 4 đã ngừng nhận bản vá bảo mật", "phiên bản mới giảm bundle X%, tăng tốc load trang Y giây", "mỗi feature mới hiện tốn thêm ~20% thời gian vì phải workaround". Và đề xuất <strong>ngân sách cố định</strong>: 20% mỗi sprint cho migration, thay vì xin dừng 2 tháng.</p>
+<p><strong>Điều kiện em sẽ đổi ý:</strong> nếu sản phẩm sắp bị thay thế trong 6 tháng, hoặc team đang cháy deadline sống còn, thì migration là sai thời điểm — nợ kỹ thuật cũng là một lựa chọn hợp lệ nếu có ý thức và có hạn.</p></blockquote>
+          <div class="note"><span class="note__icon" aria-hidden="true">⭐</span><div><p><strong>Điểm ăn tiền:</strong> Ý cuối — <em>"nợ kỹ thuật cũng là lựa chọn hợp lệ nếu có ý thức"</em> — phân biệt kỹ sư trưởng thành với người theo chủ nghĩa hoàn hảo. Rất nên nói.</p></div></div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q6</span>
+          <span class="qa__text">Bạn đo chất lượng frontend ở production bằng gì? Observability cho FE gồm những gì?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p>Bốn nhóm, theo thứ tự giá trị trên chi phí:</p>
+<ol>
+<li><strong>Error tracking (Sentry) — làm đầu tiên, giá trị cao nhất.</strong>
+<ul>
+<li>Bắt lỗi JS chưa xử lý + unhandled promise rejection + lỗi React qua ErrorBoundary.</li>
+<li><strong>Bắt buộc upload source map</strong>, không thì stack trace là rác đã minify.</li>
+<li><strong>Gắn release version + git SHA</strong> → biết lỗi xuất hiện từ bản nào.</li>
+<li><strong>Scrub PII</strong> — với hệ thống y tế thì tuyệt đối không để tên/chẩn đoán bệnh nhân đi vào Sentry. Cấu hình <code>beforeSend</code> lọc.</li>
+<li>Đặt <strong>ngưỡng cảnh báo</strong>: tỉ lệ lỗi tăng đột biến sau deploy → báo Slack ngay, không chờ user report.</li>
+</ul>
+</li>
+<li><strong>Core Web Vitals thật từ người dùng (RUM), không phải Lighthouse.</strong>
+<ul>
+<li>LCP, INP (đã thay FID), CLS — thu bằng thư viện <code>web-vitals</code>, gửi về backend/analytics.</li>
+<li><strong>Xem percentile 75, không xem trung bình.</strong> Trung bình giấu mất nhóm người dùng máy yếu/mạng chậm.</li>
+<li>Chia nhóm theo route, thiết bị, quốc gia — vấn đề thường tập trung ở một nhóm.</li>
+<li>Lighthouse trong CI vẫn hữu ích nhưng là môi trường lab, không phản ánh người dùng thật.</li>
+</ul>
+</li>
+<li><strong>Chỉ số sản phẩm/kỹ thuật ghép với nhau.</strong>
+<ul>
+<li>Tỉ lệ lỗi API theo endpoint (FE nhìn thấy khác BE nhìn thấy — FE thấy cả timeout mạng).</li>
+<li>Thời gian hoàn thành luồng quan trọng (từ mở form kê đơn đến submit thành công).</li>
+<li>Tỉ lệ bỏ giữa chừng ở form dài — số này nói lên vấn đề UX mà không bug nào báo.</li>
+<li><strong>Trace ID xuyên FE–BE</strong>: FE sinh và gửi header, BE log cùng id → debug được một request từ đầu đến cuối.</li>
+</ul>
+</li>
+<li><strong>Sức khoẻ build/CI (DX cũng là chất lượng).</strong> Thời gian build, thời gian CI, tỉ lệ test flaky, kích thước bundle theo thời gian (đặt <strong>budget</strong> và fail CI khi vượt — nếu không bundle chỉ có tăng).</li>
+</ol>
+<p><strong>Nguyên tắc em áp dụng:</strong> mỗi chỉ số phải gắn với <em>một hành động</em>. Nếu số tăng mà không ai biết phải làm gì thì đừng đo — dashboard đầy biểu đồ không ai nhìn là lãng phí và tạo cảm giác an toàn giả.</p>
+<p><strong>Thừa nhận thật:</strong> ở các dự án của em, Sentry thì có, nhưng RUM Core Web Vitals thì chưa làm bài bản — vì là hệ thống nội bộ nên áp lực performance thấp. Em biết cách làm và muốn làm ở môi trường có người dùng thật quy mô lớn.</p></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q7</span>
+          <span class="qa__text">Team đang tranh cãi: viết test nhiều hay ít? Bạn quyết định thế nào?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p>Em không trả lời bằng con số coverage, vì coverage là chỉ số dễ đánh lừa — 90% coverage với toàn <code>expect(true).toBe(true)</code> thì vô nghĩa.</p>
+<p><strong>Em quyết định theo rủi ro × chi phí:</strong></p>
+<div class="table-wrap"><table>
+<thead><tr><th>Loại code</th><th>Mức test</th><th>Vì sao</th></tr></thead>
+<tbody>
+<tr><td>Logic nghiệp vụ thuần (rule validate, tính toán, state machine)</td><td><strong>Rất cao</strong></td><td>Sai thì hậu quả nặng, test lại rẻ nhất (không cần render), và ổn định — không vỡ khi refactor UI</td></tr>
+<tr><td>Custom hook, util</td><td>Cao</td><td>Dùng lại nhiều nơi, sai một chỗ là lan rộng</td></tr>
+<tr><td>Component có nhánh logic (quyền, trạng thái)</td><td>Vừa — test hành vi</td><td>Test qua <code>role</code>/<code>label</code>, không test implementation</td></tr>
+<tr><td>Luồng sinh tử (kê đơn → duyệt → cấp phát; thanh toán)</td><td><strong>E2E bắt buộc</strong></td><td>Vỡ là mất tiền hoặc nguy hiểm; ít test nhưng phải có</td></tr>
+<tr><td>Layout, style, component thuần trình bày</td><td>Rất thấp / không</td><td>Test vỡ liên tục, không bắt được bug thật. Dùng visual regression nếu cần</td></tr>
+</tbody></table></div>
+<p><strong>Ba nguyên tắc em áp đặt cho team:</strong></p>
+<ol>
+<li><strong>Mỗi bug production sửa xong phải kèm một test tái hiện nó.</strong> Đây là quy tắc có giá trị cao nhất: bộ test lớn dần đúng theo những chỗ thực sự hay hỏng, không phải theo cảm tính.</li>
+<li><strong>Không test implementation detail.</strong> Test state nội bộ hay gọi hàm private thì refactor là vỡ hết, và team sẽ bắt đầu ghét test — đó là lúc test chết.</li>
+<li><strong>Test phải nhanh và ổn định.</strong> Suite chạy 15 phút hoặc flaky 10% thì người ta sẽ bỏ qua nó. Test flaky phải fix hoặc xoá, không được để <code>.skip</code> vĩnh viễn.</li>
+</ol>
+<p><strong>Trả lời thẳng câu hỏi:</strong> "Nếu team tranh cãi, em sẽ không tranh luận về con số mà đề nghị nhìn vào dữ liệu: 10 bug production gần nhất là ở đâu? Nếu tất cả ở logic nghiệp vụ thì đó là nơi cần test, không phải component. Quyết định bằng bằng chứng thì không ai cãi."</p></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q8</span>
+          <span class="qa__text">Bạn phát hiện một quyết định kiến trúc bạn đưa ra 6 tháng trước là sai. Làm gì?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p>Bốn bước, và điều quan trọng nhất là bước 1:</p>
+<ol>
+<li><strong>Nói ra, sớm và rõ ràng.</strong> Không im lặng vá víu để giữ thể diện. Em sẽ nói với team và lead: "Quyết định X em đưa ra hồi tháng 3 đang gây vấn đề Y, đây là bằng chứng." Giấu một quyết định sai sẽ khiến mọi người tiếp tục xây trên nó, và chi phí sửa tăng theo cấp số nhân.</li>
+<li><strong>Định lượng thiệt hại, đừng cảm tính.</strong> Nó đang làm chậm bao nhiêu? Gây bao nhiêu bug? Tốn thêm bao nhiêu giờ mỗi sprint? Nếu không đo được thì có thể nó không tệ như mình nghĩ — đôi khi "sai" chỉ là "không đẹp", và không đẹp thì không đáng sửa.</li>
+<li><strong>Đề xuất 3 phương án, không chỉ một.</strong> (a) Sống chung, khoanh vùng lại để không lan; (b) Sửa dần khi đụng tới; (c) Sửa dứt điểm — kèm chi phí và rủi ro của mỗi phương án. Thường (b) là đúng nhất. Để lead/PO quyết, vì đó là đánh đổi về nguồn lực chứ không thuần kỹ thuật.</li>
+<li><strong>Ghi lại vào ADR.</strong> Cập nhật ADR cũ: quyết định này đã bị thay thế, vì sao, và bài học. Để 6 tháng nữa người khác không lặp lại.</li>
+</ol>
+<p><strong>Ví dụ thật của em</strong> (thay bằng ví dụ của bạn): "Ở PSY HMS em thiết kế phiếu điều dưỡng thành một object lớn lưu một lần. Sau vài tháng gặp hai vấn đề: form nặng, và hai điều dưỡng sửa cùng lúc là ghi đè nhau. Em nhận ra thiết kế dữ liệu ban đầu sai — đáng ra phải chia theo section và mốc giờ. Em báo team, và chọn phương án (b): không refactor toàn bộ, mà tách section cho các phiếu <em>đang phải sửa</em>, và làm phiếu mới theo cách đúng. Sau 2 tháng thì phần lớn đã chuyển, mà không phải dừng feature."</p>
+<p><strong>Về thái độ:</strong> em cho rằng nhận sai sớm là một phần của công việc kiến trúc — quyết định luôn đưa ra với thông tin chưa đầy đủ, nên một tỉ lệ sai là bình thường. Cái không bình thường là biết sai mà không nói.</p></blockquote>
+          <div class="note"><span class="note__icon" aria-hidden="true">⭐</span><div><p><strong>Điểm ăn tiền:</strong> Chuẩn bị <strong>một ví dụ thật</strong> cho câu này. Đây là câu bộc lộ tính cách rõ nhất trong cả buổi phỏng vấn Senior.</p></div></div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <p class="empty" id="emptyState" hidden>Không tìm thấy câu hỏi nào khớp từ khoá.</p>
+
+    <div class="setnav">
+  <a class="btn" href="bo-07-system-design-he-thong.html">← 07. System Design — Hệ thống</a>
+  <span class="setnav__spacer"></span>
+  <a class="btn" href="index.html">Tất cả bộ đề</a>
+  <a class="btn" href="bo-09-cong-ty-nhat.html">09. Công ty Nhật / Outsourcing →</a>
+  </div>
+  </main>
+</div>
+
+<footer class="footer">
+  08. Vòng Senior — kiến trúc — bộ phỏng vấn soạn theo CV <strong>Hà Tiến Hiệp</strong> ·
+  Tiến độ lưu trong <code>localStorage</code> riêng cho từng bộ đề.
+</footer>
+<script src="js/app.js"></script>
+</body>
+</html>

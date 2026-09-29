@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>04. Đào sâu ENAS + Offerwall — Bộ phỏng vấn FE</title>
+<meta name="description" content="Hai dự án SaaS thị trường Nhật có cùng bài toán cốt lõi: builder kéo thả sinh UI từ cấu hình. Đây là phần kỹ thuật ấn tượng nhất trong CV bạn.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧩</text></svg>">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-set="bo-04">
+<div class="progress"><div class="progress__bar" id="progressBar"></div></div>
+<header class="topbar">
+  <a class="btn" href="index.html">← Trang chủ</a>
+  <div class="topbar__brand">
+    <span class="topbar__title">04. Đào sâu ENAS + Offerwall</span>
+    <span class="topbar__sub">Hai dự án SaaS thị trường Nhật có cùng bài toán cốt lõi: builder kéo thả sinh UI từ cấu hình. Đây là phần kỹ thuật ấn tượng nhất trong CV bạn.</span>
+  </div>
+  <div class="search">
+    <input type="search" id="searchInput" placeholder="Tìm câu hỏi…" aria-label="Tìm câu hỏi theo từ khoá">
+  </div>
+  <button class="btn" id="toggleAll" type="button" aria-label="Mở hoặc đóng tất cả câu trả lời">
+    <span aria-hidden="true">⇕</span><span class="btn__label">Mở tất cả</span>
+  </button>
+  <button class="btn btn--icon" id="themeBtn" type="button" aria-label="Đổi chế độ sáng/tối" title="Đổi chế độ sáng/tối">
+    <span aria-hidden="true" id="themeIcon">◐</span>
+  </button>
+</header>
+
+<div class="layout">
+  <nav class="toc" aria-label="Mục lục">
+    <p class="toc__label">Nội dung</p>
+    <ul class="toc__list">
+      <li><a href="#s0"><span class="toc__num">00</span> Form engine & schema</a></li>
+      <li><a href="#s1"><span class="toc__num">01</span> Builder kéo thả & preview</a></li>
+      <li><a href="#s2"><span class="toc__num">02</span> Tích hợp & thị trường Nhật</a></li>
+    </ul>
+    <p class="toc__label" style="margin-top:20px">Tiến độ bộ này</p>
+    <p style="margin:0 0 0 10px;font-size:.82rem;color:var(--text-muted)">
+      Đã thuộc <strong id="knownCount" style="color:var(--ok)">0</strong> / <span id="totalCount">0</span> câu
+    </p>
+    <button class="btn" id="resetBtn" type="button" style="margin:12px 0 0 10px">Xoá tiến độ</button>
+  </nav>
+
+  <main class="content">
+    <p class="crumb"><a href="index.html">Bộ phỏng vấn</a> <span aria-hidden="true">›</span> 04. Đào sâu ENAS + Offerwall</p>
+
+    <div class="hero">
+      <h1>🧩 Đào sâu dự án — ENAS (form marketing SaaS) & Offerwall</h1>
+      <p>ENAS: SaaS EFO form builder, A/B testing, Stripe, webhook/Salesforce, JP/EN. Offerwall: offer wall quảng cáo + Template Builder 9 loại block + live phone preview + dashboard 7 tab. <strong>Cả hai đều là "hệ thống sinh ra hệ thống"</strong> — loại bài toán mà người phỏng vấn giỏi rất muốn đào, vì nó phơi ra khả năng thiết kế kiến trúc của bạn.</p>
+      <div class="hero__meta"><span class="tag tag--mid">Middle</span><span class="pill">45–60 phút</span><span class="pill">Deep dive 2 dự án</span><span class="pill pill--accent">10 câu</span><span class="pill">Next 13/14</span><span class="pill">AntD 4/5</span><span class="pill">Redux Toolkit</span><span class="pill">React Query</span><span class="pill">Stripe</span><span class="pill">S3/CloudFront</span></div>
+    </div>
+
+    <section class="section" id="s0">
+      <div class="section__head">
+        <span class="section__num">00</span>
+        <h2 class="section__title">Form engine & schema</h2>
+        <span class="section__count">3 câu</span>
+      </div>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q1</span>
+          <span class="qa__text">Form builder của bạn sinh form từ schema. Khi khách đã publish form và thu được 10.000 lead, rồi họ sửa schema — dữ liệu cũ xử lý thế nào?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p>Đây là câu hỏi hay nhất về form builder và là chỗ thiết kế non tay sẽ vỡ. Cốt lõi: <strong>schema phải có version, và submission phải trỏ tới version nó được tạo bằng.</strong></p>
+<pre class="code"><code>form            { id, name, currentVersionId }
+form_version    { id, formId, version, schema (JSON), publishedAt }
+submission      { id, formId, formVersionId, data (JSON), createdAt }</code></pre>
+<p><strong>Ba loại thay đổi và cách xử:</strong></p>
+<div class="table-wrap"><table>
+<thead><tr><th>Thay đổi</th><th>Ảnh hưởng dữ liệu cũ</th><th>Cách làm</th></tr></thead>
+<tbody>
+<tr><td>Thêm field mới</td><td>Không phá gì</td><td>Bản ghi cũ hiện "—" ở cột mới. Tạo version mới, an toàn.</td></tr>
+<tr><td>Đổi label, đổi thứ tự</td><td>Không phá</td><td>Version mới. Khi xem lead cũ thì render theo schema version của nó, nên vẫn đúng ngữ cảnh lúc thu.</td></tr>
+<tr><td>Xoá field / đổi type (text → number)</td><td><strong>Phá</strong></td><td>Không xoá dữ liệu. Field bị ẩn khỏi form mới nhưng vẫn giữ trong submission cũ; khi export thì cột đó chỉ có giá trị ở các lead cũ. Đổi type thì em cảnh báo rõ trên UI và <em>tạo field mới</em> thay vì đổi tại chỗ.</td></tr>
+</tbody></table></div>
+<p><strong>Nguyên tắc em áp dụng:</strong></p>
+<ol>
+<li><strong>Không bao giờ sửa schema đã publish tại chỗ</strong> — luôn tạo version mới. Giống migration DB: không sửa file migration cũ.</li>
+<li><strong>Dùng <code>fieldKey</code> bất biến, không dùng label làm khoá.</strong> Khách đổi label từ "Họ tên" sang "Tên đầy đủ" thì dữ liệu vẫn phải nối đúng. Đây là lỗi kinh điển: dùng label làm key thì đổi label là mất toàn bộ dữ liệu cũ.</li>
+<li><strong>Xem lại lead cũ thì render bằng schema version của nó</strong>, không phải version hiện tại. Nếu render bằng version mới thì dữ liệu cũ hiển thị sai chỗ hoặc mất.</li>
+<li><strong>Export CSV</strong> là union các field của mọi version trong khoảng thời gian được chọn, ô nào không tồn tại ở version đó thì để trống — chứ không phải để 0 hay "null".</li>
+<li><strong>Cảnh báo trên UI trước khi publish</strong>: "Thay đổi này xoá 1 câu hỏi. 10.000 lead đã thu vẫn được giữ nhưng form mới sẽ không hỏi mục này nữa." Người dùng phải hiểu hậu quả trước khi bấm.</li>
+</ol></blockquote>
+          <div class="note"><span class="note__icon" aria-hidden="true">⭐</span><div><p><strong>Điểm ăn tiền:</strong> Nếu dự án thật của bạn <em>chưa</em> làm versioning, hãy nói thật: "dự án lúc đó chỉ lưu một schema, và em đã gặp đúng vấn đề này khi khách đổi field — nếu làm lại em sẽ version từ đầu". Nhận ra vấn đề vẫn ăn điểm; giả vờ đã làm rồi bị đào là mất điểm.</p></div></div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q2</span>
+          <span class="qa__text">Kể về kiến trúc 4 layer của form engine. Vì sao không viết một component to rồi switch-case?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p><strong>Bốn layer:</strong></p>
+<pre class="code"><code>schema     JSON mô tả field: { key, type, label, rules, visibleWhen }
+             -&gt; nguồn sự thật duy nhất, lưu DB, dùng cho cả builder và form public
+converter  schema &lt;-&gt; API shape; sinh validation schema (Zod) từ rules
+             -&gt; BE đổi shape thì chỉ sửa ở đây
+layout     grid, thứ tự, group, responsive, logic hiện/ẩn theo điều kiện
+             -&gt; không biết gì về UI component cụ thể
+ui         registry: { text: TextInput, select: SelectInput, postal: PostalInput, ... }
+             -&gt; thêm loại field = thêm 1 entry, KHÔNG sửa core</code></pre>
+<pre class="code"><code>// registry — trái tim của kiến trúc
+const FIELD_REGISTRY = {
+  text:   { Component: TextInput,   toZod: (r) =&gt; applyString(z.string(), r) },
+  number: { Component: NumberInput, toZod: (r) =&gt; applyNumber(z.number(), r) },
+  select: { Component: SelectInput, toZod: (r) =&gt; z.string().min(r.required ? 1 : 0) },
+  postal: { Component: PostalInput, toZod: () =&gt; z.string().regex(/^\d{3}-?\d{4}$/) },
+};
+
+function FieldRenderer({ field, ...props }) {
+  const entry = FIELD_REGISTRY[field.type];
+  if (!entry) return &lt;UnknownField type={field.type} /&gt;;   // fail mềm, không crash cả form
+  return &lt;entry.Component field={field} {...props} /&gt;;
+}</code></pre>
+<p><strong>Vì sao không switch-case một component to:</strong></p>
+<ul>
+<li>Với switch-case, thêm field type là <strong>sửa file core</strong> → mỗi lần sửa là rủi ro làm vỡ field khác, và 2 người thêm 2 field cùng lúc là conflict. Registry thì mỗi field một file, không ai đụng ai.</li>
+<li>Đây đúng là <strong>Open/Closed Principle</strong>: mở để mở rộng, đóng để sửa đổi.</li>
+<li><strong>Validation sinh từ schema</strong>, không viết tay 2 lần. Rule "required" khai báo một lần trong schema, converter biến thành Zod cho runtime và cùng lúc là nguồn type qua <code>z.infer</code>.</li>
+<li><strong>EFO features làm một lần ở layer layout</strong> — auto-focus field kế tiếp, validate realtime, thanh tiến độ, nhớ giá trị đã nhập — áp dụng cho mọi form của mọi khách, không phải code lại từng form.</li>
+</ul>
+<p><strong>Kết quả đo được:</strong> khi PO yêu cầu thêm field postal-code auto-fill địa chỉ (rất phổ biến ở Nhật — gõ mã bưu chính là tự điền tỉnh/thành), em thêm 1 component + 1 entry registry, không sửa engine. Từ yêu cầu tới release mất dưới một ngày.</p></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q3</span>
+          <span class="qa__text">A/B testing cho form variant — bạn implement phía FE thế nào? Làm sao đảm bảo cùng một người luôn thấy cùng variant?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p><strong>Nguyên tắc: việc chia variant phải deterministic và phải ổn định theo người dùng.</strong></p>
+<ol>
+<li><strong>Gán variant bằng hash, không bằng random.</strong> <code>variant = variants[hash(visitorId + experimentId) % variants.length]</code>. Random thì user reload là thấy form khác — dữ liệu thí nghiệm vô nghĩa và UX tệ.</li>
+<li><strong><code>visitorId</code></strong> sinh một lần lưu cookie first-party (không phải localStorage, vì form được nhúng iframe vào site khách nên cần cookie để bền hơn). Nếu user đã đăng nhập thì dùng userId để nhất quán qua nhiều thiết bị.</li>
+<li><strong>Quyết định ở đâu:</strong> lý tưởng là <strong>server</strong> (hoặc edge) quyết định và trả về HTML/config đã chọn variant. Nếu để client quyết thì có flash — user thấy variant A nhoáng rồi đổi sang B, vừa xấu vừa làm nhiễu số liệu. Với ENAS là Next.js App Router nên em đọc cookie ở Server Component và render đúng variant ngay từ HTML đầu tiên.</li>
+<li><strong>Tracking</strong>: phải log cả <em>impression</em> (đã thấy variant nào) và <em>conversion</em> (submit thành công), gắn cùng <code>visitorId</code> + <code>variantId</code>. Chỉ log conversion thì không tính được tỉ lệ.</li>
+</ol>
+<p><strong>Ba cái bẫy em phải nói ra:</strong></p>
+<ul>
+<li><strong>Đổi variant giữa thí nghiệm</strong> làm nhiễu dữ liệu — phải "đóng băng" cấu hình khi experiment đang chạy, muốn sửa thì tạo experiment mới.</li>
+<li><strong>Sample size</strong>: khách hay dừng thí nghiệm sau 50 lượt và tuyên bố variant B thắng. UI nên hiện rõ "chưa đủ dữ liệu để kết luận" — em đưa cảnh báo dựa trên ngưỡng tối thiểu, dù phần thống kê chuẩn (significance) do BE tính.</li>
+<li><strong>Nhiều experiment cùng lúc trên cùng form</strong> sẽ chồng chéo. Em giới hạn một form chỉ chạy một experiment tại một thời điểm — đơn giản hoá bằng ràng buộc nghiệp vụ, thay vì làm hệ thống multi-variate phức tạp mà khách không dùng.</li>
+</ul></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <section class="section" id="s1">
+      <div class="section__head">
+        <span class="section__num">01</span>
+        <h2 class="section__title">Builder kéo thả & preview</h2>
+        <span class="section__count">3 câu</span>
+      </div>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q4</span>
+          <span class="qa__text">Template Builder của Offerwall: 9 loại block, kéo thả, preview trong khung điện thoại. Làm sao đảm bảo preview giống hệt bản thật?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p><strong>Quy tắc số một: preview và bản public phải dùng CHUNG một bộ renderer.</strong> Viết hai bản là chắc chắn lệch sau vài sprint — khách thấy preview đẹp, wall thật khác, và đó là loại bug mất niềm tin nhất.</p>
+<pre class="code"><code>// dùng chung
+&lt;WallRenderer config={config} /&gt;
+
+// preview chỉ khác ở wrapper
+&lt;PhoneFrame width={375}&gt;
+  &lt;PreviewContext.Provider value={{ interactive: false, scale }}&gt;
+    &lt;WallRenderer config={draftConfig} /&gt;
+  &lt;/PreviewContext.Provider&gt;
+&lt;/PhoneFrame&gt;</code></pre>
+<p><strong>Bốn vấn đề thực tế và cách giải:</strong></p>
+<ol>
+<li><strong>Responsive trong khung hẹp.</strong> Preview rộng 375px nhưng nằm trong trang desktop, nên <code>@media (max-width: …)</code> <em>không</em> kích hoạt — media query tính theo viewport, không theo container. Giải: dùng <strong>container query</strong>, hoặc truyền breakpoint qua context thay vì media query. Đây là bẫy rất hay gặp.</li>
+<li><strong>Tương tác trong preview.</strong> Bấm vào block trong preview phải là "chọn block để sửa", không phải "mở link offer". Giải: <code>interactive: false</code> qua context, renderer tự chặn navigation; và một lớp overlay bắt click để chọn block.</li>
+<li><strong>Đồng bộ hai chiều.</strong> Chọn block ở panel trái phải scroll preview tới đó và highlight; ngược lại click preview phải chọn đúng item ở panel. Giải: mỗi block có <code>id</code> ổn định, dùng <code>scrollIntoView</code> + state <code>selectedId</code> dùng chung.</li>
+<li><strong>Font và ảnh.</strong> Wall thật load từ CDN của khách; preview trong admin phải load cùng nguồn, không thì màu/font lệch. Em phải xử cả CORS cho font.</li>
+</ol></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q5</span>
+          <span class="qa__text">Kéo thả 9 block mà không lag. Bạn tối ưu thế nào? Undo/redo làm sao?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p><strong>Tối ưu kéo thả — nguyên tắc: trong lúc drag thì không đụng vào store global.</strong></p>
+<ol>
+<li><strong>State kéo thả là cục bộ</strong>: vị trí tạm giữ trong ref/local state của layer drag, chỉ <strong>commit vào store khi drop</strong>. Nếu mỗi <code>onDragOver</code> đều <code>dispatch</code> thì cả cây re-render 60 lần/giây.</li>
+<li><strong>Memo từng block</strong> + props ổn định (<code>useCallback</code> cho handler). Không thì kéo 1 block là render cả 9.</li>
+<li><strong>Chỉ animate <code>transform</code></strong>, không animate <code>top/left</code> hay <code>margin</code> — <code>transform</code> chạy trên compositor, không trigger layout/paint.</li>
+<li><strong>Preview debounce nhẹ (~100ms)</strong> trong lúc kéo: cấu hình đổi liên tục nhưng preview không cần cập nhật từng frame.</li>
+<li>Em dùng <code>react-beautiful-dnd</code> / <code>react-grid-dnd</code>; nếu làm lại giờ em sẽ chọn <strong>dnd-kit</strong> — nhẹ hơn, hỗ trợ touch tốt hơn và không bị deprecated.</li>
+</ol>
+<p><strong>Undo/redo:</strong> em làm bằng <strong>history stack các snapshot</strong>, không phải command pattern:</p>
+<pre class="code"><code>// Zustand store
+{
+  present: config,
+  past:    [],      // snapshot trước đó
+  future:  [],      // để redo
+
+  commit(next) {
+    set(s =&gt; ({
+      past:    [...s.past.slice(-49), s.present],   // giới hạn 50 bước
+      present: next,
+      future:  [],                                  // hành động mới xoá nhánh redo
+    }));
+  },
+  undo() { /* dịch present sang future, lấy từ past */ },
+}</code></pre>
+<p><strong>Lý do chọn snapshot thay vì command:</strong> config của một wall chỉ vài chục KB JSON, giữ 50 snapshot là không đáng kể, mà code đơn giản hơn nhiều lần — command pattern cần viết cặp do/undo cho <em>mỗi</em> loại hành động và rất dễ sai. Nếu tài liệu lớn (kiểu Figma) thì mới cần command/patch (immer <code>produceWithPatches</code> cho patch nhỏ).</p>
+<p><strong>Chi tiết dễ quên:</strong> gộp các thay đổi liên tiếp cùng loại thành một bước undo — gõ 10 ký tự vào label không nên là 10 lần undo. Em debounce commit cho input text (~500ms) nhưng commit ngay cho hành động rời rạc (thêm/xoá/đổi thứ tự block).</p></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q6</span>
+          <span class="qa__text">Offerwall build static export deploy S3/CloudFront. Refresh trang con thì bị 404 — vì sao và sửa thế nào?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p><strong>Nguyên nhân:</strong> SPA route <code>/wall/123/detail</code> chỉ tồn tại trong JS router, không phải file thật trên S3. Vào trang chủ rồi điều hướng nội bộ thì ổn (router xử lý), nhưng gõ URL trực tiếp hoặc F5 thì browser gửi request thật lên S3 → không có object <code>/wall/123/detail</code> → 404.</p>
+<p><strong>Cách sửa:</strong></p>
+<ol>
+<li><strong>CloudFront custom error response</strong>: map 403/404 → trả <code>/index.html</code> với status <strong>200</strong>. Đây là cách em dùng. Lưu ý phải là 200, không phải 404 — nếu trả 404 thì SEO và một số client sẽ hiểu sai.</li>
+<li>Hoặc <strong>S3 static website hosting</strong> với <code>error document = index.html</code> (nhưng mất khả năng dùng OAC/private bucket).</li>
+<li>Hoặc <strong>CloudFront Function</strong> rewrite request không có extension về <code>/index.html</code> — linh hoạt nhất, xử lý được cả trailing slash.</li>
+</ol>
+<p><strong>Ba vấn đề đi kèm của static export mà em gặp:</strong></p>
+<ul>
+<li><strong>Cache invalidation.</strong> <code>index.html</code> phải <code>Cache-Control: no-cache</code> (luôn hỏi lại server), còn asset có hash trong tên (<code>main.a3f9.js</code>) thì <code>max-age=31536000, immutable</code>. Nếu cache <code>index.html</code> lâu thì deploy xong user vẫn thấy bản cũ hàng giờ. Đây là lỗi em từng gặp và mất cả buổi để hiểu.</li>
+<li><strong>Chunk cũ biến mất sau deploy.</strong> User đang mở tab, ta deploy bản mới xoá chunk cũ, user điều hướng sang route lazy-load → lỗi "Failed to fetch dynamically imported module". Giải: giữ file build cũ trên S3 vài phiên bản (không xoá ngay), <strong>và</strong> bắt lỗi import động để hiện "Có bản cập nhật mới, tải lại trang?" rồi <code>location.reload()</code>.</li>
+<li><strong>Env variable bị inline lúc build.</strong> Next/Vite nhúng <code>NEXT_PUBLIC_*</code>/<code>VITE_*</code> vào bundle, nên một build không dùng được cho nhiều môi trường. Hoặc build riêng mỗi env, hoặc tải config runtime từ một file <code>config.json</code> không cache — em chọn cách hai khi cần một artifact dùng cho cả staging và production.</li>
+</ul></blockquote>
+          <div class="note"><span class="note__icon" aria-hidden="true">⭐</span><div><p><strong>Điểm ăn tiền:</strong> Câu này chứng minh bạn đã <em>vận hành</em> chứ không chỉ code. Ba vấn đề cache/chunk/env là thứ chỉ người deploy thật mới biết.</p></div></div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <section class="section" id="s2">
+      <div class="section__head">
+        <span class="section__num">02</span>
+        <h2 class="section__title">Tích hợp & thị trường Nhật</h2>
+        <span class="section__count">4 câu</span>
+      </div>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q7</span>
+          <span class="qa__text">Stripe thanh toán khi submit form. Làm sao không bị tính tiền 2 lần?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p>Nguyên tắc nền: <strong>FE không bao giờ là nơi quyết định "đã thanh toán thành công".</strong> Sự thật nằm ở webhook từ Stripe về BE.</p>
+<p><strong>Luồng em làm:</strong></p>
+<ol>
+<li>FE gọi BE tạo <code>PaymentIntent</code>, BE trả <code>clientSecret</code>. <strong>Số tiền do BE quyết định</strong>, không nhận từ FE — nếu nhận từ FE thì user sửa request là trả 1đ.</li>
+<li>FE dùng Stripe.js (<code>confirmPayment</code>) — thông tin thẻ <strong>không</strong> đi qua server của mình (giảm phạm vi PCI-DSS).</li>
+<li>Stripe gọi <strong>webhook</strong> về BE → BE verify signature → mới ghi "đã thanh toán" và tạo submission.</li>
+<li>FE chỉ hiển thị trạng thái, và <strong>poll</strong> hoặc chờ redirect để biết kết quả — không tự kết luận từ response của <code>confirmPayment</code>.</li>
+</ol>
+<p><strong>Chống trùng (đây là phần họ muốn nghe):</strong></p>
+<ul>
+<li><strong>Idempotency key</strong> khi tạo PaymentIntent: FE sinh một key cho mỗi lần user bắt đầu thanh toán, gửi kèm. User bấm nút 3 lần hoặc mạng timeout rồi retry → Stripe trả lại <em>cùng</em> intent, không tạo mới.</li>
+<li><strong>Disable nút ngay khi bấm</strong> + hiện loading. Đơn giản nhưng chặn được phần lớn double-submit.</li>
+<li><strong>Webhook phải idempotent ở BE</strong>: Stripe có thể gửi lại cùng event nhiều lần (at-least-once delivery). BE lưu <code>event.id</code> đã xử lý và bỏ qua trùng.</li>
+<li><strong>Không tin redirect</strong>: user có thể đóng tab trước khi redirect về. Webhook mới là nguồn sự thật, nên đơn hàng vẫn hoàn tất đúng.</li>
+</ul>
+<p><strong>Xử lý 3D Secure</strong> (bắt buộc ở Nhật/EU): <code>confirmPayment</code> có thể trả về trạng thái cần xác thực thêm → Stripe mở modal/redirect. FE phải xử lý được cả trường hợp quay lại trang từ redirect với <code>payment_intent_client_secret</code> trong URL, và hiện đúng trạng thái đang chờ.</p></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q8</span>
+          <span class="qa__text">i18n JP/EN — cái gì khó ngoài việc dịch chuỗi?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p>Dịch chuỗi là phần dễ nhất. Những cái thật sự khó:</p>
+<ol>
+<li><strong>Độ dài text.</strong> Tiếng Nhật ngắn hơn khi đếm ký tự nhưng <em>rộng hơn</em> khi render (ký tự full-width), còn tiếng Đức/Anh thì dài hơn nhiều. Nút thiết kế vừa khít tiếng Nhật sẽ vỡ ở tiếng Anh. Giải: không fix width cho nút/label, luôn test cả 2 locale, và ưu tiên layout tự giãn.</li>
+<li><strong>Xuống dòng tiếng Nhật.</strong> Tiếng Nhật không có space giữa từ, browser có thể cắt dòng ở chỗ vô nghĩa. Dùng <code>word-break: normal</code> + <code>line-break: strict</code>, và với tiêu đề quan trọng thì dùng <code>&lt;wbr&gt;</code> hoặc ký tự zero-width để kiểm soát điểm cắt.</li>
+<li><strong>Plural và interpolation.</strong> Tiếng Nhật không phân biệt số ít/nhiều, tiếng Anh thì có. Không được nối chuỗi thủ công (<code>count + ' items'</code>) — phải dùng <code>t('items', { count })</code> và để i18next chọn dạng đúng theo locale.</li>
+<li><strong>Thứ tự tên người.</strong> Nhật là họ trước tên sau, và có cả furigana (cách đọc) như một field riêng — form đăng ký ở Nhật thường có 4 field: 姓/名 (kanji) + セイ/メイ (katakana). Không thể dùng chung component "Full name".</li>
+<li><strong>Địa chỉ.</strong> Nhật đi từ lớn đến nhỏ (tỉnh → thành phố → khu → số), ngược với Anh/Mỹ. Và <strong>postal code auto-fill</strong> là kỳ vọng mặc định: gõ 7 số là phải tự điền tỉnh/thành. Không có tính năng này là khách Nhật thấy form "chưa xong".</li>
+<li><strong>Ngày và năm.</strong> Ngoài <code>YYYY/MM/DD</code>, một số văn bản hành chính Nhật dùng <strong>niên hiệu</strong> (令和 6年 = 2024). Nếu nghiệp vụ cần thì phải dùng <code>Intl.DateTimeFormat('ja-JP-u-ca-japanese')</code>.</li>
+<li><strong>Chuỗi trong code.</strong> Cấm hard-code — em thêm lint rule chặn literal text trong JSX. Và <strong>không nối chuỗi từ nhiều key</strong> (<code>t('you have') + n + t('messages')</code>) vì ngữ pháp mỗi ngôn ngữ khác nhau; luôn dùng một key có placeholder.</li>
+</ol>
+<p><strong>Về kỹ thuật với Next.js</strong>: dùng <code>next-i18next</code> (Pages Router) / <code>next-intl</code> (App Router), tách namespace theo module để không tải hết file dịch của cả app trong một trang, và chỉ tải locale đang dùng.</p></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q9</span>
+          <span class="qa__text">Webhook và tích hợp Salesforce — phần FE làm gì? Bạn thiết kế UI cho việc này thế nào?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p>Webhook là chuyện của BE, nhưng UI quản lý webhook là một bài toán UX thật sự — và là chỗ dễ làm dở.</p>
+<p><strong>Những gì FE phải có:</strong></p>
+<ol>
+<li><strong>Tạo/sửa endpoint</strong> + chọn event nào gửi + hiện <strong>signing secret</strong> (chỉ hiện đầy đủ một lần lúc tạo, sau đó mask — và nói rõ điều đó trên UI).</li>
+<li><strong>Nút "Gửi thử"</strong>: cực kỳ quan trọng. Khách cấu hình webhook xong không biết nó có chạy không. Nút test gửi payload mẫu và hiện ngay response (status, body, thời gian) → khách tự debug được, giảm ticket support rất nhiều.</li>
+<li><strong>Delivery log</strong>: bảng lịch sử gửi — thời điểm, event, status code, số lần retry, payload và response (thu gọn được). Kèm nút <strong>gửi lại</strong> cho lần thất bại.</li>
+<li><strong>Trạng thái sức khoẻ</strong>: nếu endpoint fail liên tục thì hiện badge cảnh báo ở danh sách, không để khách tự phát hiện sau 3 ngày mất dữ liệu.</li>
+<li><strong>Salesforce</strong>: luồng OAuth — FE mở popup/redirect tới Salesforce, nhận callback, rồi UI <strong>mapping field</strong>: field form của mình ↔ field object Salesforce. Phần mapping này là cái khó nhất: phải fetch được danh sách field từ Salesforce (BE proxy), cảnh báo field required của Salesforce chưa được map, và validate type tương thích.</li>
+</ol>
+<p><strong>Hai điều em học được:</strong></p>
+<ul>
+<li><strong>Không bao giờ hiện secret/token đầy đủ sau lần đầu</strong>, và không log nó ra console hay Sentry. Em đã phải thêm scrub rule vì stack trace có lúc chứa header Authorization.</li>
+<li><strong>Trạng thái "đang kết nối" phải rõ ràng.</strong> OAuth có thể hết hạn refresh token — UI phải phân biệt được "chưa kết nối", "đã kết nối", "kết nối hết hạn cần cấp phép lại". Gộp 3 trạng thái này thành boolean là khách sẽ mất dữ liệu mà không biết.</li>
+</ul></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q10</span>
+          <span class="qa__text">Dashboard 7 tab báo cáo + export CSV. Có gì đáng nói về kỹ thuật?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p>Nhìn thì nhàm nhưng có 5 điểm kỹ thuật thật:</p>
+<ol>
+<li><strong>Tab là URL, không phải state.</strong> <code>/analytics?tab=revenue&amp;from=…&amp;to=…</code> — để khách bookmark và gửi link cho đồng nghiệp thấy đúng báo cáo. Đây là yêu cầu nghiệp vụ mà dev hay bỏ qua.</li>
+<li><strong>Không fetch cả 7 tab cùng lúc.</strong> Lazy theo tab đang mở, nhưng <strong>prefetch tab kế bên</strong> khi hover. Với React Query là <code>queryClient.prefetchQuery</code> — cảm giác mượt mà không tốn 7 request ngay từ đầu.</li>
+<li><strong>Filter dùng chung nhiều tab</strong> thì đưa vào <code>queryKey</code> của từng query: <code>['analytics', tab, from, to, filters]</code>. Đổi khoảng ngày thì mọi tab tự invalidate đúng, không phải tự quản lý.</li>
+<li><strong>Export CSV — đây là chỗ hay làm sai.</strong> Không export từ dữ liệu đang hiện trên màn hình (đó chỉ là 1 trang phân trang). Đúng là gọi endpoint export riêng ở BE, để BE stream file. Với dữ liệu lớn thì làm <strong>async</strong>: tạo job → BE gửi email hoặc FE poll rồi hiện link tải. Cố export 500.000 dòng trong một request HTTP là timeout.</li>
+<li><strong>CSV cho Excel tiếng Nhật</strong>: phải có <strong>BOM UTF-8</strong> ở đầu file, không thì Excel trên Windows mở ra là ký tự lỗi — khách Nhật báo bug ngay. Và dấu phân cách nên theo locale (một số cấu hình Excel JP dùng <code>;</code>). Đây là chi tiết rất nhỏ nhưng em bị report thật.</li>
+</ol>
+<p><strong>Về chart</strong> (ApexCharts ở Bidding Assistant, tương tự ở đây): chart lib nặng nên phải lazy-load, chỉ import module cần dùng, và nhớ rằng nhiều chart lib không SSR được — phải <code>dynamic(..., { ssr: false })</code> trong Next.</p></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <p class="empty" id="emptyState" hidden>Không tìm thấy câu hỏi nào khớp từ khoá.</p>
+
+    <div class="setnav">
+  <a class="btn" href="bo-03-du-an-psy-hms.html">← 03. Đào sâu PSY HMS</a>
+  <span class="setnav__spacer"></span>
+  <a class="btn" href="index.html">Tất cả bộ đề</a>
+  <a class="btn" href="bo-05-du-an-bidding-ai.html">05. Đào sâu Bidding Assistant (AI/RAG) →</a>
+  </div>
+  </main>
+</div>
+
+<footer class="footer">
+  04. Đào sâu ENAS + Offerwall — bộ phỏng vấn soạn theo CV <strong>Hà Tiến Hiệp</strong> ·
+  Tiến độ lưu trong <code>localStorage</code> riêng cho từng bộ đề.
+</footer>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>02. Live coding — Bộ phỏng vấn FE</title>
+<meta name="description" content="Share screen, gõ code thật trong 45–60 phút. Không phải thuật toán LeetCode — toàn bài FE thực dụng: hook, race condition, a11y, permission.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌨️</text></svg>">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-set="bo-02">
+<div class="progress"><div class="progress__bar" id="progressBar"></div></div>
+<header class="topbar">
+  <a class="btn" href="index.html">← Trang chủ</a>
+  <div class="topbar__brand">
+    <span class="topbar__title">02. Live coding</span>
+    <span class="topbar__sub">Share screen, gõ code thật trong 45–60 phút. Không phải thuật toán LeetCode — toàn bài FE thực dụng: hook, race condition, a11y, permission.</span>
+  </div>
+  <div class="search">
+    <input type="search" id="searchInput" placeholder="Tìm câu hỏi…" aria-label="Tìm câu hỏi theo từ khoá">
+  </div>
+  <button class="btn" id="toggleAll" type="button" aria-label="Mở hoặc đóng tất cả câu trả lời">
+    <span aria-hidden="true">⇕</span><span class="btn__label">Mở tất cả</span>
+  </button>
+  <button class="btn btn--icon" id="themeBtn" type="button" aria-label="Đổi chế độ sáng/tối" title="Đổi chế độ sáng/tối">
+    <span aria-hidden="true" id="themeIcon">◐</span>
+  </button>
+</header>
+
+<div class="layout">
+  <nav class="toc" aria-label="Mục lục">
+    <p class="toc__label">Nội dung</p>
+    <ul class="toc__list">
+      <li><a href="#s0"><span class="toc__num">00</span> Custom hook nền tảng</a></li>
+      <li><a href="#s1"><span class="toc__num">01</span> Cấu trúc dữ liệu & render</a></li>
+      <li><a href="#s2"><span class="toc__num">02</span> Chất lượng: a11y, độ bền, debug</a></li>
+    </ul>
+    <p class="toc__label" style="margin-top:20px">Tiến độ bộ này</p>
+    <p style="margin:0 0 0 10px;font-size:.82rem;color:var(--text-muted)">
+      Đã thuộc <strong id="knownCount" style="color:var(--ok)">0</strong> / <span id="totalCount">0</span> câu
+    </p>
+    <button class="btn" id="resetBtn" type="button" style="margin:12px 0 0 10px">Xoá tiến độ</button>
+  </nav>
+
+  <main class="content">
+    <p class="crumb"><a href="index.html">Bộ phỏng vấn</a> <span aria-hidden="true">›</span> 02. Live coding</p>
+
+    <div class="hero">
+      <h1>⌨️ Live coding / Pair programming</h1>
+      <p>Người phỏng vấn quan tâm <strong>cách bạn nghĩ</strong> hơn là code chạy ngay. Hãy: nói ra thành tiếng trước khi gõ, hỏi lại yêu cầu, viết bản đơn giản chạy được rồi mới tối ưu, và tự nêu edge case. <strong>Mở editor gõ lại từng bài</strong> — đọc code người khác không giúp bạn gõ được trong 10 phút dưới áp lực.</p>
+      <div class="hero__meta"><span class="tag tag--mid">Middle</span><span class="pill">45–60 phút</span><span class="pill">Share screen, gõ thật</span><span class="pill pill--accent">9 câu</span><span class="pill">React</span><span class="pill">TypeScript</span><span class="pill">Hooks</span></div>
+    </div>
+
+    <section class="section" id="s0">
+      <div class="section__head">
+        <span class="section__num">00</span>
+        <h2 class="section__title">Custom hook nền tảng</h2>
+        <span class="section__count">3 câu</span>
+      </div>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q1</span>
+          <span class="qa__text">Viết hàm <code>debounce</code> thuần, rồi bọc thành hook <code>useDebouncedValue</code>.</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <div class="prompt"><span class="prompt__label">Đề bài người phỏng vấn đưa ra</span><p>Yêu cầu: <code>debounce(fn, delay)</code> trả về hàm mới; gọi liên tục thì chỉ chạy sau khi ngừng <code>delay</code>ms. Có <code>cancel()</code>. Sau đó làm hook để dùng cho ô search.</p></div>
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p><strong>Bước 1 — hàm thuần.</strong> Điểm phải nói: giữ <code>this</code>, forward mọi tham số, và cho phép huỷ.</p>
+<pre class="code"><code>function debounce(fn, delay = 300) {
+  let timer = null;
+
+  function debounced(...args) {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() =&gt; {
+      timer = null;
+      fn.apply(this, args);
+    }, delay);
+  }
+
+  debounced.cancel = () =&gt; {
+    if (timer) clearTimeout(timer);
+    timer = null;
+  };
+
+  return debounced;
+}</code></pre>
+<p><strong>Bước 2 — hook.</strong> Trong React em thường debounce <em>giá trị</em> chứ không debounce callback, vì debounce callback dễ bị tạo lại mỗi render và mất timer.</p>
+<pre class="code"><code>function useDebouncedValue(value, delay = 300) {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() =&gt; {
+    const id = setTimeout(() =&gt; setDebounced(value), delay);
+    return () =&gt; clearTimeout(id);   // cleanup chính là phần "debounce"
+  }, [value, delay]);
+
+  return debounced;
+}
+
+// dùng:
+const [keyword, setKeyword] = useState('');
+const q = useDebouncedValue(keyword, 350);
+const { data } = useQuery({ queryKey: ['patients', q], queryFn: () =&gt; search(q) });</code></pre>
+<p><strong>Edge case cần tự nêu:</strong> (1) input vẫn phải cập nhật tức thì để user thấy mình gõ được — nên tách <code>keyword</code> (hiển thị) và <code>q</code> (gọi API); (2) khi user xoá hết thì nên bỏ debounce để reset danh sách ngay; (3) nếu debounce callback thì phải <code>useMemo</code> nó và <code>cancel()</code> trong cleanup, không thì unmount xong timer vẫn chạy.</p></blockquote>
+          <div class="note"><span class="note__icon" aria-hidden="true">⭐</span><div><p><strong>Điểm ăn tiền:</strong> Nếu bạn nói được <em>"trong React em debounce giá trị chứ không debounce hàm, vì cleanup của useEffect đã là cơ chế debounce sẵn"</em> — đó là dấu hiệu của người làm thật, không phải học vở.</p></div></div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q2</span>
+          <span class="qa__text">Viết hook <code>useFetch(url)</code> tự xử lý race condition và cancel khi unmount.</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <div class="prompt"><span class="prompt__label">Đề bài người phỏng vấn đưa ra</span><p>Trả về <code>{ data, error, loading }</code>. Gõ search nhanh thì response cũ về sau response mới <strong>không được</strong> ghi đè dữ liệu mới.</p></div>
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><pre class="code"><code>function useFetch(url) {
+  const [state, setState] = useState({ data: null, error: null, loading: true });
+
+  useEffect(() =&gt; {
+    const controller = new AbortController();
+    let alive = true;                 // chốt thứ hai, phòng khi abort không kịp
+
+    setState(s =&gt; ({ ...s, loading: true, error: null }));
+
+    fetch(url, { signal: controller.signal })
+      .then(res =&gt; {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(data =&gt; {
+        if (alive) setState({ data, error: null, loading: false });
+      })
+      .catch(err =&gt; {
+        if (err.name === 'AbortError') return;      // huỷ chủ động, không phải lỗi
+        if (alive) setState({ data: null, error: err, loading: false });
+      });
+
+    return () =&gt; {
+      alive = false;
+      controller.abort();      // url đổi hoặc unmount -&gt; huỷ request cũ
+    };
+  }, [url]);
+
+  return state;
+}</code></pre>
+<p><strong>Ba điểm phải nói ra:</strong></p>
+<ol>
+<li><strong>Cleanup chạy trước effect mới</strong> — nên request cũ bị abort trước khi request mới bắt đầu. Đó chính là cách chặn race condition.</li>
+<li><strong><code>AbortError</code> không phải lỗi thật</strong> — phải lọc, không thì UI hiện "Có lỗi" mỗi lần user gõ tiếp.</li>
+<li><strong><code>fetch</code> không throw khi 4xx/5xx</strong> — phải tự check <code>res.ok</code>. Đây là bug rất hay gặp.</li>
+</ol>
+<p><strong>Và câu chốt ăn điểm:</strong> "Trong dự án thật em <em>không</em> tự viết hook này — em dùng TanStack Query, vì nó lo sẵn cache, dedupe, retry, và race condition qua <code>queryKey</code>. Em viết tay ở đây để thể hiện là em hiểu bên dưới nó làm gì."</p></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q3</span>
+          <span class="qa__text">Viết <code>useCan</code> + component <code>&lt;Can&gt;</code> cho hệ thống RBAC 6 role (như PSY HMS).</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <div class="prompt"><span class="prompt__label">Đề bài người phỏng vấn đưa ra</span><p>BE trả về sau khi login: <code>permissions: ['prescription:read', 'prescription:approve', 'inventory:*']</code>. Cần hook kiểm tra quyền, hỗ trợ wildcard, và component bọc UI.</p></div>
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><pre class="code"><code>// store — Zustand
+const useAuthStore = create((set) =&gt; ({
+  permissions: [],
+  setPermissions: (permissions) =&gt; set({ permissions }),
+}));
+
+// So khớp có wildcard: 'inventory:*' khớp 'inventory:export'
+function matches(granted, required) {
+  if (granted === '*' || granted === required) return true;
+  const [gRes, gAct] = granted.split(':');
+  const [rRes, rAct] = required.split(':');
+  return (gRes === '*' || gRes === rRes) &amp;&amp; (gAct === '*' || gAct === rAct);
+}
+
+export function useCan() {
+  const permissions = useAuthStore(s =&gt; s.permissions);
+
+  // Set + useCallback: tra cứu O(1) cho khớp chính xác, chỉ fallback loop khi có wildcard
+  return useMemo(() =&gt; {
+    const exact = new Set(permissions);
+    const wild  = permissions.filter(p =&gt; p.includes('*'));
+
+    return (required) =&gt; {
+      if (!required) return true;
+      const list = Array.isArray(required) ? required : [required];
+      return list.every(r =&gt; exact.has(r) || wild.some(w =&gt; matches(w, r)));
+    };
+  }, [permissions]);
+}
+
+// Component bọc UI
+export function Can({ permission, fallback = null, children }) {
+  const can = useCan();
+  return can(permission) ? children : fallback;
+}</code></pre>
+<pre class="code"><code>// dùng
+const can = useCan();
+
+&lt;Can permission="prescription:approve"&gt;
+  &lt;Button onClick={approve}&gt;Duyệt đơn&lt;/Button&gt;
+&lt;/Can&gt;
+
+// hoặc disable kèm lý do, thường UX tốt hơn là ẩn hẳn
+&lt;Tooltip title={can('inventory:export') ? '' : 'Bạn không có quyền xuất kho'}&gt;
+  &lt;Button disabled={!can('inventory:export')}&gt;Xuất kho&lt;/Button&gt;
+&lt;/Tooltip&gt;</code></pre>
+<p><strong>Phải nói thêm 3 điều — đây là phần phân biệt Middle với Junior:</strong></p>
+<ol>
+<li><strong>FE check quyền chỉ là UX, không phải bảo mật.</strong> BE bắt buộc enforce lại ở từng endpoint, nếu không mở DevTools là bypass.</li>
+<li><strong>Check theo permission, không theo role.</strong> <code>role === 'doctor'</code> rải khắp code thì thêm role mới là sửa hàng chục chỗ.</li>
+<li><strong>Route guard và menu phải đọc cùng một config</strong> — không thì menu hiện mục mà vào bị 403, hoặc ngược lại.</li>
+</ol></blockquote>
+          <div class="note"><span class="note__icon" aria-hidden="true">⭐</span><div><p><strong>Điểm ăn tiền:</strong> Bài này gắn trực tiếp với dự án PSY HMS trong CV bạn. Nếu người phỏng vấn không đưa bài này, bạn có thể tự kể như ví dụ khi họ hỏi về RBAC.</p></div></div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <section class="section" id="s1">
+      <div class="section__head">
+        <span class="section__num">01</span>
+        <h2 class="section__title">Cấu trúc dữ liệu & render</h2>
+        <span class="section__count">2 câu</span>
+      </div>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q4</span>
+          <span class="qa__text">Từ danh sách phẳng có <code>parentId</code>, dựng cây và render comment lồng nhau.</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <div class="prompt"><span class="prompt__label">Đề bài người phỏng vấn đưa ra</span><p><code>[{ id: 3, parentId: 1, text: '...' }, ...]</code> — hàng nghìn phần tử. Dựng cây rồi render đệ quy. Chú ý hiệu năng.</p></div>
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p><strong>Dựng cây một lượt, O(n)</strong> — đừng dùng <code>filter</code> lồng trong <code>map</code> vì đó là O(n²):</p>
+<pre class="code"><code>function buildTree(items) {
+  const byId = new Map();
+  const roots = [];
+
+  // lượt 1: tạo node, khởi tạo children
+  for (const item of items) {
+    byId.set(item.id, { ...item, children: [] });
+  }
+
+  // lượt 2: nối vào cha
+  for (const item of items) {
+    const node = byId.get(item.id);
+    if (item.parentId == null) {
+      roots.push(node);
+    } else {
+      const parent = byId.get(item.parentId);
+      if (parent) parent.children.push(node);
+      else roots.push(node);        // cha bị xoá -&gt; coi như gốc, đừng để mất dữ liệu
+    }
+  }
+
+  return roots;
+}</code></pre>
+<pre class="code"><code>const Comment = memo(function Comment({ node, depth = 0 }) {
+  return (
+    &lt;li style={{ marginLeft: depth * 16 }}&gt;
+      {node.text}
+      {node.children.length &gt; 0 &amp;&amp; (
+        &lt;ul&gt;
+          {node.children.map(child =&gt; (
+            &lt;Comment key={child.id} node={child} depth={depth + 1} /&gt;
+          ))}
+        &lt;/ul&gt;
+      )}
+    &lt;/li&gt;
+  );
+});
+
+// trong component cha
+const tree = useMemo(() =&gt; buildTree(items), [items]);</code></pre>
+<p><strong>Edge case tự nêu (đây là điểm cộng lớn):</strong></p>
+<ul>
+<li><strong>Cha mất</strong> (bị xoá / chưa load): đẩy lên gốc chứ không im lặng bỏ — mất dữ liệu là bug tệ nhất.</li>
+<li><strong>Vòng lặp</strong> (A là cha B, B là cha A — dữ liệu bẩn): render đệ quy sẽ tràn stack. Thêm <code>Set</code> các id đã thăm, hoặc giới hạn <code>depth</code> tối đa.</li>
+<li><strong>Cây quá sâu</strong>: giới hạn hiển thị ~5 cấp rồi nút "Xem thêm trả lời" — Reddit, Facebook đều làm vậy, vừa gọn vừa tránh tràn stack.</li>
+<li><strong>Cây rất lớn</strong>: đệ quy React render hết một lượt. Cần thì chuyển sang flatten có <code>depth</code> + virtualize, vì virtualize không làm được trên cây lồng DOM.</li>
+<li><code>key</code> phải là <code>id</code>, không phải index — xoá 1 comment là lệch toàn bộ state con.</li>
+</ul></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q5</span>
+          <span class="qa__text">Viết virtual list đơn giản cho 50.000 dòng cao bằng nhau.</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <div class="prompt"><span class="prompt__label">Đề bài người phỏng vấn đưa ra</span><p>Không dùng thư viện. Container cao 600px, mỗi dòng 40px. Chỉ render phần trong viewport.</p></div>
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><pre class="code"><code>function VirtualList({ items, rowHeight = 40, height = 600, overscan = 3 }) {
+  const [scrollTop, setScrollTop] = useState(0);
+
+  const total       = items.length * rowHeight;
+  const visibleRows = Math.ceil(height / rowHeight);
+
+  // chỉ số bắt đầu/kết thúc, cộng thêm overscan để không thấy khoảng trắng khi scroll nhanh
+  const start = Math.max(0, Math.floor(scrollTop / rowHeight) - overscan);
+  const end   = Math.min(items.length, start + visibleRows + overscan * 2);
+
+  const slice = items.slice(start, end);
+
+  return (
+    &lt;div
+      style={{ height, overflowY: 'auto', position: 'relative' }}
+      onScroll={e =&gt; setScrollTop(e.currentTarget.scrollTop)}
+    &gt;
+      {/* lớp giữ chiều cao thật để scrollbar đúng tỉ lệ */}
+      &lt;div style={{ height: total, position: 'relative' }}&gt;
+        {slice.map((item, i) =&gt; {
+          const index = start + i;
+          return (
+            &lt;div
+              key={item.id}
+              style={{
+                position: 'absolute',
+                top: index * rowHeight,
+                height: rowHeight,
+                left: 0, right: 0,
+              }}
+            &gt;
+              {item.name}
+            &lt;/div&gt;
+          );
+        })}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<p><strong>Ý tưởng cốt lõi</strong> để nói ra: một div "spacer" cao <code>n × rowHeight</code> để scrollbar đúng, còn các dòng thì <code>position: absolute</code> đặt đúng offset. DOM chỉ giữ ~20 node thay vì 50.000.</p>
+<p><strong>Giới hạn và bước tiếp theo — nên tự nêu:</strong></p>
+<ul>
+<li><code>onScroll</code> setState mỗi frame là hơi nặng: dùng <code>transform: translateY</code> trên một wrapper thay vì <code>top</code> tuyệt đối, hoặc throttle theo <code>requestAnimationFrame</code>.</li>
+<li><strong>Dòng cao không đều</strong> là bài toán khó hơn nhiều: phải đo thật (<code>ResizeObserver</code>) và giữ bảng offset tích luỹ. Lúc này em dùng <strong>TanStack Virtual</strong> chứ không tự viết.</li>
+<li><strong>Accessibility</strong>: virtual list phá <code>Ctrl+F</code> của browser và screen reader không thấy dòng chưa render — cần <code>aria-rowcount</code>/<code>aria-rowindex</code> nếu là bảng.</li>
+<li><strong>Thực tế ở dự án em</strong>: với bảng admin 10.000 dòng em ưu tiên <strong>server-side pagination</strong> trước, virtualize chỉ dùng khi nghiệp vụ bắt buộc scroll liên tục — như infinite scroll của offer wall.</li>
+</ul></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <section class="section" id="s2">
+      <div class="section__head">
+        <span class="section__num">02</span>
+        <h2 class="section__title">Chất lượng: a11y, độ bền, debug</h2>
+        <span class="section__count">4 câu</span>
+      </div>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q6</span>
+          <span class="qa__text">Viết Modal accessible: focus trap, Esc để đóng, trả focus về nút đã mở, portal.</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <div class="prompt"><span class="prompt__label">Đề bài người phỏng vấn đưa ra</span><p>Không dùng Ant Design / Radix. Phải dùng được bằng bàn phím và screen reader.</p></div>
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><pre class="code"><code>function Modal({ open, onClose, title, children }) {
+  const panelRef   = useRef(null);
+  const restoreRef = useRef(null);
+
+  // Nhớ element đang focus để trả lại khi đóng
+  useEffect(() =&gt; {
+    if (open) restoreRef.current = document.activeElement;
+    else restoreRef.current?.focus?.();
+  }, [open]);
+
+  useEffect(() =&gt; {
+    if (!open) return;
+
+    // focus vào panel khi mở
+    panelRef.current?.focus();
+
+    function onKeyDown(e) {
+      if (e.key === 'Escape') { onClose(); return; }
+      if (e.key !== 'Tab') return;
+
+      // focus trap: vòng Tab trong panel
+      const nodes = panelRef.current.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (nodes.length === 0) return;
+
+      const first = nodes[0];
+      const last  = nodes[nodes.length - 1];
+
+      if (e.shiftKey &amp;&amp; document.activeElement === first) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey &amp;&amp; document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown);
+    // chặn scroll trang phía sau
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () =&gt; {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return createPortal(
+    &lt;div className="overlay" onMouseDown={onClose}&gt;
+      &lt;div
+        ref={panelRef}
+        className="panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        tabIndex={-1}
+        onMouseDown={e =&gt; e.stopPropagation()}   // click trong panel không đóng
+      &gt;
+        &lt;h2 id="modal-title"&gt;{title}&lt;/h2&gt;
+        {children}
+      &lt;/div&gt;
+    &lt;/div&gt;,
+    document.body
+  );
+}</code></pre>
+<p><strong>Checklist a11y phải kể ra:</strong> <code>role="dialog"</code> + <code>aria-modal="true"</code> + <code>aria-labelledby</code> trỏ vào tiêu đề · Esc đóng · Tab không thoát ra ngoài · trả focus về nút đã mở (rất hay bị bỏ) · portal ra <code>body</code> để thoát stacking context và <code>overflow: hidden</code> của cha · chặn scroll nền · click overlay đóng nhưng click nội dung thì không (dùng <code>onMouseDown</code> + <code>stopPropagation</code>, không phải <code>onClick</code>, để tránh đóng khi user bôi đen text kéo ra ngoài).</p>
+<p><strong>Thiếu sót còn lại nên tự thừa nhận:</strong> chưa xử lý nhiều modal xếp lớp (cần stack + chỉ modal trên cùng nhận Esc), và chưa <code>inert</code> phần nền cho screen reader.</p></blockquote>
+          <div class="note"><span class="note__icon" aria-hidden="true">💡</span><div><p><strong>Mẹo:</strong> A11y là chỗ đa số ứng viên FE Việt Nam bỏ trống. Chỉ cần bạn nhắc được "trả focus về nút đã mở" và <code>aria-modal</code> là đã nổi bật.</p></div></div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q7</span>
+          <span class="qa__text">Viết <code>retryWithBackoff</code> — retry có exponential backoff + jitter, chỉ retry lỗi tạm thời.</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <div class="prompt"><span class="prompt__label">Đề bài người phỏng vấn đưa ra</span><p>Dùng cho API upload tài liệu (dự án Bidding Assistant). Retry tối đa 3 lần, không retry 4xx.</p></div>
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><pre class="code"><code>class HttpError extends Error {
+  constructor(status, message) { super(message); this.status = status; }
+}
+
+// Chỉ lỗi tạm thời mới đáng retry
+function isRetryable(err) {
+  if (err instanceof HttpError) {
+    return err.status === 429 || err.status &gt;= 500;
+  }
+  return true;   // lỗi network / timeout
+}
+
+const sleep = (ms, signal) =&gt; new Promise((resolve, reject) =&gt; {
+  const id = setTimeout(resolve, ms);
+  signal?.addEventListener('abort', () =&gt; { clearTimeout(id); reject(new Error('aborted')); },
+    { once: true });
+});
+
+async function retryWithBackoff(fn, { retries = 3, base = 500, cap = 8000, signal } = {}) {
+  let lastErr;
+
+  for (let attempt = 0; attempt &lt;= retries; attempt++) {
+    try {
+      return await fn({ attempt, signal });
+    } catch (err) {
+      lastErr = err;
+
+      if (attempt === retries || !isRetryable(err)) throw err;
+
+      // exponential: 500, 1000, 2000... chặn trần ở cap
+      const backoff = Math.min(cap, base * 2 ** attempt);
+      // full jitter: tránh mọi client retry cùng lúc (thundering herd)
+      const delay = Math.random() * backoff;
+
+      await sleep(delay, signal);
+    }
+  }
+
+  throw lastErr;
+}</code></pre>
+<p><strong>Bốn điểm phải giải thích:</strong></p>
+<ol>
+<li><strong>Vì sao exponential</strong>: server đang quá tải, retry dày chỉ làm nó tệ hơn.</li>
+<li><strong>Vì sao jitter</strong>: nếu 1.000 client cùng fail và cùng retry sau đúng 1s, chúng lại đập server cùng lúc — jitter tán chúng ra.</li>
+<li><strong>Vì sao có <code>cap</code></strong>: không để delay leo lên hàng phút, user sẽ nghĩ app treo.</li>
+<li><strong>Vì sao không retry 4xx</strong>: 400/422 là lỗi dữ liệu, retry 3 lần vẫn sai — chỉ tốn thời gian của user. 401 thì phải refresh token, không phải retry.</li>
+</ol>
+<p><strong>Và cảnh báo quan trọng:</strong> chỉ retry request <strong>idempotent</strong>. Retry một POST tạo đơn thuốc có thể tạo 2 đơn. Muốn retry POST thì phải có <strong>idempotency key</strong> do client sinh và BE tôn trọng. Ở PSY HMS em tắt retry cho mọi mutation ghi dữ liệu y tế đúng vì lý do này.</p></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q8</span>
+          <span class="qa__text">Đoạn code này có 4 bug. Tìm và sửa.</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <div class="prompt"><span class="prompt__label">Đề bài người phỏng vấn đưa ra</span><pre class="code"><code>function TodoList({ userId }) {
+  const [todos, setTodos] = useState([]);
+  const [filter, setFilter] = useState({ done: false });
+
+  useEffect(() =&gt; {
+    fetch('/api/todos?user=' + userId)
+      .then(r =&gt; r.json())
+      .then(setTodos);
+  }, [filter]);
+
+  const visible = todos.filter(t =&gt; t.done === filter.done);
+
+  return (
+    &lt;ul&gt;
+      {visible.map((todo, i) =&gt; (
+        &lt;li key={i}&gt;
+          &lt;input defaultValue={todo.title} /&gt;
+          &lt;button onClick={() =&gt; {
+            todos.splice(i, 1);
+            setTodos(todos);
+          }}&gt;Xoá&lt;/button&gt;
+        &lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}</code></pre></div>
+          <span class="answer-label">Đáp án — 4 bug</span>
+          <blockquote><p><strong>Bug 1 — deps sai.</strong> Effect fetch theo <code>userId</code> nhưng deps là <code>[filter]</code>. Đổi <code>userId</code> thì không fetch lại (hiện dữ liệu người cũ); đổi <code>filter</code> thì fetch lại vô ích. Tệ hơn: <code>filter</code> là object nên nếu cha tạo mới mỗi render là <strong>vòng lặp vô hạn</strong>.</p>
+<p><strong>Bug 2 — mutate state trực tiếp.</strong> <code>todos.splice()</code> sửa chính mảng trong state rồi <code>setTodos(todos)</code> truyền lại <em>cùng một reference</em> → React so sánh thấy không đổi → <strong>không re-render</strong>. Phải tạo mảng mới.</p>
+<p><strong>Bug 3 — <code>key={i}</code>.</strong> List có xoá phần tử. Xoá dòng 0 thì dòng 1 tụt lên index 0, React tưởng là cùng element nên giữ nguyên DOM — <code>defaultValue</code> của input không được cập nhật, giá trị dính sai dòng.</p>
+<p><strong>Bug 4 — index lệch.</strong> <code>i</code> là index trong <code>visible</code> (đã filter), nhưng <code>splice(i, 1)</code> áp lên <code>todos</code> (chưa filter) → xoá sai phần tử. Phải xoá theo <code>id</code>.</p>
+<p><em>Bonus bug 5:</em> không có <code>catch</code>, không xử lý loading/error, và không có race-condition guard khi <code>userId</code> đổi nhanh.</p>
+<p><strong>Bản đã sửa:</strong></p>
+<pre class="code"><code>function TodoList({ userId }) {
+  const [filter, setFilter] = useState({ done: false });
+
+  // Dùng React Query: queryKey lo cache + race condition, không cần useEffect
+  const { data: todos = [], isLoading, error } = useQuery({
+    queryKey: ['todos', userId],
+    queryFn: ({ signal }) =&gt;
+      fetch(`/api/todos?user=${userId}`, { signal }).then(r =&gt; {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      }),
+  });
+
+  const [removed, setRemoved] = useState([]);   // ví dụ đơn giản; thực tế dùng mutation
+  const visible = useMemo(
+    () =&gt; todos.filter(t =&gt; t.done === filter.done &amp;&amp; !removed.includes(t.id)),
+    [todos, filter.done, removed]
+  );
+
+  if (isLoading) return &lt;Spinner /&gt;;
+  if (error)     return &lt;ErrorState error={error} /&gt;;
+
+  return (
+    &lt;ul&gt;
+      {visible.map(todo =&gt; (
+        &lt;li key={todo.id}&gt;                                {/* key theo id */}
+          &lt;input defaultValue={todo.title} /&gt;
+          &lt;button onClick={() =&gt; setRemoved(prev =&gt; [...prev, todo.id])}&gt;  {/* mảng mới, theo id */}
+            Xoá
+          &lt;/button&gt;
+        &lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}</code></pre></blockquote>
+          <div class="note"><span class="note__icon" aria-hidden="true">⭐</span><div><p><strong>Điểm ăn tiền:</strong> Bài "tìm bug" rất hay được dùng. Hãy đọc to từng dòng và nói ra suy luận — người phỏng vấn chấm quy trình rà soát của bạn, không chỉ số bug tìm được.</p></div></div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q9</span>
+          <span class="qa__text">Format ngày và tiền cho hệ thống Nhật. Code hiện tại lệch ngày 1 hôm — sửa.</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <div class="prompt"><span class="prompt__label">Đề bài người phỏng vấn đưa ra</span><p>BE trả <code>createdAt: '2026-03-15T22:30:00Z'</code>. Nghiệp vụ tính theo giờ Nhật (JST, UTC+9). Máy dev ở Việt Nam (UTC+7) hiện 15/03, server hiện 15/03, nhưng khách Nhật phải thấy <strong>16/03</strong>.</p></div>
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote><p><strong>Nguyên nhân:</strong> mọi API format ngày dựa vào timezone <em>của máy đang chạy</em>. 22:30 UTC = 05:30 ngày 16 ở Nhật, nhưng = 05:30 ngày 16 ở VN thì... thực ra là 05:30 ngày 16 (UTC+7) — sai lệch xuất hiện rõ nhất với mốc quanh nửa đêm và khi so sánh "hôm nay". Vấn đề gốc: <strong>không ép timezone nghiệp vụ</strong>, để browser tự quyết.</p>
+<pre class="code"><code>// ❌ SAI: phụ thuộc timezone máy chạy
+new Date(iso).toLocaleDateString();
+new Date(iso).getDate();               // ngày theo máy, không phải theo JST
+
+// ✅ ĐÚNG: ép timezone nghiệp vụ, khai báo rõ ràng
+const JP_DATE = new Intl.DateTimeFormat('ja-JP', {
+  timeZone: 'Asia/Tokyo',
+  year: 'numeric', month: '2-digit', day: '2-digit',
+});
+
+const JP_DATETIME = new Intl.DateTimeFormat('ja-JP', {
+  timeZone: 'Asia/Tokyo',
+  dateStyle: 'medium', timeStyle: 'short',
+});
+
+export const formatDateJP     = (iso) =&gt; JP_DATE.format(new Date(iso));
+export const formatDateTimeJP = (iso) =&gt; JP_DATETIME.format(new Date(iso));
+
+// Tiền: dùng Intl, không tự nối 'đ' hay '¥'
+const JPY = new Intl.NumberFormat('ja-JP', {
+  style: 'currency', currency: 'JPY', maximumFractionDigits: 0,   // yên không có số lẻ
+});
+const VND = new Intl.NumberFormat('vi-VN', {
+  style: 'currency', currency: 'VND', maximumFractionDigits: 0,
+});</code></pre>
+<p><strong>Quy ước em áp dụng trong dự án</strong> (nói ra phần này mới ăn điểm):</p>
+<ol>
+<li><strong>BE luôn trả UTC ISO string</strong> có hậu tố <code>Z</code>. Không bao giờ trả <code>'2026-03-15 22:30:00'</code> không timezone — đó là nguồn của mọi bug lệch giờ.</li>
+<li><strong>FE có đúng một module format</strong> (<code>utils/datetime.ts</code>), không ai được gọi <code>toLocaleDateString()</code> rải rác. Lint rule ban <code>toLocaleDateString</code> nếu cần.</li>
+<li><strong>Timezone nghiệp vụ là cấu hình</strong>, không hard-code — hệ thống Nhật thì <code>Asia/Tokyo</code>, hệ thống bệnh viện VN thì <code>Asia/Ho_Chi_Minh</code>.</li>
+<li><strong>Ngày không có giờ</strong> (ngày sinh, ngày nhập viện) thì lưu dạng <code>'2026-03-15'</code> plain date, <strong>không</strong> để thành <code>Date</code> — nếu không, chuyển timezone sẽ làm ngày sinh nhảy 1 hôm. Đây là bug em từng gặp thật.</li>
+<li><code>Intl.DateTimeFormat</code> nên <strong>khởi tạo một lần</strong> ở module scope, không tạo trong render — nó khá nặng.</li>
+</ol></blockquote>
+          
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <p class="empty" id="emptyState" hidden>Không tìm thấy câu hỏi nào khớp từ khoá.</p>
+
+    <div class="setnav">
+  <a class="btn" href="bo-01-so-loai.html">← 01. Vòng sơ loại</a>
+  <span class="setnav__spacer"></span>
+  <a class="btn" href="index.html">Tất cả bộ đề</a>
+  <a class="btn" href="bo-03-du-an-psy-hms.html">03. Đào sâu PSY HMS →</a>
+  </div>
+  </main>
+</div>
+
+<footer class="footer">
+  02. Live coding — bộ phỏng vấn soạn theo CV <strong>Hà Tiến Hiệp</strong> ·
+  Tiến độ lưu trong <code>localStorage</code> riêng cho từng bộ đề.
+</footer>
+<script src="js/app.js"></script>
+</body>
+</html>

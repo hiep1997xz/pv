@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>00. Tổng hợp nền tảng — Bộ phỏng vấn FE</title>
+<meta name="description" content="Bộ câu hỏi và câu trả lời phỏng vấn vị trí Middle–Senior Frontend Developer, soạn theo CV của Hà Tiến Hiệp.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-set="bo-00">
+
+<div class="progress"><div class="progress__bar" id="progressBar"></div></div>
+
+<header class="topbar">
+  <a class="btn" href="index.html">← Trang chủ</a>
+  <div class="topbar__brand">
+    <span class="topbar__title">00. Tổng hợp nền tảng</span>
+    <span class="topbar__sub">Hà Tiến Hiệp · Middle–Senior FE · 32 câu</span>
+  </div>
+
+  <div class="search">
+    <input type="search" id="searchInput" placeholder="Tìm câu hỏi…" aria-label="Tìm câu hỏi theo từ khoá">
+  </div>
+
+  <button class="btn" id="toggleAll" type="button" aria-label="Mở hoặc đóng tất cả câu trả lời">
+    <span aria-hidden="true">⇕</span><span class="btn__label">Mở tất cả</span>
+  </button>
+
+  <button class="btn btn--icon" id="themeBtn" type="button" aria-label="Đổi chế độ sáng/tối" title="Đổi chế độ sáng/tối">
+    <span aria-hidden="true" id="themeIcon">◐</span>
+  </button>
+</header>
+
+<div class="layout">
+
+  <!-- ================= MỤC LỤC ================= -->
+  <nav class="toc" aria-label="Mục lục">
+    <p class="toc__label">Nội dung</p>
+    <ul class="toc__list">
+      <li><a href="#s0"><span class="toc__num">00</span> Warm-up</a></li>
+      <li><a href="#s1"><span class="toc__num">01</span> React Core</a></li>
+      <li><a href="#s2"><span class="toc__num">02</span> Next.js</a></li>
+      <li><a href="#s3"><span class="toc__num">03</span> State &amp; Data Fetching</a></li>
+      <li><a href="#s4"><span class="toc__num">04</span> Kiến trúc &amp; Dự án</a></li>
+      <li><a href="#s5"><span class="toc__num">05</span> Performance</a></li>
+      <li><a href="#s6"><span class="toc__num">06</span> TypeScript</a></li>
+      <li><a href="#s7"><span class="toc__num">07</span> CI/CD &amp; Fullstack</a></li>
+      <li><a href="#s8"><span class="toc__num">08</span> Quy trình &amp; Soft skills</a></li>
+      <li><a href="#s9"><span class="toc__num">09</span> Câu hỏi tình huống</a></li>
+      <li><a href="#s10"><span class="toc__num">10</span> Câu hỏi hỏi lại HR</a></li>
+      <li><a href="#s11"><span class="toc__num">11</span> Tổng kết &amp; việc cần làm</a></li>
+    </ul>
+    <p class="toc__label" style="margin-top:20px">Tiến độ</p>
+    <p style="margin:0 0 0 10px;font-size:.82rem;color:var(--text-muted)">
+      Đã thuộc <strong id="knownCount" style="color:var(--ok)">0</strong> / <span id="totalCount">0</span> câu
+    </p>
+    <button class="btn" id="resetBtn" type="button" style="margin:12px 0 0 10px">Xoá tiến độ</button>
+  </nav>
+
+  <!-- ================= NỘI DUNG ================= -->
+  <main class="content">
+
+    <p class="crumb"><a href="index.html">Bộ phỏng vấn</a> <span aria-hidden="true">›</span> 00. Tổng hợp nền tảng</p>
+
+    <div class="hero">
+      <h1>Bộ phỏng vấn Frontend Developer</h1>
+      <p>
+        Soạn theo CV của <strong>Hà Tiến Hiệp</strong> — hơn 5 năm React/Next.js, thị trường Nhật (AMELA)
+        và sản phẩm y tế / AI-RAG (IniSoft). Người phỏng vấn ở đây vào vai <em>Tech Lead / Hiring Manager</em>
+        cho vị trí Middle–Senior. Bấm vào câu hỏi để xem gợi ý trả lời.
+      </p>
+      <div class="hero__meta">
+        <span class="pill pill--accent">32 câu hỏi</span>
+        <span class="pill">React · Next.js · TypeScript</span>
+        <span class="pill">TanStack Query · Zustand · Redux</span>
+        <span class="pill">Jenkins · Docker</span>
+        <span class="pill">Node.js · FastAPI</span>
+        <span class="pill">Tiến độ lưu tại máy bạn</span>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 0 ===== -->
+    <section class="section" id="s0">
+      <div class="section__head">
+        <span class="section__num">00</span>
+        <h2 class="section__title">Warm-up</h2>
+        <span class="section__count">3 câu</span>
+      </div>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q1</span>
+          <span class="qa__text">Bạn giới thiệu ngắn về bản thân và hành trình nghề nghiệp?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Em là Hiệp, Frontend Developer với hơn 5 năm kinh nghiệm, chủ yếu làm React/Next.js + TypeScript. Em bắt đầu ở AMELA 07/2021 với vai trò Junior, được công ty đào tạo nền tảng frontend bài bản, rồi đi qua 5 dự án trong 3,5 năm — từ HTML/CSS/jQuery lên ReactJS/Next.js và React Native, phần lớn là dự án thị trường Nhật (FactoryX, Offerwall, ENAS, WAS). Giai đoạn cuối ở AMELA em đã đảm nhiệm code review và tự build/release app lên App Store Connect + Google Play.</p>
+            <p>Từ 02/2025 em sang IniSoft ở vai trò Middle FE, làm own end-to-end module: tự design UI trên Figma, code FE, viết cả BE Node.js/Express và FastAPI khi cần, set up Jenkins CI/CD với Docker. Hai dự án gần nhất là hệ thống quản lý bệnh nhân tâm thần (PSY HMS) và Trợ lý đấu thầu AI (RAG).</p>
+            <p>Mục tiêu ngắn hạn của em là làm sâu hơn về kiến trúc FE và performance; dài hạn là trở thành Full Stack Developer — hiện em đã đi được một phần đường đó qua việc viết BE trong 2 dự án vừa rồi.</p>
+          </blockquote>
+          <div class="note">
+            <span class="note__icon" aria-hidden="true">⚠️</span>
+            <p><strong>Lưu ý:</strong> giữ dưới 90 giây. Đừng đọc lại toàn bộ CV — chỉ nêu 3 mốc: nền tảng → mở rộng → hiện tại.</p>
+          </div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q2</span>
+          <span class="qa__text">Tôi thấy bạn học Đại học Văn hóa Hà Nội (2016–2019) rồi mới qua VTI Academy học IT. Vì sao chuyển ngành?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Em học Văn hóa nhưng trong quá trình học em làm thêm về thiết kế (Photoshop, Illustrator) và bắt đầu tự học HTML/CSS để làm web. Em thấy mình thích phần "biến thiết kế thành sản phẩm chạy được" hơn, nên sau khi tốt nghiệp em đầu tư 1 năm học chính quy tại VTI Academy để có nền tảng lập trình đúng bài, rồi vào AMELA.</p>
+            <p>Nền thiết kế đó hóa ra là lợi thế: em đọc được file Figma, hiểu ý đồ designer, và ở IniSoft em tự làm được wireframe + high-fidelity mockup cho module mình phụ trách thay vì phải chờ designer.</p>
+          </blockquote>
+          <div class="note">
+            <span class="note__icon" aria-hidden="true">⚠️</span>
+            <p><strong>Lưu ý:</strong> Đây là câu chắc chắn bị hỏi. Đừng xin lỗi hay phòng thủ — biến background thành <strong>điểm cộng</strong> (design sense, Figma, UX).</p>
+          </div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q3</span>
+          <span class="qa__text">(Câu "bắt lỗi") Timeline dự án của bạn bị overlap: Offerwall 01/2023–12/2024, ENAS 01/2024–08/2024, WAS 08/2024–01/2025. Giải thích giúp tôi?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Đúng là có giai đoạn em làm song song. Offerwall là dự án dài, sau khi release bản chính thì chuyển sang chế độ maintain + phát triển thêm feature nhỏ, nên em chỉ dành một phần thời gian. Trong lúc đó em được điều sang ENAS làm module chính, và cuối 2024 sang WAS để làm responsive + build app.</p>
+            <p>Tỉ lệ thời gian thực tế: Offerwall là dự án chính đến hết 2023, năm 2024 em chủ yếu ở ENAS rồi WAS, Offerwall chỉ còn support.</p>
+          </blockquote>
+          <div class="note">
+            <span class="note__icon" aria-hidden="true">🔴</span>
+            <p><strong>Lưu ý cực quan trọng:</strong> Bạn <strong>phải</strong> chuẩn bị câu này — nhà tuyển dụng đọc CV kỹ sẽ thấy ngay. Cách tốt nhất: sửa CV ghi rõ <em>(maintain/part-time)</em> cho Offerwall giai đoạn 2024, hoặc chỉnh lại thành 01/2023–12/2023 nếu thực tế là vậy.</p>
+          </div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===== SECTION 1 ===== -->
+    <section class="section" id="s1">
+      <div class="section__head">
+        <span class="section__num">01</span>
+        <h2 class="section__title">React Core</h2>
+        <span class="section__count">4 câu</span>
+      </div>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q4</span>
+          <span class="qa__text"><code>useMemo</code>, <code>useCallback</code>, <code>React.memo</code> — khi nào bạn thực sự dùng? Cho ví dụ từ dự án của bạn.</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Em không dùng theo phản xạ, vì bản thân 3 cái này cũng có cost (lưu cache, so sánh deps). Em dùng khi có lý do đo được:</p>
+            <ul>
+              <li><code>useMemo</code>: khi tính toán tốn kém trên danh sách lớn. Ví dụ ở PSY HMS có catalog 3.321 đơn vị hành chính, việc build cây tỉnh → huyện → xã và filter theo keyword em memo lại theo <code>[data, keyword]</code>, không thì mỗi keystroke re-build cả cây.</li>
+              <li><code>useCallback</code>: khi function được truyền xuống component con đã <code>memo</code>, hoặc là dependency của <code>useEffect</code>. Ví dụ handler <code>onChange</code> truyền vào từng block trong Template Builder của Offerwall — không memo thì kéo thả 1 block là re-render cả 9 block.</li>
+              <li><code>React.memo</code>: cho leaf component render nhiều lần với props ổn định. Ví dụ từng cell trong phiếu theo dõi chức năng sống (vital signs) ở PSY — form có hàng trăm input, không memo thì gõ 1 ô là re-render toàn bảng.</li>
+            </ul>
+            <p>Nguyên tắc của em: <strong>đo trước, optimize sau</strong> — dùng React DevTools Profiler xem component nào re-render và mất bao nhiêu ms, rồi mới thêm memo.</p>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q5</span>
+          <span class="qa__text">Form có ~200 input (như phiếu chăm sóc điều dưỡng), gõ 1 ký tự là lag. Bạn debug và fix thế nào?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Em làm theo 3 bước:</p>
+            <ol>
+              <li><strong>Xác nhận nguyên nhân</strong> — mở React DevTools Profiler, bật "Highlight updates". Nếu cả form sáng lên khi gõ 1 ô → state đang nằm ở component cha và mọi input là controlled từ đó.</li>
+              <li><strong>Fix gốc: tách subscription.</strong> Em dùng <code>react-hook-form</code> — nó là uncontrolled by default (register qua ref), nên gõ 1 ô không trigger re-render form. Chỉ nơi nào cần watch giá trị thì dùng <code>useWatch</code> với <code>name</code> cụ thể, chứ không dùng <code>watch()</code> toàn form. Field array thì dùng <code>useFieldArray</code>, và tách mỗi row ra component riêng + <code>memo</code>.</li>
+              <li><strong>Nếu vẫn nặng:</strong> virtualize phần bảng dài (react-window), và debounce validation nặng (Zod schema có async check) thay vì validate mode <code>onChange</code> — dùng <code>mode: 'onBlur'</code> hoặc <code>onTouched</code>.</li>
+            </ol>
+            <p>Ở PSY em dùng đúng combo Ant Design Form + tách section theo tab/step, mỗi phiếu MOH chia thành các block độc lập, nên không bị re-render chéo.</p>
+          </blockquote>
+          <div class="note">
+            <span class="note__icon" aria-hidden="true">⚠️</span>
+            <p><strong>Lưu ý:</strong> Đây là câu hỏi "đinh" cho CV của bạn vì bạn khoe form phức tạp. Phải trả lời được mạch: <em>đo → tìm nguyên nhân re-render → chọn uncontrolled → virtualize</em>.</p>
+          </div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q6</span>
+          <span class="qa__text">Giải thích cơ chế reconciliation và vai trò của <code>key</code>. Vì sao dùng index làm key là sai?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>React so sánh cây Virtual DOM cũ và mới theo từng level. Ở cùng một level, nó dùng <code>key</code> để nhận diện "đây có phải cùng một element không". Cùng type + cùng key → giữ instance, chỉ update props. Khác key → unmount cái cũ, mount cái mới (mất toàn bộ state nội bộ).</p>
+            <p>Dùng index sai khi list có thể <strong>chèn / xóa / sắp xếp lại</strong>: xóa item đầu tiên thì item thứ 2 tụt lên index 0, React tưởng nó là item cũ nên giữ nguyên state — dẫn tới giá trị input dính sai row, checkbox tick sai dòng.</p>
+            <p>Em gặp đúng case này ở Template Builder của Offerwall: 9 loại content block cho phép kéo thả đổi thứ tự và duplicate. Ban đầu dùng index, kéo block xong thì state preview của block bị lẫn. Fix bằng cách mỗi block sinh <code>id</code> riêng (uuid/nanoid) khi tạo và dùng id đó làm key.</p>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q7</span>
+          <span class="qa__text"><code>useEffect</code> — kể một bug liên quan đến dependency array bạn từng gặp.</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Case kinh điển em gặp: infinite loop do object/array trong deps. Ví dụ <code>useEffect(() =&gt; fetchList(filter), [filter])</code> mà <code>filter</code> được tạo mới mỗi render (<code>{ page, keyword }</code> inline) → mỗi lần render tạo object mới → effect chạy lại → setState → render lại → loop.</p>
+            <p>Cách fix: hoặc để deps là các primitive (<code>[page, keyword]</code>), hoặc <code>useMemo</code> cái filter object, hoặc tốt hơn là <strong>không tự fetch trong useEffect</strong> — em dùng TanStack Query với <code>queryKey: ['documents', page, keyword]</code>, để nó tự lo caching/dedupe/refetch. Từ khi chuyển sang React Query, gần như em không còn viết useEffect để fetch data nữa.</p>
+            <p>Một case thứ hai là race condition: gõ search nhanh, response cũ về sau response mới → hiển thị sai. Trước em phải tự xử bằng <code>AbortController</code> + cleanup function; giờ React Query xử lý sẵn qua queryKey.</p>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===== SECTION 2 ===== -->
+    <section class="section" id="s2">
+      <div class="section__head">
+        <span class="section__num">02</span>
+        <h2 class="section__title">Next.js</h2>
+        <span class="section__count">3 câu</span>
+      </div>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q8</span>
+          <span class="qa__text">Bạn dùng Next.js 11 (SSR, FactoryX), Next 13 (static export, Offerwall), Next 14 App Router (ENAS). So sánh và giải thích vì sao mỗi dự án chọn khác nhau?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Mỗi lựa chọn xuất phát từ yêu cầu sản phẩm:</p>
+            <ul>
+              <li><strong>FactoryX (Next 11, SSR/<code>getServerSideProps</code>)</strong>: là platform tuyển dụng thị trường Nhật, trang job listing cần SEO và cần render dữ liệu mới nhất theo từng request → SSR là đúng. Dữ liệu job thay đổi liên tục, không static được.</li>
+              <li><strong>Offerwall (Next 13, static export ra S3/CloudFront)</strong>: offer wall được nhúng vào app của đối tác, không cần SEO, và hạ tầng yêu cầu deploy tĩnh lên S3 + CDN cho rẻ và scale tốt. Toàn bộ nội dung wall được render động ở client theo config API mà admin cấu hình, nên không cần server render. Trade-off: không dùng được API routes / ISR, mọi thứ phải qua REST API riêng.</li>
+              <li><strong>ENAS (Next 14 App Router)</strong>: dự án mới nên chọn App Router để dùng Server Components giảm bundle, layout lồng nhau cho khu vực dashboard, và loading/error boundary theo route segment.</li>
+            </ul>
+            <p>Về khác biệt kỹ thuật lớn nhất giữa Pages và App Router: data fetching chuyển từ <code>getServerSideProps</code>/<code>getStaticProps</code> sang <code>async</code> Server Component + <code>fetch</code> với cache option; mặc định component là Server Component, phải khai báo <code>'use client'</code> khi cần state/effect; và routing convention đổi sang <code>layout.tsx</code> / <code>page.tsx</code> / <code>loading.tsx</code>.</p>
+          </blockquote>
+          <div class="note">
+            <span class="note__icon" aria-hidden="true">⚠️</span>
+            <p><strong>Lưu ý:</strong> Câu này rất dễ bị hỏi vì CV bạn ghi 3 phiên bản Next khác nhau. Phải nói được <strong>"vì sao chọn"</strong>, không chỉ "em dùng cái gì".</p>
+          </div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q9</span>
+          <span class="qa__text">Server Component vs Client Component — bạn dùng ranh giới nào? Sai lầm thường gặp?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Nguyên tắc của em: <strong>Server Component là default, <code>'use client'</code> chỉ đặt ở lá gần nhất cần interactivity.</strong> Phần fetch data, đọc secret/token server-side, render nội dung tĩnh → để Server. Phần có state, event handler, hook, browser API → Client.</p>
+            <p>Sai lầm em từng thấy (và từng mắc):</p>
+            <ol>
+              <li>Đặt <code>'use client'</code> ở <code>layout.tsx</code> hoặc component cha lớn → toàn bộ cây con thành client, mất hết lợi ích. Fix: đẩy <code>'use client'</code> xuống component nhỏ nhất, ví dụ chỉ cái button hoặc cái filter.</li>
+              <li>Truyền function/class instance làm prop từ Server xuống Client → lỗi serialization. Props qua ranh giới phải serializable.</li>
+              <li>Đưa Ant Design / styled-components vào Server Component → lỗi vì chúng cần context/CSS-in-JS runtime. Với ENAS dùng AntD 5 em phải setup <code>StyleProvider</code> + registry để SSR không bị flash unstyled.</li>
+            </ol>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q10</span>
+          <span class="qa__text">Hydration mismatch là gì, nguyên nhân phổ biến, cách xử?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Là khi HTML server render ra khác với cây React client render lần đầu, React cảnh báo và có thể render lại/bỏ HTML server.</p>
+            <p>Nguyên nhân hay gặp: dùng <code>Date.now()</code> / <code>new Date()</code> / <code>Math.random()</code> trong render; đọc <code>localStorage</code> hoặc <code>window</code> khi render; render theo theme dark/light lưu ở client; format ngày theo timezone của máy (dự án Nhật — server UTC, client JST → lệch ngày).</p>
+            <p>Cách xử của em: giá trị chỉ có ở client thì render sau khi mount (<code>useEffect</code> set state, lần đầu render placeholder), hoặc dùng <code>dynamic(..., { ssr: false })</code>; với timezone thì <strong>format ở một chỗ duy nhất, ép timezone rõ ràng</strong> (Asia/Tokyo) thay vì dựa vào locale máy. Ở FactoryX dự án Nhật em luôn chuẩn hóa: BE trả UTC ISO string, FE format theo timezone cố định của nghiệp vụ.</p>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===== SECTION 3 ===== -->
+    <section class="section" id="s3">
+      <div class="section__head">
+        <span class="section__num">03</span>
+        <h2 class="section__title">State Management &amp; Data Fetching</h2>
+        <span class="section__count">3 câu</span>
+      </div>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q11</span>
+          <span class="qa__text">Bạn dùng cả Redux Toolkit, Zustand và TanStack Query. Tiêu chí chọn?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Em phân biệt rõ <strong>server state</strong> và <strong>client state</strong> — đây là điểm quan trọng nhất:</p>
+            <ul>
+              <li><strong>Server state</strong> (data từ API): luôn dùng <strong>TanStack Query</strong>. Nó lo cache theo queryKey, dedupe request, stale-while-revalidate, retry, invalidate sau mutation. Trước đây nhiều dự án nhét API data vào Redux, dẫn tới viết tay 3 action loading/success/error cho mỗi endpoint — rất nhiều boilerplate và cache tự quản lý rất dễ sai.</li>
+              <li><strong>Client state nhỏ, cục bộ</strong> (UI toggle, filter, step của wizard): <strong>Zustand</strong>. Nhẹ, không cần Provider, API đơn giản, chọn selector để tránh re-render. Em dùng Zustand ở Offerwall, FactoryX, PSY HMS.</li>
+              <li><strong>Redux Toolkit</strong>: dùng khi dự án đã có sẵn (ENAS, WAS) hoặc khi state phức tạp cần devtools time-travel, middleware, nhiều slice liên quan chặt. Nếu bắt đầu mới và không cần những thứ đó, em chọn Zustand + React Query.</li>
+            </ul>
+            <p>Thực tế ở PSY HMS: server state qua TanStack Query, còn Zustand chỉ giữ auth/permission matrix và trạng thái UI của form nhiều bước.</p>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q12</span>
+          <span class="qa__text">Giải thích <code>staleTime</code> vs <code>gcTime</code> (cacheTime) trong TanStack Query. Bạn set thế nào?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <ul>
+              <li><code>staleTime</code>: khoảng thời gian data còn được coi là "tươi". Trong khoảng này, mount lại component hoặc focus lại window <strong>không refetch</strong>, dùng luôn cache. Default là 0 → luôn refetch background.</li>
+              <li><code>gcTime</code>: sau khi query không còn observer nào (component unmount), cache còn được giữ bao lâu trước khi bị xóa. Default 5 phút. Nó quyết định việc quay lại trang có hiện data cũ ngay lập tức hay hiện loading.</li>
+            </ul>
+            <p>Cách em set theo tính chất dữ liệu:</p>
+            <ul>
+              <li>Catalog / danh mục ít đổi (ICD-10, danh mục thuốc, 3.321 đơn vị hành chính ở PSY): <code>staleTime</code> rất dài, 30 phút đến <code>Infinity</code>, vì gần như không đổi trong một session.</li>
+              <li>Dữ liệu nghiệp vụ đang thao tác (danh sách bệnh nhân, đơn thuốc chờ duyệt): <code>staleTime</code> ngắn 0–30s để luôn mới, và <code>invalidateQueries</code> ngay sau mutation.</li>
+              <li>Dashboard / báo cáo: <code>staleTime</code> vài phút, thêm <code>refetchOnWindowFocus: false</code> để không nhấp nháy khi user switch tab.</li>
+            </ul>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q13</span>
+          <span class="qa__text">Sau khi tạo/sửa một record, làm sao list được cập nhật? So sánh invalidate vs optimistic update.</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Hai cách em dùng:</p>
+            <ol>
+              <li><strong>Invalidate (mặc định, an toàn)</strong>: trong <code>onSuccess</code> của mutation gọi <code>queryClient.invalidateQueries({ queryKey: ['prescriptions'] })</code>. Data sẽ refetch từ server → chắc chắn đúng. Trade-off: user thấy một nhịp loading nhỏ.</li>
+              <li><strong>Optimistic update</strong>: trong <code>onMutate</code> cập nhật cache ngay (<code>setQueryData</code>), lưu snapshot; nếu lỗi thì <code>onError</code> rollback về snapshot; <code>onSettled</code> invalidate để đồng bộ lại. Dùng khi cần UI phản hồi tức thì và rủi ro thất bại thấp — ví dụ toggle trạng thái bật/tắt banner, đổi thứ tự block trong Template Builder (kéo thả phải mượt, không thể chờ API).</li>
+            </ol>
+            <p>Với nghiệp vụ y tế ở PSY thì em <strong>không</strong> optimistic cho các hành động quan trọng như duyệt đơn thuốc hay xuất kho — sai số liệu ở đó nguy hiểm, nên em chọn invalidate + loading rõ ràng, thà chậm 300ms còn hơn hiển thị sai tồn kho.</p>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===== SECTION 4 ===== -->
+    <section class="section" id="s4">
+      <div class="section__head">
+        <span class="section__num">04</span>
+        <h2 class="section__title">Kiến trúc &amp; Bài toán khó trong CV</h2>
+        <span class="section__count">5 câu</span>
+      </div>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q14</span>
+          <span class="qa__text">Kể chi tiết về <strong>schema-driven dynamic form engine</strong> ở ENAS. Bạn thiết kế kiến trúc thế nào?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Bài toán: khách hàng (doanh nghiệp Nhật) tự tạo form thu lead bằng drag-and-drop, có validation phức tạp và tối ưu EFO (Entry Form Optimization). Nghĩa là form không hard-code mà phải render từ dữ liệu.</p>
+            <p>Em tách thành <strong>4 layer</strong> rõ ràng:</p>
+            <ol>
+              <li><strong>Schema layer</strong> — nguồn sự thật duy nhất: một JSON mô tả các field (type, label, required, rule validate, điều kiện hiển thị). Đây là thứ lưu DB và render cả ở builder lẫn form public.</li>
+              <li><strong>Converter layer</strong> — chuyển schema ↔ format API, và sinh validation schema (Zod/Yup) từ rule trong schema. Tách riêng để khi BE đổi shape thì chỉ sửa một chỗ.</li>
+              <li><strong>Layout layer</strong> — lo grid, thứ tự, group field, responsive. Không biết gì về UI cụ thể.</li>
+              <li><strong>UI layer</strong> — map <code>type</code> → component thực tế qua một registry (<code>{ text: TextInput, select: SelectInput, ... }</code>). Thêm loại field mới = thêm 1 entry vào registry + 1 rule ở converter, <strong>không sửa core</strong>.</li>
+            </ol>
+            <p>Lợi ích rõ nhất: khi PO yêu cầu thêm field type mới (ví dụ postal-code auto-fill địa chỉ — rất phổ biến ở Nhật), em chỉ thêm component + rule, không phải đụng vào engine. EFO features (auto-focus field kế tiếp, realtime validate, hiện progress) được implement một lần ở layout/engine và áp dụng cho mọi form.</p>
+          </blockquote>
+          <div class="note">
+            <span class="note__icon" aria-hidden="true">⭐</span>
+            <p><strong>Lưu ý:</strong> Đây là <strong>câu ăn điểm nhất</strong> của bạn. Hãy vẽ được 4 layer trên giấy/whiteboard khi trả lời. Nhấn vào từ khóa <strong>registry pattern</strong> và <strong>"thêm field mới không sửa core"</strong> (Open/Closed Principle).</p>
+          </div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q15</span>
+          <span class="qa__text">Template Builder (Offerwall) và Process Diagram Editor (ReactFlow) — khó nhất ở đâu?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p><strong>Template Builder (Offerwall):</strong> 9 loại content block, kéo thả đổi thứ tự, duplicate, preview live trong khung điện thoại. Ba cái khó:</p>
+            <ol>
+              <li><em>Đồng bộ editor ↔ preview</em>: preview phải dùng <strong>đúng component</strong> mà offer wall public dùng, nếu viết 2 bản sẽ lệch. Em giải quyết bằng cách dùng chung một bộ renderer, chỉ khác wrapper (khung phone + disable interaction).</li>
+              <li><em>Identity của block</em>: mỗi block phải có id riêng sinh lúc tạo, không dùng index, không thì duplicate/reorder là lẫn state.</li>
+              <li><em>Performance khi kéo</em>: kéo thả trigger update liên tục. Em giữ state kéo thả cục bộ trong lúc drag, chỉ commit vào store khi drop; đồng thời memo từng block để không re-render cả 9 block mỗi frame.</li>
+            </ol>
+            <p><strong>Process Editor (ReactFlow, Bidding Assistant):</strong> khó ở chỗ đây là quy trình đấu thầu có stage và nhóm quy trình, cần validate tính hợp lệ của graph — không cho tạo cycle, không cho node treo không có kết nối. Em viết validate ở tầng domain (duyệt graph tìm cycle) chứ không nhét vào component; và lưu layout (vị trí node) cùng với quan hệ logic để mở lại đúng như lúc lưu.</p>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q16</span>
+          <span class="qa__text">RBAC với 6 role và permission matrix chi tiết (PSY) — bạn làm ở FE thế nào? FE check quyền là đủ chưa?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Trước hết: <strong>FE check quyền chỉ là UX, không phải bảo mật.</strong> Mọi quyền phải được BE enforce lại ở từng endpoint — nếu không, user chỉ cần mở DevTools hoặc gọi API trực tiếp là bypass. Em luôn nói rõ điều này khi thống nhất với BE.</p>
+            <p>Ở FE em làm 3 tầng:</p>
+            <ol>
+              <li><strong>Nguồn quyền</strong>: sau login, BE trả về danh sách permission dạng <code>resource:action</code> (ví dụ <code>prescription:approve</code>, <code>inventory:export</code>). Em lưu vào store (Zustand) và expose một hook <code>useCan('prescription:approve')</code>.</li>
+              <li><strong>Route guard</strong>: mỗi route khai báo permission cần có; layout kiểm tra, không có quyền thì redirect 403. Menu sidebar cũng render từ cùng config đó nên không bao giờ lệch giữa menu và route.</li>
+              <li><strong>Component level</strong>: bọc <code>&lt;Can permission="..."&gt;</code> hoặc disable button kèm tooltip giải thích. Với 6 role (Giám đốc, Bác sĩ, Điều dưỡng, Dược sĩ, Hành chính, System admin) thì cùng một trang nhưng khác nút hành động — nên em làm ở mức <strong>permission</strong>, không phải mức <strong>role</strong>. Nếu check <code>role === 'doctor'</code> thì khi nghiệp vụ thêm role mới là phải sửa khắp nơi; check theo permission thì chỉ cần đổi cấu hình phía BE.</li>
+            </ol>
+          </blockquote>
+          <div class="note">
+            <span class="note__icon" aria-hidden="true">⚠️</span>
+            <p><strong>Lưu ý:</strong> Câu "FE check là đủ chưa?" là <strong>bẫy</strong>. Bắt buộc phải nói "BE phải enforce lại". Đây là câu phân biệt Middle với Junior.</p>
+          </div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q17</span>
+          <span class="qa__text">Upload và parse file DOCX/PDF lên S3-compatible (RustFS). Bạn xử lý file lớn, progress, lỗi thế nào?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Luồng em làm ở Bidding Assistant:</p>
+            <ol>
+              <li><strong>Validate client-side trước</strong>: check extension + MIME + size trước khi gửi, để không tốn băng thông vô ích. Nhưng em hiểu validate client chỉ là UX — BE vẫn phải verify lại content type thực (magic number), vì extension đổi được dễ dàng.</li>
+              <li><strong>Presigned URL</strong>: FE xin presigned PUT URL từ BE rồi upload trực tiếp lên storage, không đi qua app server. Giảm tải server và không bị giới hạn body size của API.</li>
+              <li><strong>Progress + cancel</strong>: dùng <code>onUploadProgress</code> của axios (hoặc XHR) để hiện %; giữ <code>AbortController</code> để user cancel được.</li>
+              <li><strong>Parse là async</strong>: parse DOCX/PDF để đưa vào vector DB (Qdrant) mất thời gian, nên không block request upload. BE tạo job, FE poll trạng thái document (<code>pending → processing → done/failed</code>) qua TanStack Query với <code>refetchInterval</code>, hiện badge trạng thái trên bảng. Fail thì cho retry và hiện lý do.</li>
+              <li><strong>Lỗi</strong>: phân biệt lỗi upload (network, hết quota) với lỗi parse (file corrupt, scan ảnh không có text layer) — message khác nhau để user biết phải làm gì.</li>
+            </ol>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q18</span>
+          <span class="qa__text">Bạn build &amp; release iOS/Android từ codebase React web (WAS). Làm cách nào và gặp vấn đề gì?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>WAS là web app React 18 được đóng gói thành app (webview wrapper) và release lên App Store + Google Play. Việc của em gồm 2 phần:</p>
+            <p><strong>Phần code:</strong> làm module Operator responsive hoàn toàn — booking calendar, drag-and-drop lịch, navigation — để dùng được trên màn hình điện thoại. Calendar drag-drop trên mobile là khó nhất vì touch event khác mouse event, phải xử lý <code>touchstart/touchmove</code> và chặn scroll của page khi đang drag; ngoài ra vùng chạm phải đủ lớn (min 44px) theo guideline của Apple.</p>
+            <p><strong>Phần release:</strong> setup certificate/provisioning profile trên Apple Developer, tạo app record trên App Store Connect, build và upload qua Xcode/Transporter; phía Android là keystore signing + upload AAB lên Play Console, điền data safety form.</p>
+            <p>Vấn đề thực tế gặp phải: (1) Apple review từ chối app kiểu webview nếu không đủ native value — phải bổ sung tính năng thật (push notification, xử lý offline) và giải trình; (2) safe-area trên iPhone có notch — phải dùng <code>env(safe-area-inset-*)</code>; (3) keyboard đẩy layout trên iOS khác Android, phải test riêng.</p>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===== SECTION 5 ===== -->
+    <section class="section" id="s5">
+      <div class="section__head">
+        <span class="section__num">05</span>
+        <h2 class="section__title">Performance</h2>
+        <span class="section__count">2 câu</span>
+      </div>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q19</span>
+          <span class="qa__text">Trang admin load 8 giây. Bạn debug từ đâu?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Em đi theo thứ tự <strong>đo → phân loại → fix</strong>:</p>
+            <ol>
+              <li><strong>Đo</strong>: Lighthouse + Network tab + Performance tab. Xác định thời gian mất ở đâu: tải bundle, chờ API, hay render.</li>
+              <li><strong>Nếu là bundle</strong>: chạy <code>vite-bundle-visualizer</code> / <code>webpack-bundle-analyzer</code>. Những thứ hay phình ở dự án admin của em: Ant Design (import cả bộ icon), moment.js với full locale, ApexCharts, TipTap editor, ReactFlow. Fix bằng: lazy load theo route (<code>React.lazy</code> + <code>Suspense</code>), lazy load editor và chart chỉ khi vào trang đó, thay moment bằng dayjs, import icon lẻ.</li>
+              <li><strong>Nếu là API</strong>: xem có N+1 request không (mỗi row gọi 1 API detail), có request nào block render đầu tiên không. Fix: gộp endpoint với BE, parallel hóa bằng <code>useQueries</code>, và prefetch data của trang kế.</li>
+              <li><strong>Nếu là render</strong>: bảng lớn không phân trang / không virtualize → thêm server-side pagination hoặc virtual scroll.</li>
+              <li><strong>Hạ tầng</strong>: bật gzip/brotli, cache header cho static asset, CDN. Ở Offerwall bản static export deploy S3 + CloudFront nên phần này CDN lo.</li>
+            </ol>
+            <p>Ở PSY HMS là pnpm monorepo, em còn kiểm tra không import chéo package làm kéo theo dependency không cần thiết vào bundle.</p>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q20</span>
+          <span class="qa__text">Bảng 10.000 dòng, filter + sort. Bạn làm client-side hay server-side? Vì sao?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p><strong>Server-side</strong>, gần như luôn luôn, ở quy mô đó. Lý do: tải 10.000 record về client tốn băng thông và RAM, filter/sort trong JS chặn main thread, và số liệu dễ lệch nếu data thay đổi. Em để BE làm pagination + filter + sort (nó có index DB), FE gửi params lên và đưa params vào <code>queryKey</code> để cache từng combination.</p>
+            <p>Em chỉ chọn client-side khi: dataset nhỏ và cố định (&lt; ~1.000 dòng, ví dụ danh mục), cần filter tức thì không delay, và không có yêu cầu realtime.</p>
+            <p>Bổ sung: nếu nghiệp vụ <em>bắt buộc</em> hiện danh sách dài liên tục (ví dụ scroll vô hạn ở offer wall), em dùng <code>useInfiniteQuery</code> + virtualization (react-window / TanStack Virtual) để chỉ render phần trong viewport — ở Offerwall em làm đúng infinite scroll cho wall.</p>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===== SECTION 6 ===== -->
+    <section class="section" id="s6">
+      <div class="section__head">
+        <span class="section__num">06</span>
+        <h2 class="section__title">TypeScript</h2>
+        <span class="section__count">1 câu</span>
+      </div>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q21</span>
+          <span class="qa__text"><code>type</code> vs <code>interface</code>? <code>any</code> vs <code>unknown</code>? Bạn xử lý type của API response thế nào?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <ul>
+              <li><code>interface</code> cho object shape, extend được và declaration merging; <code>type</code> cho union, intersection, mapped type, conditional type. Em mặc định <code>interface</code> cho shape, <code>type</code> cho phần còn lại.</li>
+              <li><code>any</code> tắt hoàn toàn type check và <strong>lây lan</strong> sang chỗ khác — em tránh, nếu buộc phải dùng thì kèm comment lý do. <code>unknown</code> an toàn hơn: phải narrow (typeof/instanceof/schema) trước khi dùng, nên compiler vẫn bảo vệ mình.</li>
+              <li><strong>API response</strong>: TypeScript chỉ tồn tại ở compile time — BE trả sai shape thì type không cứu được. Nên em validate runtime ở boundary bằng <strong>Zod</strong>: khai báo schema một lần, <code>z.infer</code> ra type để dùng trong code, và <code>schema.parse()</code> response. Nếu BE có OpenAPI/Swagger thì em generate type từ đó để không phải viết tay và không bị lệch khi BE đổi.</li>
+            </ul>
+            <p>Ở Bidding Assistant em dùng <code>react-hook-form + Zod</code>, nên schema vừa dùng để validate form vừa là nguồn type — một nguồn sự thật, không phải maintain 2 chỗ.</p>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===== SECTION 7 ===== -->
+    <section class="section" id="s7">
+      <div class="section__head">
+        <span class="section__num">07</span>
+        <h2 class="section__title">CI/CD, Docker &amp; Fullstack</h2>
+        <span class="section__count">3 câu</span>
+      </div>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q22</span>
+          <span class="qa__text">Bạn set up Jenkins pipeline với Docker. Mô tả pipeline đó.</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Pipeline em dựng ở IniSoft (Jenkinsfile, declarative) gồm các stage:</p>
+            <ol>
+              <li><strong>Checkout</strong> — theo branch, webhook từ GitLab trigger.</li>
+              <li><strong>Install &amp; Cache</strong> — <code>pnpm install --frozen-lockfile</code>, cache <code>node_modules</code> / pnpm store giữa các build cho nhanh.</li>
+              <li><strong>Quality gate</strong> — lint, typecheck (<code>tsc --noEmit</code>), unit test (Vitest + React Testing Library ở PSY). <strong>Fail là dừng</strong>, không cho deploy.</li>
+              <li><strong>Build</strong> — multi-stage Dockerfile: stage builder chạy <code>pnpm build</code>, stage runtime chỉ copy <code>dist</code> vào nginx alpine → image nhỏ, không chứa devDependencies và source.</li>
+              <li><strong>Push image</strong> — tag theo git SHA + version, đẩy lên registry. Tag theo SHA để rollback được chính xác.</li>
+              <li><strong>Deploy</strong> — <code>docker-compose up -d</code> trên server theo môi trường (dev/staging), production thì có bước approval thủ công.</li>
+            </ol>
+            <p>Vài điểm em chú ý: build args cho env public (<code>VITE_*</code>) vì Vite inline biến lúc build — nên mỗi môi trường phải build riêng hoặc runtime-inject config; secret <strong>không</strong> để trong <code>ENV</code> của Dockerfile (nó nằm trong image history), mà lấy từ Jenkins credentials; và Dockerfile chạy user non-root.</p>
+          </blockquote>
+          <div class="note">
+            <span class="note__icon" aria-hidden="true">⚠️</span>
+            <p><strong>Lưu ý:</strong> Nếu pipeline thực tế của bạn đơn giản hơn, hãy nói đúng những gì bạn làm và thêm <em>"phần X em chưa làm nhưng hiểu cần thiết"</em>. Đừng phóng đại — interviewer sẽ đào sâu.</p>
+          </div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q23</span>
+          <span class="qa__text">Bạn nói có viết Node.js/Express và FastAPI. Cụ thể bạn tự làm được đến đâu?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Em nói thẳng mức độ của mình: em <strong>không</strong> phải backend chính, nhưng em tự làm được endpoint CRUD end-to-end để không phải chờ BE cho những feature mình own.</p>
+            <ul>
+              <li>Ở Bidding Assistant: em viết REST API với Node.js/Express + TypeScript, PostgreSQL qua Sequelize — model, migration, controller, validate input, và phần liên quan tới upload/S3 (RustFS).</li>
+              <li>Ở PSY HMS: BE là FastAPI (Python), em contribute endpoint và fix bug để phục vụ FE — thêm field vào response, sửa query filter, chỉnh serialization.</li>
+            </ul>
+            <p>Những thứ em <strong>chưa</strong> làm sâu và đang muốn học: tối ưu query phức tạp và index PostgreSQL, thiết kế schema cho hệ thống lớn, message queue, và kiến trúc scale. Em biết viết query tham số hóa để tránh SQL injection và không log dữ liệu nhạy cảm, nhưng về performance tuning DB thì em vẫn cần học thêm.</p>
+          </blockquote>
+          <div class="note">
+            <span class="note__icon" aria-hidden="true">⭐</span>
+            <p><strong>Lưu ý:</strong> <strong>Trung thực về ranh giới năng lực là điểm cộng lớn.</strong> Nói "em làm được CRUD, chưa làm được tối ưu DB" đáng tin hơn là nói "em làm fullstack" rồi bị đào đến chỗ không biết.</p>
+          </div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q24</span>
+          <span class="qa__text">Dự án của bạn có AI/RAG (Qdrant vector DB). Phần FE của bạn liên quan thế nào? Bạn hiểu RAG ra sao?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>RAG = Retrieval-Augmented Generation: thay vì để LLM trả lời từ kiến thức sẵn có, mình tìm (retrieve) các đoạn tài liệu liên quan nhất từ vector DB rồi đưa vào prompt làm ngữ cảnh, LLM trả lời dựa trên đó. Nhờ vậy câu trả lời dựa trên tài liệu đấu thầu thật và trích dẫn được nguồn.</p>
+            <p>Scope của em là <strong>Admin CMS</strong> — tức là phần "feeding the pipeline": quản lý Documents &amp; Document Types, upload/parse DOCX/PDF, theo dõi trạng thái xử lý (parse → embed → indexed vào Qdrant), quản lý FAQ, App Settings, API Keys, Audit Log. App Flutter mới là phần chat/query, và AI backend Python lo vector search.</p>
+            <p>Nếu làm phần chat UI thì thách thức em hình dung là: <strong>streaming response</strong> (SSE/chunked, render token dần thay vì chờ hết), hiển thị citation link về đúng đoạn tài liệu, xử lý trạng thái đang-generate (cho phép stop), và giữ lịch sử hội thoại. Đây là phần em rất muốn được làm sâu hơn.</p>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===== SECTION 8 ===== -->
+    <section class="section" id="s8">
+      <div class="section__head">
+        <span class="section__num">08</span>
+        <h2 class="section__title">Quy trình, Leadership &amp; Soft skills</h2>
+        <span class="section__count">6 câu</span>
+      </div>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q25</span>
+          <span class="qa__text">Bạn code review cho team. Bạn tìm gì trong một MR? Cách feedback khi thấy code tệ?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Thứ tự ưu tiên khi em review:</p>
+            <ol>
+              <li><strong>Đúng nghiệp vụ</strong> — code có làm đúng yêu cầu và cover edge case chưa (empty state, loading, error, quyền).</li>
+              <li><strong>Bug tiềm ẩn</strong> — key dùng index, useEffect thiếu/dư deps, không cleanup, không handle error của API, race condition.</li>
+              <li><strong>Bảo mật</strong> — không hard-code token/secret, không tin validate client, XSS khi render HTML (<code>dangerouslySetInnerHTML</code> phải sanitize).</li>
+              <li><strong>Tái sử dụng &amp; cấu trúc</strong> — có copy-paste logic đã có chưa, file có quá dài không, tách được hook/util không.</li>
+              <li><strong>Style/naming</strong> — cuối cùng, và nên để linter/prettier tự lo, không tranh luận thủ công.</li>
+            </ol>
+            <p>Cách feedback: em comment vào <strong>code, không vào người</strong>; nói rõ <em>lý do</em> và <em>đề xuất cụ thể</em> thay vì "cái này sai"; phân loại comment thành <strong>must fix</strong> / <strong>nên sửa</strong> / <strong>nit (tùy bạn)</strong> để người nhận biết cái nào block merge. Nếu có 2–3 vòng comment mà vẫn chưa thông thì em gọi call 10 phút thay vì comment qua lại — nhanh hơn và không gây cảm giác bị công kích.</p>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q26</span>
+          <span class="qa__text">Kể một lần bạn bất đồng với PO/BA hoặc BE. Bạn xử lý thế nào?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời (dùng STAR — hãy thay bằng case thật của bạn)</span>
+          <blockquote>
+            <p><strong>Situation:</strong> Ở PSY HMS, phiếu chăm sóc điều dưỡng theo chuẩn Bộ Y tế có rất nhiều trường; PO muốn để tất cả trên một trang duy nhất giống form giấy để điều dưỡng quen tay.</p>
+            <p><strong>Task:</strong> Em lo về usability (scroll rất dài trên tablet) và performance (hàng trăm input trên một trang).</p>
+            <p><strong>Action:</strong> Em không tranh luận bằng cảm tính — em làm 2 bản prototype: một bản 1 trang, một bản chia theo nhóm/bước, rồi ngồi cùng PO và một điều dưỡng thật để họ thử. Em cũng đưa số đo: bản 1 trang gõ bị delay rõ ràng.</p>
+            <p><strong>Result:</strong> Kết luận cuối là giữ <strong>layout giống phiếu giấy</strong> như PO muốn (vì đó là yêu cầu nghiệp vụ không thể bỏ) nhưng <strong>chia thành các section collapse + tách state theo section</strong> để giải quyết phần performance. Cả hai mối lo đều được xử lý.</p>
+            <p><strong>Bài học:</strong> người dùng cuối và số liệu là trọng tài, không phải quan điểm cá nhân của em.</p>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q27</span>
+          <span class="qa__text">Bạn từng làm team lead 2–5 người. Bạn chia việc và theo dõi tiến độ thế nào?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Em chia việc theo <strong>module theo chiều dọc</strong>, không theo tầng — mỗi người own trọn một module từ UI đến tích hợp API. Lý do: chia theo tầng (một người làm hết UI, một người làm hết API) thì phụ thuộc chéo liên tục và ai cũng bị block.</p>
+            <p>Em cố gắng chia task xuống mức <strong>≤ 1 ngày</strong> và có định nghĩa "done" rõ ràng (có UI, có handle loading/error/empty, có test tay theo case nào). Theo dõi qua daily standup ngắn và board (Backlog/Redmine/GitLab). Quan trọng là em hỏi <em>"có gì đang block không"</em> chứ không hỏi <em>"xong chưa"</em> — blocker lộ ra sớm mới xử được.</p>
+            <p>Với bạn mới, em không đưa task khó ngay; em pair 1–2 buổi đầu, cho task nhỏ có tính lặp để hiểu codebase và convention, rồi mới mở rộng. Em cũng review MR của bạn ấy kỹ hơn và giải thích <em>vì sao</em> chứ không chỉ <em>sửa thế nào</em>.</p>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q28</span>
+          <span class="qa__text">Làm dự án thị trường Nhật nhiều năm — điều gì khác so với dự án Việt Nam?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Mấy điểm em thấy rõ:</p>
+            <ol>
+              <li><strong>Yêu cầu rất chi tiết và ít đổi</strong> — spec cụ thể đến từng message lỗi, từng pixel; đổi spec phải qua quy trình. Nên khâu đọc/hiểu spec và confirm trước khi code quan trọng hơn là code nhanh.</li>
+              <li><strong>Chất lượng và tỉ mỉ được coi trọng hơn tốc độ</strong> — bug nhỏ về hiển thị vẫn bị raise. Em học được thói quen tự test kỹ trước khi đẩy QA.</li>
+              <li><strong>i18n là mặc định, không phải tính năng thêm</strong> — em làm JP/EN ở ENAS, JP ở FactoryX bằng next-i18next. Phải tính từ đầu: text dài hơn trong tiếng Nhật, không hard-code chuỗi, format ngày/tiền/địa chỉ theo locale, và <code>postal-code → auto-fill địa chỉ</code> là chuẩn ở Nhật.</li>
+              <li><strong>Giao tiếp gián tiếp</strong> — câu hỏi phải hỏi rõ ràng, có screenshot, có phương án đề xuất kèm theo, thì mới nhận được câu trả lời dứt khoát. Em quen với việc viết câu hỏi dạng "em hiểu là A, nếu đúng em làm theo cách X, anh confirm giúp" thay vì hỏi mở.</li>
+            </ol>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q29</span>
+          <span class="qa__text">Vì sao bạn muốn rời công ty hiện tại / tìm việc mới?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Em không có vấn đề gì với IniSoft — em vẫn đang own module và học được nhiều, nhất là phần CI/CD và backend. Nhưng em muốn tìm môi trường có <strong>quy mô sản phẩm và số lượng người dùng lớn hơn</strong>, để được làm những bài toán em chưa có cơ hội chạm tới: performance ở quy mô thật, kiến trúc frontend cho codebase lớn nhiều team, và có người giỏi hơn em để học.</p>
+            <p>Em cũng muốn đi sâu về hướng AI/product — em đã làm phần admin của một hệ thống RAG và thấy rất thú vị, muốn làm sâu hơn phần sản phẩm AI thực sự chứ không chỉ CMS.</p>
+          </blockquote>
+          <div class="note">
+            <span class="note__icon" aria-hidden="true">🔴</span>
+            <p><strong>Lưu ý:</strong> <strong>Tuyệt đối không nói xấu công ty cũ</strong> (lương thấp, lead dở, quản lý kém). Luôn khung theo hướng <em>"tôi muốn tiến tới X"</em>, không phải <em>"tôi muốn thoát khỏi Y"</em>.</p>
+          </div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q30</span>
+          <span class="qa__text">Điểm yếu lớn nhất của bạn?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Điểm yếu thật của em là <strong>hay nhận quá nhiều việc</strong>. Vì ở IniSoft em own end-to-end (design Figma, FE, BE, CI/CD), em có xu hướng cái gì cũng tự nhảy vào làm, dẫn tới có sprint em bị dàn mỏng và deadline sát. Em đang xử lý bằng cách estimate có buffer thực tế hơn, và nói rõ với lead khi thấy quá tải thay vì cố gánh rồi trễ.</p>
+            <p>Điểm yếu thứ hai là <strong>kiến thức backend chưa sâu</strong> — em viết được CRUD nhưng chưa mạnh về tối ưu DB, index, và kiến trúc scale. Em đang tự học và đây cũng là một lý do em muốn vào môi trường có backend mạnh để học từ họ.</p>
+          </blockquote>
+          <div class="note">
+            <span class="note__icon" aria-hidden="true">⚠️</span>
+            <p><strong>Lưu ý:</strong> Nói điểm yếu <strong>thật</strong> + <strong>đang làm gì để sửa</strong>. Đừng dùng điểm yếu giả kiểu "em quá cầu toàn" — interviewer nghe câu đó hàng trăm lần.</p>
+          </div>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===== SECTION 9 ===== -->
+    <section class="section" id="s9">
+      <div class="section__head">
+        <span class="section__num">09</span>
+        <h2 class="section__title">Câu hỏi tình huống (Behavioral)</h2>
+        <span class="section__count">2 câu</span>
+      </div>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q31</span>
+          <span class="qa__text">Sắp release 1 ngày, QA phát hiện bug nghiêm trọng. Bạn làm gì?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <ol>
+              <li><strong>Đánh giá trước, sửa sau</strong>: bug này ảnh hưởng ai, bao nhiêu %, có mất/sai dữ liệu không, có workaround không. Ở PSY mà bug liên quan tới đơn thuốc hoặc tồn kho thuốc thì mặc định là blocker — sai số liệu y tế là không thể release.</li>
+              <li><strong>Báo ngay cho lead/PO</strong> kèm thông tin đủ để họ quyết định: mức độ ảnh hưởng, nguyên nhân (nếu đã biết), thời gian fix dự kiến, rủi ro nếu fix gấp.</li>
+              <li><strong>Đề xuất phương án</strong>, không chỉ báo vấn đề: (a) hotfix nếu nguyên nhân rõ và fix nhỏ, (b) tắt tính năng đó bằng feature flag và release phần còn lại, (c) hoãn release.</li>
+              <li><strong>Fix thì fix tối thiểu</strong> — không refactor kèm theo lúc gần release. Viết test cho case đó để không tái diễn.</li>
+              <li><strong>Sau release</strong>: retro ngắn — vì sao QA phát hiện muộn, có thiếu test case nào không, thêm vào checklist.</li>
+            </ol>
+            <p>Điều em tránh: im lặng tự fix đến đêm rồi đẩy lên mà không ai biết. Quyết định release là của lead/PO, việc của em là cung cấp thông tin chính xác và nhanh.</p>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary class="qa__q">
+          <span class="qa__id">Q32</span>
+          <span class="qa__text">Bạn được giao maintain một codebase legacy không có document, không test, code rối. Bắt đầu từ đâu?</span>
+          <span class="qa__chev" aria-hidden="true">▸</span>
+        </summary>
+        <div class="qa__a">
+          <span class="answer-label">Gợi ý trả lời</span>
+          <blockquote>
+            <p>Em từng ở tình huống gần giống khi nhận tiếp module ở Offerwall và WAS.</p>
+            <ol>
+              <li><strong>Chạy được trước đã</strong> — setup local, đi hết luồng chính bằng tay để hiểu sản phẩm làm gì. Hiểu nghiệp vụ trước khi đọc code.</li>
+              <li><strong>Vẽ map</strong> — đâu là entry point, routing, nơi gọi API, nơi giữ state. Em thường note lại thành một file map ngắn, vì chính em 2 tuần sau cũng cần.</li>
+              <li><strong>Không refactor ngay.</strong> Refactor code mình chưa hiểu, không có test bảo vệ, là cách nhanh nhất để tạo bug. Em làm task thật trước, mỗi task hiểu thêm một vùng.</li>
+              <li><strong>Thêm an toàn dần</strong>: trước khi sửa một vùng, viết test cho hành vi hiện tại (characterization test), rồi mới đổi. Bật dần TypeScript strict / lint theo từng folder thay vì bật cả repo rồi ngập 2000 lỗi.</li>
+              <li><strong>Refactor theo cơ hội</strong> — chỗ nào mình đang phải sửa thì dọn chỗ đó (boy scout rule), không mở PR refactor 50 file.</li>
+            </ol>
+          </blockquote>
+          <button class="mark" type="button"><span class="mark__box" aria-hidden="true">✓</span>Đã thuộc</button>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===== SECTION 10 ===== -->
+    <section class="section prose" id="s10">
+      <div class="section__head">
+        <span class="section__num">10</span>
+        <h2 class="section__title">Câu bạn nên hỏi lại nhà tuyển dụng</h2>
+      </div>
+
+      <p>Phần này <strong>rất quan trọng</strong> — không hỏi gì là mất điểm. Chọn 3–4 câu:</p>
+      <ul class="checklist">
+        <li>Team frontend hiện có bao nhiêu người, và vị trí này sẽ own phần nào của sản phẩm?</li>
+        <li>Codebase hiện tại dùng stack gì, có test coverage và CI/CD chưa? Nợ kỹ thuật lớn nhất hiện nay là gì?</li>
+        <li>Quy trình từ lúc có yêu cầu đến khi release như thế nào? Có QA riêng không, có code review bắt buộc không?</li>
+        <li>Sản phẩm có bao nhiêu người dùng / traffic cỡ nào? <em>(để biết bài toán performance có thật hay không)</em></li>
+        <li>Lộ trình phát triển cho vị trí này trong 1–2 năm tới là gì? Có định hướng lên Senior/Lead không?</li>
+        <li>Có phải làm việc trực tiếp với client nước ngoài không? Yêu cầu ngoại ngữ ở mức nào?</li>
+      </ul>
+    </section>
+
+    <!-- ===== SECTION 11 ===== -->
+    <section class="section prose" id="s11">
+      <div class="section__head">
+        <span class="section__num">11</span>
+        <h2 class="section__title">Tổng kết &amp; việc cần làm</h2>
+      </div>
+
+      <h3 style="font-size:1rem;margin:0 0 10px">Điểm mạnh cần đẩy mạnh trong phỏng vấn</h3>
+      <ul>
+        <li><strong>Breadth thật</strong>: React 17→19, Next 11/13/14, cả Vite SPA, cả monorepo pnpm</li>
+        <li><strong>Bài toán khó cụ thể</strong>: schema-driven form engine, drag-drop builder, ReactFlow, RBAC 6 role</li>
+        <li><strong>Vượt ra ngoài FE</strong>: Figma design, Node/FastAPI, Jenkins/Docker, build &amp; release mobile app</li>
+        <li><strong>Domain đa dạng</strong>: y tế (MOH standard), quảng cáo, SaaS Nhật, AI/RAG</li>
+      </ul>
+
+      <h3 style="font-size:1rem;margin:24px 0 10px">3 lỗ hổng cần vá trước khi đi phỏng vấn</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Lỗ hổng</th><th>Rủi ro</th><th>Việc cần làm</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Timeline dự án overlap</strong> (Q3)</td>
+              <td>Interviewer nghi CV phóng đại</td>
+              <td>Sửa CV ghi rõ <em>(maintain)</em> hoặc chỉnh lại ngày cho khớp</td>
+            </tr>
+            <tr>
+              <td><strong>Testing mỏng</strong> — CV chỉ nhắc Vitest + RTL ở 1 dự án</td>
+              <td>Bị hỏi "coverage bao nhiêu, test gì" mà không trả lời được</td>
+              <td>Chuẩn bị nói rõ: test gì (util + form validation + custom hook), coverage thực tế, và thừa nhận chưa có E2E</td>
+            </tr>
+            <tr>
+              <td><strong>Không có số liệu định lượng</strong></td>
+              <td>CV toàn "built", "developed" — không có impact</td>
+              <td>Thêm số: giảm bundle X%, giảm thời gian load từ Ys→Zs, giảm build time nhờ Jenkins</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="font-size:1rem;margin:24px 0 10px">Câu hỏi còn để lại cho bạn</h3>
+      <ol>
+        <li>Bạn đang target <strong>Middle</strong> hay <strong>Senior</strong>? Nếu Senior, cần thêm ~10 câu về kiến trúc FE quy mô lớn, micro-frontend, design system, và mentoring.</li>
+        <li>Công ty bạn nhắm tới là product hay outsourcing? Domain nào? (câu hỏi sẽ khác khá nhiều)</li>
+        <li>Có yêu cầu phỏng vấn bằng tiếng Anh/Nhật không? Nếu có thì cần bản song ngữ.</li>
+      </ol>
+    </section>
+
+    <div class="setnav">
+      <span class="setnav__spacer"></span>
+      <a class="btn" href="index.html">Tất cả bộ đề</a>
+      <a class="btn" href="bo-01-so-loai.html">01. Vòng sơ loại →</a>
+    </div>
+
+    <p class="empty" id="emptyState" hidden>Không tìm thấy câu hỏi nào khớp từ khoá.</p>
+
+  </main>
+</div>
+
+<footer class="footer">
+  Bộ phỏng vấn soạn theo CV <strong>Hà Tiến Hiệp</strong> — Frontend Developer ·
+  Tiến độ "đã thuộc" được lưu trong <code>localStorage</code> của máy bạn, không gửi đi đâu.
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>

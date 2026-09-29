@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bộ đề luyện phỏng vấn Frontend — Hà Tiến Hiệp</title>
+<meta name="description" content="11 bộ đề phỏng vấn Frontend: sơ loại, live coding, đào sâu dự án, System Design, Senior, manager.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-set="hub">
+<div class="progress"><div class="progress__bar" id="progressBar"></div></div>
+<header class="topbar">
+  
+  <div class="topbar__brand">
+    <span class="topbar__title">Bộ phỏng vấn Frontend</span>
+    <span class="topbar__sub">Hà Tiến Hiệp · 11 bộ đề · 115 câu</span>
+  </div>
+  <div class="search">
+    <input type="search" id="searchInput" placeholder="Tìm câu hỏi…" aria-label="Tìm câu hỏi theo từ khoá">
+  </div>
+  <button class="btn" id="toggleAll" type="button" aria-label="Mở hoặc đóng tất cả câu trả lời">
+    <span aria-hidden="true">⇕</span><span class="btn__label">Mở tất cả</span>
+  </button>
+  <button class="btn btn--icon" id="themeBtn" type="button" aria-label="Đổi chế độ sáng/tối" title="Đổi chế độ sáng/tối">
+    <span aria-hidden="true" id="themeIcon">◐</span>
+  </button>
+</header>
+
+<div class="layout" style="grid-template-columns:minmax(0,1fr)">
+  <main class="content" style="max-width:1080px">
+
+    <div class="hero">
+      <h1>Bộ đề luyện phỏng vấn Frontend</h1>
+      <p>
+        Soạn theo CV của <strong>Hà Tiến Hiệp</strong> — hơn 5 năm React/Next.js, dự án thị trường Nhật
+        (AMELA) và sản phẩm y tế / AI-RAG (IniSoft). Mỗi bộ mô phỏng một <strong>vòng phỏng vấn thật</strong>
+        khác nhau: sơ loại, live coding, đào sâu từng dự án trong CV, System Design, vòng kiến trúc Senior,
+        và vòng manager. Chọn một bộ, bấm vào câu hỏi để xem gợi ý trả lời.
+      </p>
+      <div class="hero__meta">
+        <span class="pill pill--accent">115 câu hỏi</span>
+        <span class="pill">11 bộ đề</span>
+        <span class="pill">2 bộ System Design</span>
+        <span class="pill">3 bộ đào sâu dự án CV</span>
+        <span class="pill">Tiến độ lưu riêng từng bộ</span>
+      </div>
+    </div>
+
+    <div class="overall">
+      <span class="overall__num" id="overallNum">0%</span>
+      <span class="overall__txt" id="overallTxt">Chưa tick câu nào. Bấm "Đã thuộc" ở mỗi câu để theo dõi tiến độ.</span>
+      <div class="overall__bar"><div class="overall__fill" id="overallFill"></div></div>
+    </div>
+
+    <div class="section__head">
+      <span class="section__num">↓</span>
+      <h2 class="section__title">Chọn bộ đề</h2>
+      <span class="section__count">11 bộ</span>
+    </div>
+
+    <div class="hubgrid">
+        <a class="setcard" href="bo-00-tong-hop.html" data-set="bo-00" data-total="32">
+          <div class="setcard__top">
+            <span class="setcard__icon" aria-hidden="true">📋</span>
+            <span>
+              <span class="setcard__code">BỘ 00</span>
+              <span class="setcard__name">Tổng hợp nền tảng</span>
+            </span>
+          </div>
+          <p class="setcard__desc">32 câu xuyên suốt: React core, Next.js, state, kiến trúc, performance, TypeScript, CI/CD, soft skills. Bắt đầu từ đây.</p>
+          <div class="setcard__meta"><span class="tag tag--mid">Middle</span><span class="tag">32 câu</span><span class="tag">60–90 phút</span></div>
+          <div class="setcard__bar"><div class="setcard__fill"></div></div>
+          <span class="setcard__stat">0/32 câu đã thuộc</span>
+        </a>
+        <a class="setcard" href="bo-01-so-loai.html" data-set="bo-01" data-total="12">
+          <div class="setcard__top">
+            <span class="setcard__icon" aria-hidden="true">📞</span>
+            <span>
+              <span class="setcard__code">BỘ 01</span>
+              <span class="setcard__name">Vòng sơ loại</span>
+            </span>
+          </div>
+          <p class="setcard__desc">Vòng đầu tiên, thường qua điện thoại hoặc Google Meet. HR hỏi động lực và lương, rồi một tech lead hỏi nhanh vài câu để loại người nói quá.</p>
+          <div class="setcard__meta"><span class="tag tag--mid">Middle</span><span class="tag">12 câu</span><span class="tag">30–45 phút</span></div>
+          <div class="setcard__bar"><div class="setcard__fill"></div></div>
+          <span class="setcard__stat">0/12 câu đã thuộc</span>
+        </a>
+        <a class="setcard" href="bo-02-live-coding.html" data-set="bo-02" data-total="9">
+          <div class="setcard__top">
+            <span class="setcard__icon" aria-hidden="true">⌨️</span>
+            <span>
+              <span class="setcard__code">BỘ 02</span>
+              <span class="setcard__name">Live coding</span>
+            </span>
+          </div>
+          <p class="setcard__desc">Share screen, gõ code thật trong 45–60 phút. Không phải thuật toán LeetCode — toàn bài FE thực dụng: hook, race condition, a11y, permission.</p>
+          <div class="setcard__meta"><span class="tag tag--mid">Middle</span><span class="tag">9 câu</span><span class="tag">45–60 phút</span></div>
+          <div class="setcard__bar"><div class="setcard__fill"></div></div>
+          <span class="setcard__stat">0/9 câu đã thuộc</span>
+        </a>
+        <a class="setcard" href="bo-03-du-an-psy-hms.html" data-set="bo-03" data-total="11">
+          <div class="setcard__top">
+            <span class="setcard__icon" aria-hidden="true">🏥</span>
+            <span>
+              <span class="setcard__code">BỘ 03</span>
+              <span class="setcard__name">Đào sâu PSY HMS</span>
+            </span>
+          </div>
+          <p class="setcard__desc">Vòng đào sâu 1 dự án: người phỏng vấn chọn dự án lớn nhất trong CV rồi hỏi đến khi bạn hết biết. Đây là vòng quyết định level của bạn.</p>
+          <div class="setcard__meta"><span class="tag tag--mid">Middle</span><span class="tag">11 câu</span><span class="tag">45–60 phút</span></div>
+          <div class="setcard__bar"><div class="setcard__fill"></div></div>
+          <span class="setcard__stat">0/11 câu đã thuộc</span>
+        </a>
+        <a class="setcard" href="bo-04-du-an-enas-offerwall.html" data-set="bo-04" data-total="10">
+          <div class="setcard__top">
+            <span class="setcard__icon" aria-hidden="true">🧩</span>
+            <span>
+              <span class="setcard__code">BỘ 04</span>
+              <span class="setcard__name">Đào sâu ENAS + Offerwall</span>
+            </span>
+          </div>
+          <p class="setcard__desc">Hai dự án SaaS thị trường Nhật có cùng bài toán cốt lõi: builder kéo thả sinh UI từ cấu hình. Đây là phần kỹ thuật ấn tượng nhất trong CV bạn.</p>
+          <div class="setcard__meta"><span class="tag tag--mid">Middle</span><span class="tag">10 câu</span><span class="tag">45–60 phút</span></div>
+          <div class="setcard__bar"><div class="setcard__fill"></div></div>
+          <span class="setcard__stat">0/10 câu đã thuộc</span>
+        </a>
+        <a class="setcard" href="bo-05-du-an-bidding-ai.html" data-set="bo-05" data-total="8">
+          <div class="setcard__top">
+            <span class="setcard__icon" aria-hidden="true">🤖</span>
+            <span>
+              <span class="setcard__code">BỘ 05</span>
+              <span class="setcard__name">Đào sâu Bidding Assistant (AI/RAG)</span>
+            </span>
+          </div>
+          <p class="setcard__desc">Dự án mới nhất và là điểm bán tốt nhất của bạn hiện tại: hệ thống RAG thật. Vòng này quyết định bạn có được xếp vào nhóm làm được sản phẩm AI hay không.</p>
+          <div class="setcard__meta"><span class="tag tag--mid">Middle</span><span class="tag">8 câu</span><span class="tag">45–60 phút</span></div>
+          <div class="setcard__bar"><div class="setcard__fill"></div></div>
+          <span class="setcard__stat">0/8 câu đã thuộc</span>
+        </a>
+        <a class="setcard" href="bo-06-system-design-fe.html" data-set="bo-06" data-total="5">
+          <div class="setcard__top">
+            <span class="setcard__icon" aria-hidden="true">📐</span>
+            <span>
+              <span class="setcard__code">BỘ 06</span>
+              <span class="setcard__name">System Design — Frontend</span>
+            </span>
+          </div>
+          <p class="setcard__desc">Vòng thiết kế: cho một đề mở, bạn có 20 phút vừa nói vừa vẽ. Họ chấm cách bạn hỏi lại, chia tầng, và nêu trade-off — không chấm bạn ra đúng một đáp án.</p>
+          <div class="setcard__meta"><span class="tag tag--design">System Design</span><span class="tag">5 câu</span><span class="tag">60 phút · 2–3 đề</span></div>
+          <div class="setcard__bar"><div class="setcard__fill"></div></div>
+          <span class="setcard__stat">0/5 câu đã thuộc</span>
+        </a>
+        <a class="setcard" href="bo-07-system-design-he-thong.html" data-set="bo-07" data-total="4">
+          <div class="setcard__top">
+            <span class="setcard__icon" aria-hidden="true">🏗️</span>
+            <span>
+              <span class="setcard__code">BỘ 07</span>
+              <span class="setcard__name">System Design — Hệ thống</span>
+            </span>
+          </div>
+          <p class="setcard__desc">Đề rộng hơn bộ 06: có cả BE, database, hàng đợi, cache. Bạn là FE nên không cần sâu như backend engineer — nhưng phải nói được kiến trúc tổng và biết ranh giới hiểu biết của mình.</p>
+          <div class="setcard__meta"><span class="tag tag--design">System Design</span><span class="tag">4 câu</span><span class="tag">60 phút · 2 đề</span></div>
+          <div class="setcard__bar"><div class="setcard__fill"></div></div>
+          <span class="setcard__stat">0/4 câu đã thuộc</span>
+        </a>
+        <a class="setcard" href="bo-08-senior-kien-truc.html" data-set="bo-08" data-total="8">
+          <div class="setcard__top">
+            <span class="setcard__icon" aria-hidden="true">🏛️</span>
+            <span>
+              <span class="setcard__code">BỘ 08</span>
+              <span class="setcard__name">Vòng Senior — kiến trúc</span>
+            </span>
+          </div>
+          <p class="setcard__desc">Dành cho vị trí Senior/Lead: monorepo, design system, migration, observability, tech debt. Họ không hỏi bạn code gì — họ hỏi bạn quyết định gì và chịu trách nhiệm ra sao.</p>
+          <div class="setcard__meta"><span class="tag tag--senior">Senior</span><span class="tag">8 câu</span><span class="tag">60 phút</span></div>
+          <div class="setcard__bar"><div class="setcard__fill"></div></div>
+          <span class="setcard__stat">0/8 câu đã thuộc</span>
+        </a>
+        <a class="setcard" href="bo-09-cong-ty-nhat.html" data-set="bo-09" data-total="8">
+          <div class="setcard__top">
+            <span class="setcard__icon" aria-hidden="true">🗾</span>
+            <span>
+              <span class="setcard__code">BỘ 09</span>
+              <span class="setcard__name">Công ty Nhật / Outsourcing</span>
+            </span>
+          </div>
+          <p class="setcard__desc">3,5 năm ở AMELA làm 5 dự án thị trường Nhật là lợi thế lớn khi ứng tuyển công ty Nhật hoặc outsourcing. Bộ này khai thác đúng vốn đó.</p>
+          <div class="setcard__meta"><span class="tag tag--mid">Middle</span><span class="tag">8 câu</span><span class="tag">40–50 phút</span></div>
+          <div class="setcard__bar"><div class="setcard__fill"></div></div>
+          <span class="setcard__stat">0/8 câu đã thuộc</span>
+        </a>
+        <a class="setcard" href="bo-10-vong-cuoi-manager.html" data-set="bo-10" data-total="8">
+          <div class="setcard__top">
+            <span class="setcard__icon" aria-hidden="true">🤝</span>
+            <span>
+              <span class="setcard__code">BỘ 10</span>
+              <span class="setcard__name">Vòng cuối — Manager</span>
+            </span>
+          </div>
+          <p class="setcard__desc">Qua hết vòng kỹ thuật rồi. Vòng này quyết định họ có muốn LÀM VIỆC CÙNG bạn không, và chốt tiền. Kỹ thuật không còn được hỏi nhiều.</p>
+          <div class="setcard__meta"><span class="tag tag--mid">Middle</span><span class="tag">8 câu</span><span class="tag">30–45 phút</span></div>
+          <div class="setcard__bar"><div class="setcard__fill"></div></div>
+          <span class="setcard__stat">0/8 câu đã thuộc</span>
+        </a>
+    </div>
+
+    <div class="section__head">
+      <span class="section__num">7d</span>
+      <h2 class="section__title">Lịch luyện gợi ý — 7 ngày</h2>
+    </div>
+    <ul class="plan">
+        <li><span class="plan__day">Ngày 1</span><span>Bộ 00 (tổng hợp) + Bộ 01 (sơ loại) — lấy lại phản xạ, sửa timeline CV.</span></li>
+        <li><span class="plan__day">Ngày 2</span><span>Bộ 03 + Bộ 04 — đào sâu 2 dự án lớn nhất. Nói to thành tiếng, bấm đồng hồ.</span></li>
+        <li><span class="plan__day">Ngày 3</span><span>Bộ 05 (AI/RAG) + Bộ 02 (live coding) — mở editor gõ thật, không copy.</span></li>
+        <li><span class="plan__day">Ngày 4</span><span>Bộ 06 (System Design FE) — vẽ ra giấy, mỗi đề 20 phút.</span></li>
+        <li><span class="plan__day">Ngày 5</span><span>Bộ 07 (System Design hệ thống) — tập nói cấu trúc 5 bước.</span></li>
+        <li><span class="plan__day">Ngày 6</span><span>Bộ 08 (Senior/kiến trúc) + Bộ 09 (công ty Nhật).</span></li>
+        <li><span class="plan__day">Ngày 7</span><span>Bộ 10 (manager/culture fit) + chốt số liệu lương, ôn lại câu đã tick.</span></li>
+    </ul>
+
+    <div class="section__head">
+      <span class="section__num">!</span>
+      <h2 class="section__title">Cách luyện cho hiệu quả</h2>
+    </div>
+    <div class="prose">
+      <ul class="checklist">
+        <li><strong>Đọc câu hỏi, che đáp án, nói to thành tiếng trước</strong> — đọc hiểu thì tưởng mình biết, nói ra mới biết mình bí ở đâu.</li>
+        <li><strong>Bấm đồng hồ</strong>: câu giới thiệu ≤ 90 giây, câu kỹ thuật 2–3 phút, System Design 15–20 phút.</li>
+        <li><strong>Tự ghi âm 3 câu mỗi ngày</strong> rồi nghe lại — bạn sẽ tự phát hiện chỗ lan man và câu "à, ờ".</li>
+        <li><strong>Đáp án ở đây là khung, không phải kịch bản.</strong> Thay số liệu và ví dụ bằng cái thật của bạn; interviewer phát hiện ngay câu học thuộc.</li>
+        <li><strong>Câu nào không chắc thì đừng tick "Đã thuộc"</strong> — để quay lại. Tick chỉ khi đã nói trôi không cần nhìn.</li>
+        <li><strong>Với System Design: luôn hỏi lại làm rõ yêu cầu trước khi vẽ.</strong> Nhảy vào giải pháp ngay là lỗi bị trừ điểm nhiều nhất.</li>
+      </ul>
+    </div>
+
+    <div class="section__head">
+      <span class="section__num">⚑</span>
+      <h2 class="section__title">3 việc phải làm trước khi đi phỏng vấn</h2>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Việc</th><th>Vì sao</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Sửa timeline dự án trong CV</strong> — Offerwall (01/2023–12/2024) đang overlap với ENAS và WAS</td><td>Người đọc CV kỹ sẽ hỏi ngay và nghi CV phóng đại. Ghi rõ <em>(maintain)</em> hoặc chỉnh lại ngày.</td></tr>
+          <tr><td><strong>Chuẩn bị số liệu testing thật</strong> — coverage bao nhiêu, test những gì, có E2E chưa</td><td>CV nhắc Vitest + RTL nên chắc chắn bị hỏi. Không có số là mất điểm tin cậy.</td></tr>
+          <tr><td><strong>Thêm số đo định lượng vào CV</strong> — giảm bundle bao nhiêu %, load từ mấy giây xuống mấy giây</td><td>CV hiện toàn "built", "developed" — không có impact đo được.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<footer class="footer">
+  11 bộ đề · 115 câu · soạn theo CV <strong>Hà Tiến Hiệp</strong> — Frontend Developer ·
+  Toàn bộ chạy offline, tiến độ lưu trong <code>localStorage</code> máy bạn.
+</footer>
+<script src="js/app.js"></script>
+</body>
+</html>
